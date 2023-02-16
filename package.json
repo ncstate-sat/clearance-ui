@@ -1,0 +1,33 @@
+{
+  "name": "clearance-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "node ./serve/server.js",
+    "e2e": "npx playwright test"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.9.2",
+    "axios": "^1.3.2",
+    "dotenv": "^16.0.3",
+    "evergreen-ui": "^7.1.3",
+    "express": "^4.18.2",
+    "react": "^18.2.0",
+    "react-datepicker": "^4.10.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.0.5",
+    "react-router-dom": "^6.8.1",
+    "styled-components": "^5.3.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.30.0",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "@vitejs/plugin-react": "^3.1.0",
+    "vite": "^4.1.0"
+  }
+}
