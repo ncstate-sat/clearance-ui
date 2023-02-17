@@ -30,7 +30,7 @@ spec:
           - name: VITE_CLEARANCE_SERVICE_URL
             value: "https://clearance.services.test.ehps.ncsu.edu"
           - name: VITE_AUTH_SERVICE_URL
-            value: "https://auth.services.ehps.ncsu.edu"
+            value: "https://auth.services.test.ehps.ncsu.edu"
           command: ["npm"]
           args: ["run", "serve"]
 
