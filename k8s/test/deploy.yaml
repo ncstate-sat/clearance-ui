@@ -20,7 +20,7 @@ spec:
       labels:
         app: clearance-frontend
       annotations:
-        enable.version-checker.io/fmi-proxy: "true"
+        enable.version-checker.io/clearance-frontend: "true"
     spec:
       containers:
         - name: clearance-frontend
