@@ -19,6 +19,8 @@ spec:
     metadata:
       labels:
         app: clearance-frontend
+      annotations:
+        enable.version-checker.io/fmi-proxy: "true"
     spec:
       containers:
         - name: clearance-frontend
