@@ -229,7 +229,7 @@ export default function ManageClearance() {
 
       <ContentCard>
         <Heading size={600} marginBottom={minorScale(3)}>
-          Add Person(s)
+          Add Person
         </Heading>
         <TagInput
           tagSubmitKey='enter'
