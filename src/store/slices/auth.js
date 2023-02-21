@@ -1,5 +1,6 @@
+import axios from 'axios'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import authService from '../../apis/authService'
+import getEnvVariable from '../../utils/getEnvVariable'
 
 const initialState = {
   token: null,
@@ -15,9 +16,12 @@ const initialState = {
 export const signInWithGoogle = createAsyncThunk(
   'auth/signInWithGoogle',
   async (credential, _) => {
-    const googleSignInResponse = await authService.post('/google-sign-in', {
-      token: credential,
-    })
+    const googleSignInResponse = await axios.post(
+      getEnvVariable('VITE_AUTH_SERVICE_URL') + '/google-sign-in',
+      {
+        token: credential,
+      }
+    )
     const token = googleSignInResponse.data['token']
     const refreshToken = googleSignInResponse.data['refresh_token']
     const payload = googleSignInResponse.data['payload']
@@ -31,9 +35,12 @@ export const refreshToken = createAsyncThunk(
   'auth/refreshToken',
   async (_, __) => {
     const refreshToken = localStorage.getItem('refresh-token')
-    const refreshResponse = await authService.post('/refresh-token', {
-      token: refreshToken,
-    })
+    const refreshResponse = await axios.post(
+      getEnvVariable('VITE_AUTH_SERVICE_URL') + '/refresh-token',
+      {
+        token: refreshToken,
+      }
+    )
     const newToken = refreshResponse.data['token']
     const newRefreshToken = refreshResponse.data['refresh_token']
     const payload = refreshResponse.data['payload']
