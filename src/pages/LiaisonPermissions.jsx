@@ -51,6 +51,8 @@ export default function LiaisonPermissions() {
   ] = clearanceService.useRevokeLiaisonPermissionMutation()
 
   // UI STATE
+  const [tableFilter, setTableFilter] = useState('')
+
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
@@ -235,7 +237,11 @@ export default function LiaisonPermissions() {
 
       <Table marginTop={minorScale(6)}>
         <Table.Head>
-          <Table.SearchHeaderCell flexBasis='65%' />
+          <Table.SearchHeaderCell
+            flexBasis='65%'
+            value={tableFilter}
+            onChange={setTableFilter}
+          />
           <Table.TextHeaderCell flexShrink={0}>Actions</Table.TextHeaderCell>
         </Table.Head>
         <Table.Body>
@@ -248,21 +254,27 @@ export default function LiaisonPermissions() {
               <Text>No Permissions</Text>
             </Pane>
           ) : (
-            clearanceAssignments.map((cl) => (
-              <Table.Row key={cl['id']}>
-                <Table.TextCell flexBasis='65%'>{cl['name']}</Table.TextCell>
-                <Table.TextCell flexShrink={0} textAlign='right'>
-                  <Button
-                    test-id='revoke-permission-btn'
-                    appearance='secondary'
-                    onClick={() => onRevokeClearance(cl['id'])}
-                    isLoading={loadingRevokeRequests.includes(cl['id'])}
-                  >
-                    Revoke
-                  </Button>
-                </Table.TextCell>
-              </Table.Row>
-            ))
+            clearanceAssignments
+              .filter((cl) => {
+                return cl['name']
+                  .toLowerCase()
+                  .includes(tableFilter.toLowerCase())
+              })
+              .map((cl) => (
+                <Table.Row key={cl['id']}>
+                  <Table.TextCell flexBasis='65%'>{cl['name']}</Table.TextCell>
+                  <Table.TextCell flexShrink={0} textAlign='right'>
+                    <Button
+                      test-id='revoke-permission-btn'
+                      appearance='secondary'
+                      onClick={() => onRevokeClearance(cl['id'])}
+                      isLoading={loadingRevokeRequests.includes(cl['id'])}
+                    >
+                      Revoke
+                    </Button>
+                  </Table.TextCell>
+                </Table.Row>
+              ))
           )}
         </Table.Body>
       </Table>

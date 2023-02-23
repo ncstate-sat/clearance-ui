@@ -37,6 +37,8 @@ export default function ManageClearance() {
     },
   ] = clearanceService.useRevokeClearancesMutation()
 
+  const [tableFilter, setTableFilter] = useState('')
+
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
@@ -150,7 +152,11 @@ export default function ManageClearance() {
       {selectedPersonnel.length > 0 && (
         <Table>
           <Table.Head>
-            <Table.SearchHeaderCell flexBasis='65%' />
+            <Table.SearchHeaderCell
+              flexBasis='65%'
+              value={tableFilter}
+              onChange={setTableFilter}
+            />
             <Table.TextHeaderCell flexShrink={0}>Actions</Table.TextHeaderCell>
           </Table.Head>
           <Table.Body>
@@ -163,21 +169,29 @@ export default function ManageClearance() {
                 <Text>No Clearances</Text>
               </Pane>
             ) : (
-              clearanceAssignments.map((cl) => (
-                <Table.Row key={cl['id']}>
-                  <Table.TextCell flexBasis='65%'>{cl['name']}</Table.TextCell>
-                  <Table.TextCell flexShrink={0} textAlign='right'>
-                    <Button
-                      test-id='revoke-clearance-btn'
-                      appearance='secondary'
-                      onClick={() => onRevokeClearance(cl['id'])}
-                      isLoading={loadingRevokeRequests.includes(cl['id'])}
-                    >
-                      Revoke
-                    </Button>
-                  </Table.TextCell>
-                </Table.Row>
-              ))
+              clearanceAssignments
+                .filter((cl) => {
+                  return cl['name']
+                    .toLowerCase()
+                    .includes(tableFilter.toLowerCase())
+                })
+                .map((cl) => (
+                  <Table.Row key={cl['id']}>
+                    <Table.TextCell flexBasis='65%'>
+                      {cl['name']}
+                    </Table.TextCell>
+                    <Table.TextCell flexShrink={0} textAlign='right'>
+                      <Button
+                        test-id='revoke-clearance-btn'
+                        appearance='secondary'
+                        onClick={() => onRevokeClearance(cl['id'])}
+                        isLoading={loadingRevokeRequests.includes(cl['id'])}
+                      >
+                        Revoke
+                      </Button>
+                    </Table.TextCell>
+                  </Table.Row>
+                ))
             )}
           </Table.Body>
         </Table>
