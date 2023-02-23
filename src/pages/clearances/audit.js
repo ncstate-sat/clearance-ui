@@ -345,8 +345,7 @@ export default function AuditLog() {
       <Table marginY={minorScale(6)}>
         <Table.Head>
           <Table.TextHeaderCell>Date Assigned</Table.TextHeaderCell>
-          <Table.TextHeaderCell>Clearance</Table.TextHeaderCell>
-          <Table.TextHeaderCell>Message</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Action</Table.TextHeaderCell>
           <Table.TextHeaderCell>Assigned To</Table.TextHeaderCell>
           <Table.TextHeaderCell>Done By</Table.TextHeaderCell>
         </Table.Head>
@@ -357,10 +356,9 @@ export default function AuditLog() {
                 <Table.TextCell>
                   {new Date(l['timestamp']).toLocaleString()}
                 </Table.TextCell>
-                <Table.TextCell>{l['clearance']?.['name']}</Table.TextCell>
                 <Table.TextCell>{l['message']}</Table.TextCell>
-                <Table.TextCell>{l['assignee_id']}</Table.TextCell>
-                <Table.TextCell>{l['assigner_id']}</Table.TextCell>
+                <Table.TextCell>{l['assignee_name']}</Table.TextCell>
+                <Table.TextCell>{l['assigner_name']}</Table.TextCell>
               </Table.Row>
             )
           })}
