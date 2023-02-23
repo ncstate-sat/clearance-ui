@@ -225,7 +225,7 @@ export default function AuditLog() {
             </Menu>
           )}
         >
-          <Button data-testid='add-filter-btn'>Add Filter</Button>
+          <Button test-id='add-filter-btn'>Add Filter</Button>
         </Popover>
       </Pane>
 
@@ -243,7 +243,7 @@ export default function AuditLog() {
               position='absolute'
               top={0}
               right={0}
-              data-testid='remove-filter-btn'
+              test-id='remove-filter-btn'
             />
           </Tooltip>
           <Heading size={600} marginBottom={minorScale(3)}>
@@ -287,7 +287,7 @@ export default function AuditLog() {
               position='absolute'
               top={0}
               right={0}
-              data-testid='remove-filter-btn'
+              test-id='remove-filter-btn'
             />
           </Tooltip>
           <Heading size={600} marginBottom={minorScale(3)}>
@@ -316,7 +316,7 @@ export default function AuditLog() {
               position='absolute'
               top={0}
               right={0}
-              data-testid='remove-filter-btn'
+              test-id='remove-filter-btn'
             />
           </Tooltip>
           <Heading size={600} marginBottom={minorScale(3)}>
