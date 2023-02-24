@@ -12,15 +12,21 @@ const Auth = ({ children }) => {
   useEffect(() => {
     dispatch(refreshToken());
 
-    window.google.accounts.id.initialize({
-      client_id: getEnvVariable('VITE_GOOGLE_IDENTITY_CLIENT_ID'),
-      callback: (response) =>
-        dispatch(signInWithGoogle(response["credential"])),
-    });
-    window.google.accounts.id.renderButton(
-      document.getElementById("login-button-div"),
-      { theme: "outline", size: "large" }
-    );
+    if (!isLoggedIn) {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: getEnvVariable('VITE_GOOGLE_IDENTITY_CLIENT_ID'),
+          callback: (response) =>
+            dispatch(signInWithGoogle(response["credential"])),
+        });
+        window.google.accounts.id.renderButton(
+          document.getElementById("login-button-div"),
+          { theme: "outline", size: "large" }
+        );
+      } else {
+        window.location.reload()
+      }
+    }
   }, [isLoggedIn]);
 
   if (isLoggedIn) {
