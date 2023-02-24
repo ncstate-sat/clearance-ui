@@ -82,7 +82,7 @@ export default function AuditFilterCard({
           position='absolute'
           top={0}
           right={0}
-          data-testid='remove-filter-btn'
+          test-id='remove-filter-btn'
         />
       </Tooltip>
       <Heading size={400} marginBottom={minorScale(3)}>
