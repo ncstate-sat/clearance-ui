@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
+import { toaster } from 'evergreen-ui'
 import clearanceService from '../apis/clearanceService'
 
 const useClearance = (initialQuery = '') => {
-  const [getClearances, { data: clearances = [] }] =
+  const [getClearances, { data: clearances = [], isError }] =
     clearanceService.useLazyGetClearancesQuery()
 
   const [query, setQuery] = useState(initialQuery)
@@ -23,6 +24,12 @@ const useClearance = (initialQuery = '') => {
       }
     }
   }, [query])
+
+  useEffect(() => {
+    if (isError) {
+      toaster.danger('There was an error querying for clearances.')
+    }
+  }, [isError])
 
   return {
     clearances: query.length >= 3 ? clearances : [],
