@@ -165,7 +165,10 @@ export default function AssignClearance() {
                     position={Position.RIGHT}
                     content='This person is verified and will be given all selected clearances.'
                   >
-                    <TickCircleIcon color='success' />
+                    <TickCircleIcon
+                      color='success'
+                      test-id='verify-success-icon'
+                    />
                   </Tooltip>
                 ) : (
                   <Tooltip
@@ -205,6 +208,7 @@ export default function AssignClearance() {
               marginLeft='0.5rem'
               checked={bulkAssign}
               onChange={(e) => setBulkAssign(e.target.checked)}
+              test-id='bulk-select-switch'
             />
           </Pane>
         </Pane>
@@ -243,12 +247,14 @@ export default function AssignClearance() {
               resize='vertical'
               value={bulkPersonnelText}
               onChange={(e) => setBulkPersonnelText(e.target.value)}
+              test-id='bulk-personnel-textarea'
             />
             <Button
               marginBottom='1rem'
               onClick={verifyBulkPersonnelData}
               isLoading={isVerifyingBulkPersonnel}
               disabled={isVerifyingBulkPersonnel}
+              test-id='bulk-verify-btn'
             >
               Verify
             </Button>
