@@ -3,7 +3,7 @@ import { toaster } from 'evergreen-ui'
 import clearanceService from '../apis/clearanceService'
 
 const usePersonnel = (initialQuery = '') => {
-  const [getPersonnel, { data: personnel = [], isError }] =
+  const [getPersonnel, { data: personnel = [], isError, error }] =
     clearanceService.useLazyGetPersonnelQuery()
 
   const [query, setQuery] = useState(initialQuery)
@@ -26,10 +26,10 @@ const usePersonnel = (initialQuery = '') => {
   }, [query])
 
   useEffect(() => {
-    if (isError) {
+    if (isError && error?.['name'] !== 'AbortError') {
       toaster.danger('There was an error querying for personnel.')
     }
-  }, [isError])
+  }, [isError, error])
 
   return {
     personnel: query.length >= 3 ? personnel : [],
