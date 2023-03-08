@@ -5,7 +5,6 @@ import {
   Pane,
   Tablist,
   useTheme,
-  Tab,
 } from 'evergreen-ui'
 import { useContext } from 'react'
 import { useSelector } from 'react-redux'
