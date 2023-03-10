@@ -1,4 +1,5 @@
 import {
+  Pane,
   Heading,
   minorScale,
   TagInput,
@@ -7,6 +8,7 @@ import {
   toaster,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect } from 'react'
+import styled from 'styled-components'
 import ContentCard from '../components/ContentCard'
 import Layout from '../components/Layout'
 
@@ -15,15 +17,38 @@ import usePersonnel from '../hooks/usePersonnel'
 
 import clearanceService from '../apis/clearanceService'
 
+const NoResultsText = styled(Pane)`
+  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #cccccc;
+  font-size: 0.8rem;
+`
+
 export default function AssignClearance() {
   const [assignClearance, { isLoading, isSuccess, isError, data }] =
     clearanceService.useAssignClearancesMutation()
 
   const [selectedClearances, setSelectedClearances] = useState([])
-  const { clearances, setClearanceQuery } = useClearance()
+  const {
+    clearances,
+    setClearanceQuery,
+    length: clearancesLength,
+    isTyping: isTypingClearances,
+    isLoading: isLoadingClearances,
+  } = useClearance()
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
-  const { personnel, setPersonnelQuery } = usePersonnel()
+  const {
+    personnel,
+    setPersonnelQuery,
+    length: personnelLength,
+    isTyping: isTypingPersonnel,
+    isLoading: isLoadingPersonnel,
+  } = usePersonnel()
 
   // const [startDate, setStartDate] = useState(null)
   // const [endDate, setEndDate] = useState(null)
@@ -102,6 +127,13 @@ export default function AssignClearance() {
           onInputChange={(e) => setPersonnelQuery(e.target.value)}
           test-id='personnel-input'
         />
+        <NoResultsText
+          $visible={
+            !isLoadingPersonnel && !isTypingPersonnel && personnelLength === 0
+          }
+        >
+          No Personnel Found
+        </NoResultsText>
       </ContentCard>
 
       <ContentCard>
@@ -128,6 +160,15 @@ export default function AssignClearance() {
           onInputChange={(e) => setClearanceQuery(e.target.value)}
           test-id='clearance-input'
         />
+        <NoResultsText
+          $visible={
+            !isLoadingClearances &&
+            !isTypingClearances &&
+            clearancesLength === 0
+          }
+        >
+          No Clearances Found
+        </NoResultsText>
       </ContentCard>
 
       {/* <ContentCard>

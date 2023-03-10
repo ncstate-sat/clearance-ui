@@ -13,7 +13,10 @@ const api = createApi({
         },
       }),
       transformResponse: (response, meta, args) => {
-        return response['clearance_names']
+        return {
+          clearances: response['clearance_names'],
+          length: response['clearance_names'].length,
+        }
       },
     }),
     getPersonnel: builder.query({
@@ -25,7 +28,10 @@ const api = createApi({
         },
       }),
       transformResponse: (response) => {
-        return response['personnel']
+        return {
+          personnel: response['personnel'],
+          length: response['personnel'].length,
+        }
       },
     }),
     getAssignments: builder.query({
