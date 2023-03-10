@@ -14,6 +14,7 @@ import { useMemo, useState, useEffect } from 'react'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import Layout from '../components/Layout'
+import NoResultsText from '../components/NoResultsText'
 
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
@@ -57,10 +58,24 @@ export default function LiaisonPermissions() {
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
   const [selectedClearances, setSelectedClearances] = useState([])
-  const { clearances, setClearanceQuery } = useClearance()
+  const {
+    clearances,
+    clearanceQuery,
+    setClearanceQuery,
+    length: clearancesLength,
+    isTyping: isTypingClearances,
+    isLoading: isLoadingClearances,
+  } = useClearance()
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
-  const { personnel, setPersonnelQuery } = usePersonnel()
+  const {
+    personnel,
+    personnelQuery,
+    setPersonnelQuery,
+    length: personnelLength,
+    isTyping: isTypingPersonnel,
+    isLoading: isLoadingPersonnel,
+  } = usePersonnel()
 
   // Suggestion strings for clearances.
   const autocompleteClearances = useMemo(() => {
@@ -194,6 +209,16 @@ export default function LiaisonPermissions() {
           onInputChange={(e) => setPersonnelQuery(e.target.value)}
           test-id='personnel-input'
         />
+        <NoResultsText
+          $visible={
+            !isLoadingPersonnel &&
+            !isTypingPersonnel &&
+            personnelQuery.length >= 3 &&
+            personnelLength === 0
+          }
+        >
+          No Personnel Found
+        </NoResultsText>
       </ContentCard>
 
       <ContentCard>
@@ -220,6 +245,16 @@ export default function LiaisonPermissions() {
           onInputChange={(e) => setClearanceQuery(e.target.value)}
           test-id='clearance-input'
         />
+        <NoResultsText
+          $visible={
+            !isLoadingClearances &&
+            !isTypingClearances &&
+            clearanceQuery.length >= 3 &&
+            clearancesLength === 0
+          }
+        >
+          No Clearances Found
+        </NoResultsText>
       </ContentCard>
 
       <Button
