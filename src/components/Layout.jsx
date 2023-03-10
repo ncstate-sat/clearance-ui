@@ -7,96 +7,88 @@ import {
   minorScale,
   Pane,
   useTheme,
-} from "evergreen-ui";
-import PropTypes from "prop-types";
-import { useContext } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import styled from "styled-components";
-import { devices } from "../utils/breakpoints";
-import { LayoutContext } from "./LayoutProvider";
-import SideNav from "./SideNav";
-import { logOut } from "../store/slices/auth";
-
-const LayoutContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
+} from 'evergreen-ui'
+import { useContext } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
+import { LayoutContext } from './LayoutProvider'
+import SideNav from './SideNav'
+import { logOut } from '../store/slices/auth'
 
 const HeaderContainer = styled(Pane)`
   display: flex;
   border-bottom: 1px solid ${({ borderColor }) => borderColor};
   align-items: center;
-  padding: ${minorScale(3)}px ${majorScale(4)}px;
+  padding: ${minorScale(3)}px ${minorScale(4)}px;
+  width: 100%;
+  top: 0;
+  position: fixed;
+  z-index: 2;
+`
 
-  @media ${devices.desktop} {
-    padding-left: ${minorScale(4)}vw;
-    padding-right: ${minorScale(4)}vw;
-  }
-`;
+const HeaderContent = styled(Pane)`
+  display: flex;
+  width: ${majorScale(120)}px;
+  max-width: 100%;
+  margin: auto;
+`
+
+const ViewContainer = styled(Pane)`
+  display: grid;
+  grid-template-columns: ${({ $isSidebarOpen }) =>
+    $isSidebarOpen ? `${majorScale(32)}px 1fr` : '0 1fr'};
+  column-gap: ${({ $isSidebarOpen }) => ($isSidebarOpen ? '16px' : '0')};
+  width: ${majorScale(120)}px;
+  max-width: 100%;
+  margin: auto;
+  transition: grid 0.2s ease;
+`
 
 const BodyContainer = styled(Pane)`
-  flex: 1;
-  height: 100%;
-  padding-top: ${minorScale(12)}px;
-  padding-bottom: ${minorScale(12)}px;
-  max-width: ${majorScale(80)}px;
-  margin-left: ${minorScale(12)}px;
-  margin-right: ${minorScale(12)}px;
+  margin-top: 100px;
+  margin-left: ${({ $isSidebarOpen }) => ($isSidebarOpen ? '36px' : '8px')};
+  margin-right: 8px;
+`
 
-  @media ${devices.desktop} {
-    margin-left: ${minorScale(24)}px;
-    margin-right: ${minorScale(24)}px;
-  }
-`;
-
-export default function Layout({ title, children }) {
-  const { colors } = useTheme();
-  const { isSidebarOpen, setIsSidebarOpen } = useContext(LayoutContext);
-  const isLoggedIn = useSelector((state) => state.auth.token !== null);
-  const dispatch = useDispatch();
+export default function Layout({ children }) {
+  const { colors } = useTheme()
+  const { isSidebarOpen, setIsSidebarOpen } = useContext(LayoutContext)
+  const isLoggedIn = useSelector((state) => state.auth.token !== null)
+  const dispatch = useDispatch()
 
   return (
-    <div>
-      {/* <Head title={`Automation | ${title}`} /> */}
+    <>
       <HeaderContainer
-        $isSidebarOpen={isSidebarOpen}
         backgroundColor={colors.gray50}
         borderColor={colors.gray100}
       >
-        <Pane paddingRight={minorScale(2)}>
-          <IconButton
-            appearance="none"
-            icon={<MenuIcon />}
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          />
-        </Pane>
-        <Pane display="flex">
-          <Heading size={600}>Security Applications Portal</Heading>
-        </Pane>
-        <Pane display="flex" marginLeft="auto">
-          {isLoggedIn && (
-            <Button onClick={() => dispatch(logOut())}>Sign Out</Button>
-          )}
-        </Pane>
-      </HeaderContainer>
-      <LayoutContainer>
-        <Pane display="flex" flex={1}>
-          <SideNav />
+        <HeaderContent>
           <Pane
-            width="100%"
-            display="flex"
-            flexDirection="row"
-            justifyContent={isSidebarOpen ? "flex-start" : "center"}
-            alignItems="flex-start"
+            display='flex'
+            flexDirection='row'
+            justifyContent='flex-start'
+            alignItems='center'
           >
-            <BodyContainer>{children}</BodyContainer>
+            <IconButton
+              appearance='none'
+              icon={<MenuIcon />}
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              paddingRight={minorScale(2)}
+            />
+            <Heading size={600}>Security Applications Portal</Heading>
           </Pane>
-        </Pane>
-      </LayoutContainer>
-    </div>
-  );
+          <Pane display='flex' marginLeft='auto'>
+            {isLoggedIn && (
+              <Button onClick={() => dispatch(logOut())}>Sign Out</Button>
+            )}
+          </Pane>
+        </HeaderContent>
+      </HeaderContainer>
+      <SideNav />
+      <ViewContainer $isSidebarOpen={isSidebarOpen}>
+        <div></div>
+        <BodyContainer $isSidebarOpen={isSidebarOpen}>{children}</BodyContainer>
+      </ViewContainer>
+    </>
+  )
 }
-
-Layout.propTypes = {
-  title: PropTypes.string,
-};

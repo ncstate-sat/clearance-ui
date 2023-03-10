@@ -1,4 +1,5 @@
 import {
+  Pane,
   Heading,
   minorScale,
   TagInput,
@@ -8,7 +9,6 @@ import {
   Table,
   TickCircleIcon,
   WarningSignIcon,
-  Pane,
   Switch,
   Spinner,
   Tooltip,
@@ -16,17 +16,28 @@ import {
   toaster,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect } from 'react'
+import axios from 'axios'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 import ContentCard from '../components/ContentCard'
 import Layout from '../components/Layout'
+import getEnvVariable from '../utils/getEnvVariable'
 
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
 
 import clearanceService from '../apis/clearanceService'
 
-import axios from 'axios'
-import { useSelector } from 'react-redux'
-import getEnvVariable from '../utils/getEnvVariable'
+const NoResultsText = styled(Pane)`
+  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #cccccc;
+  font-size: 0.8rem;
+`
 
 export default function AssignClearance() {
   const token = useSelector((state) => state.auth.token)
@@ -41,10 +52,22 @@ export default function AssignClearance() {
   const [bulkPersonnel, setBulkPersonnel] = useState([])
 
   const [selectedClearances, setSelectedClearances] = useState([])
-  const { clearances, setClearanceQuery } = useClearance()
+  const {
+    clearances,
+    setClearanceQuery,
+    length: clearancesLength,
+    isTyping: isTypingClearances,
+    isLoading: isLoadingClearances,
+  } = useClearance()
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
-  const { personnel, setPersonnelQuery } = usePersonnel()
+  const {
+    personnel,
+    setPersonnelQuery,
+    length: personnelLength,
+    isTyping: isTypingPersonnel,
+    isLoading: isLoadingPersonnel,
+  } = usePersonnel()
 
   // const [startDate, setStartDate] = useState(null)
   // const [endDate, setEndDate] = useState(null)
@@ -214,32 +237,43 @@ export default function AssignClearance() {
           </Pane>
         </Pane>
         {!bulkAssign ? (
-          <TagInput
-            tagSubmitKey='enter'
-            width='100%'
-            values={selectedPersonnel.map(
-              (p) =>
-                `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-            )}
-            onChange={(selected) => {
-              const personnelObjects = []
-              const allPersonnel = [...personnel, ...selectedPersonnel]
-              const personnelStrings = allPersonnel.map(
+          <>
+            <TagInput
+              tagSubmitKey='enter'
+              width='100%'
+              values={selectedPersonnel.map(
                 (p) =>
                   `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-              )
-              selected.forEach((s) => {
-                const i = personnelStrings.indexOf(s)
-                if (i >= 0) {
-                  personnelObjects.push(allPersonnel[i])
-                }
-              })
-              setSelectedPersonnel(personnelObjects)
-            }}
-            autocompleteItems={autocompletePersonnel}
-            onInputChange={(e) => setPersonnelQuery(e.target.value)}
-            test-id='personnel-input'
-          />
+              )}
+              onChange={(selected) => {
+                const personnelObjects = []
+                const allPersonnel = [...personnel, ...selectedPersonnel]
+                const personnelStrings = allPersonnel.map(
+                  (p) =>
+                    `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
+                )
+                selected.forEach((s) => {
+                  const i = personnelStrings.indexOf(s)
+                  if (i >= 0) {
+                    personnelObjects.push(allPersonnel[i])
+                  }
+                })
+                setSelectedPersonnel(personnelObjects)
+              }}
+              autocompleteItems={autocompletePersonnel}
+              onInputChange={(e) => setPersonnelQuery(e.target.value)}
+              test-id='personnel-input'
+            />
+            <NoResultsText
+              $visible={
+                !isLoadingPersonnel &&
+                !isTypingPersonnel &&
+                personnelLength === 0
+              }
+            >
+              No Personnel Found
+            </NoResultsText>
+          </>
         ) : (
           <>
             <Textarea
@@ -288,6 +322,15 @@ export default function AssignClearance() {
           onInputChange={(e) => setClearanceQuery(e.target.value)}
           test-id='clearance-input'
         />
+        <NoResultsText
+          $visible={
+            !isLoadingClearances &&
+            !isTypingClearances &&
+            clearancesLength === 0
+          }
+        >
+          No Clearances Found
+        </NoResultsText>
       </ContentCard>
 
       {/* <ContentCard>
