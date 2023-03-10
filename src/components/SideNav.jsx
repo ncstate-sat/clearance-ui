@@ -5,30 +5,46 @@ import {
   Pane,
   Tablist,
   useTheme,
-  Tab,
 } from 'evergreen-ui'
 import { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
-import { devices } from '../utils/breakpoints'
 import { LayoutContext } from './LayoutProvider'
 import SideTab from './SideTab'
 
 const SidebarContainer = styled(Pane)`
   background-color: ${({ backgroundColor }) => backgroundColor};
-  min-height: 100vh;
+  width: calc((100vw - ${majorScale(120)}px) / 2 + ${majorScale(32)}px);
   height: 100%;
-  display: none;
+  position: fixed;
+  zindex: 1;
+  transform: translateX(0);
+  transition: transform 0.2s ease;
 
   ${({ $isOpen }) =>
-    $isOpen &&
+    !$isOpen &&
     css`
-      display: initial;
-
-      @media ${devices.desktop} {
-        padding-left: ${minorScale(4)}vw;
-      }
+      transform: translateX(
+        calc((100vw - ${majorScale(120)}px) / -2 - ${majorScale(32)}px)
+      );
     `}
+
+  @media (max-width: ${majorScale(120)}px) {
+    width: ${majorScale(32)}px;
+
+    ${({ $isOpen }) =>
+      !$isOpen &&
+      css`
+        transform: translateX(-${majorScale(32)}px);
+      `}
+  }
+`
+
+const SidebarContent = styled(Pane)`
+  float: right;
+  padding-left: ${minorScale(3)}px;
+  padding-right: ${minorScale(3)}px;
+  width: ${majorScale(32)}px;
 `
 
 const SidebarHeading = styled(Heading)`
@@ -42,42 +58,30 @@ export default function SideNav() {
 
   const { isSidebarOpen } = useContext(LayoutContext)
 
-  return (
+  return isLoggedIn ? (
     <SidebarContainer
-      $isOpen={isSidebarOpen}
       backgroundColor={colors.gray50}
-      paddingY={minorScale(12)}
-      paddingX={minorScale(8)}
       borderRight='muted'
+      $isOpen={isSidebarOpen}
     >
-      {isSidebarOpen && isLoggedIn && (
-        <Pane
-          display='flex'
-          position='sticky'
-          top={minorScale(24)}
-          flexDirection='column'
-          paddingX={minorScale(3)}
-          overflowY='auto'
-          width={majorScale(28)}
-        >
-          <Tablist width='100%'>
-            <SidebarHeading size={600}>Clearance Assignment</SidebarHeading>
-            <SideTab title='Assign' href='/assign' useAnchor={false} />
-            <SideTab title='Manage' href='/manage' useAnchor={false} />
-            {roles.includes('Admin') && (
-              <SideTab
-                title='Liaison Permissions'
-                href='/liaison-permissions'
-                useAnchor={false}
-              />
-            )}
-            <SideTab title='Audit Log' href='/audit' useAnchor={false} />
-            {roles.includes('Admin') && (
-              <SideTab title='Admin' href='/admin' useAnchor={false} />
-            )}
-          </Tablist>
-        </Pane>
-      )}
+      <SidebarContent>
+        <Tablist width='100%' marginTop='100px'>
+          <SidebarHeading size={600}>Clearance Assignment</SidebarHeading>
+          <SideTab title='Assign' href='/assign' useAnchor={false} />
+          <SideTab title='Manage' href='/manage' useAnchor={false} />
+          {roles.includes('Admin') && (
+            <SideTab
+              title='Liaison Permissions'
+              href='/liaison-permissions'
+              useAnchor={false}
+            />
+          )}
+          <SideTab title='Audit Log' href='/audit' useAnchor={false} />
+          {roles.includes('Admin') && (
+            <SideTab title='Admin' href='/admin' useAnchor={false} />
+          )}
+        </Tablist>
+      </SidebarContent>
     </SidebarContainer>
-  )
+  ) : null
 }
