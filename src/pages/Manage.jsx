@@ -55,7 +55,9 @@ export default function ManageClearance() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    return personnelStrings.filter((i) => !selectedPersonnelStrings.includes(i))
+    return personnelStrings
+      .filter((i) => !selectedPersonnelStrings.includes(i))
+      .sort()
   }, [personnel, selectedPersonnel])
 
   // Respond to API response to clearance assignment request.
