@@ -13,7 +13,6 @@ import {
 import { useMemo, useState, useEffect } from 'react'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
 
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
@@ -156,7 +155,7 @@ export default function LiaisonPermissions() {
   }
 
   return (
-    <Layout title='Liaison Permissions'>
+    <>
       <Heading size={800}>Manage Liaison Permissions</Heading>
       <Text>View and edit the clearances a liaison can assign</Text>
 
@@ -278,7 +277,7 @@ export default function LiaisonPermissions() {
           )}
         </Table.Body>
       </Table>
-    </Layout>
+    </>
   )
 }
 

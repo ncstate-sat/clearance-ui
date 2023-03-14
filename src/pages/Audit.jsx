@@ -19,7 +19,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import clearanceService from '../apis/clearanceService'
 import { AUDIT_FILTERS } from '../components/AuditFilterCard'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
 import Timeframe from '../components/Timeframe'
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
@@ -174,7 +173,7 @@ export default function AuditLog() {
   }, [page])
 
   return (
-    <Layout title='Audit Log'>
+    <>
       <Heading size={800}>Audit Log</Heading>
       <Pane display='flex' flexDirection='row' justifyContent='space-between'>
         <Pane>
@@ -377,7 +376,7 @@ export default function AuditLog() {
       >
         Load More
       </Button>
-    </Layout>
+    </>
   )
 }
 

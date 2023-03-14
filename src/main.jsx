@@ -98,48 +98,34 @@ const myTheme = mergeTheme(defaultTheme, {
 
 const router = createBrowserRouter([
   {
-    path: '/assign',
-    element: (
-      <Auth>
-        <AssignClearance />
-      </Auth>
-    ),
-  },
-  {
-    path: '/manage',
-    element: (
-      <Auth>
-        <ManageClearance />
-      </Auth>
-    ),
-  },
-  {
-    path: '/liaison-permissions',
-    element: (
-      <Auth>
-        <LiaisonPermissions />
-      </Auth>
-    ),
-  },
-  {
-    path: '/audit',
-    element: (
-      <Auth>
-        <AuditLog />
-      </Auth>
-    ),
-  },
-  {
-    path: '/admin',
-    element: (
-      <Auth>
-        <Admin />
-      </Auth>
-    ),
-  },
-  {
-    path: '*',
-    element: <Navigate to='/assign' />,
+    path: '/',
+    element: <Auth />,
+    children: [
+      {
+        path: 'assign',
+        element: <AssignClearance />,
+      },
+      {
+        path: 'manage',
+        element: <ManageClearance />,
+      },
+      {
+        path: 'liaison-permissions',
+        element: <LiaisonPermissions />,
+      },
+      {
+        path: 'audit',
+        element: <AuditLog />,
+      },
+      {
+        path: 'admin',
+        element: <Admin />,
+      },
+      {
+        path: '*',
+        element: <Navigate to='/assign' />,
+      },
+    ],
   },
 ])
 

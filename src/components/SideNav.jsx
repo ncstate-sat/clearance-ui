@@ -27,7 +27,7 @@ const SidebarContainer = styled(Pane)`
           32
         )}px))`
       : 'translateX(0)'};
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, width 0.2s ease;
 
   @media (max-width: ${majorScale(120)}px) {
     ${({ $isExtended }) =>
@@ -55,8 +55,7 @@ const SidebarHeading = styled(Heading)`
   padding-bottom: ${minorScale(2)}px;
 `
 
-export default function SideNav({ children }) {
-  const isValidUser = useSelector((state) => state.auth.isValidUser)
+export default function SideNav({ sidebarContent }) {
   const roles = useSelector((state) => state.auth.roles)
   const { colors } = useTheme()
 
@@ -67,10 +66,10 @@ export default function SideNav({ children }) {
       backgroundColor={colors.gray50}
       borderRight='muted'
       $isOpen={isSidebarOpen}
-      $isExtended={!isValidUser}
+      $isExtended={sidebarContent !== undefined}
     >
-      {children ? (
-        children
+      {sidebarContent ? (
+        sidebarContent
       ) : (
         <SidebarContent>
           <Tablist width='100%' marginTop='100px'>

@@ -3,18 +3,19 @@ import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { Heading, Pane, minorScale } from 'evergreen-ui'
 import { refreshToken, signInWithGoogle } from '../store/slices/auth'
-import SideNav from './SideNav'
+import Layout from './Layout'
 import getEnvVariable from '../utils/getEnvVariable'
 
-import github from '../github.svg'
+import github from '../assets/github.svg'
 
 const SidebarContent = styled(Pane)`
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-end;
   height: 100%;
   padding: ${minorScale(8)}px;
+  padding-top: 25vh;
 `
 
 const DescriptionContainer = styled(Pane)`
@@ -71,11 +72,11 @@ const Auth = ({ children }) => {
   }, [isLoggedIn])
 
   if (isLoggedIn && isValidUser) {
-    return children
+    return <Layout />
   } else {
     return (
-      <Pane>
-        <SideNav>
+      <Layout
+        sidebarContent={
           <SidebarContent>
             <Pane marginBottom={minorScale(6)} textAlign='right'>
               <Heading size={900}>Security Applications</Heading>
@@ -83,7 +84,9 @@ const Auth = ({ children }) => {
             </Pane>
             <div id='login-button-div'></div>
           </SidebarContent>
-        </SideNav>
+        }
+        hideApp={true}
+      >
         <DescriptionContainer>
           <DescriptionContent></DescriptionContent>
           <Footer>
@@ -101,7 +104,7 @@ const Auth = ({ children }) => {
             </a>
           </Footer>
         </DescriptionContainer>
-      </Pane>
+      </Layout>
     )
   }
 }
