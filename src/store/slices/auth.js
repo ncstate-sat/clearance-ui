@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { toaster } from 'evergreen-ui'
 import getEnvVariable from '../../utils/getEnvVariable'
 
 const initialState = {
@@ -7,11 +8,14 @@ const initialState = {
   refreshToken: null,
   email: null,
   roles: [],
+  isValidUser: false,
   unityId: null,
   campusId: null,
   message: null,
   isLoading: false,
 }
+
+const ALLOWED_ROLES = ['Admin', 'Liaison']
 
 export const signInWithGoogle = createAsyncThunk(
   'auth/signInWithGoogle',
@@ -26,8 +30,13 @@ export const signInWithGoogle = createAsyncThunk(
     const refreshToken = googleSignInResponse.data['refresh_token']
     const payload = googleSignInResponse.data['payload']
 
+    const isValidUser = payload.roles.some((r) => ALLOWED_ROLES.indexOf(r) >= 0)
+    if (!isValidUser) {
+      toaster.danger('You do not have permission to use this tool.')
+    }
+
     localStorage.setItem('refresh-token', refreshToken)
-    return { token, refreshToken, payload }
+    return { token, refreshToken, payload, isValidUser }
   }
 )
 
@@ -45,8 +54,16 @@ export const refreshToken = createAsyncThunk(
     const newRefreshToken = refreshResponse.data['refresh_token']
     const payload = refreshResponse.data['payload']
 
+    const isValidUser = payload.roles.some((r) => ALLOWED_ROLES.indexOf(r) >= 0)
+
     localStorage.setItem('refresh-token', newRefreshToken)
-    return { token: newToken, refreshToken, newRefreshToken, payload: payload }
+    return {
+      token: newToken,
+      refreshToken,
+      newRefreshToken,
+      payload,
+      isValidUser,
+    }
   }
 )
 
@@ -61,6 +78,7 @@ const logInStateChange = (state, action) => {
   state.unityId = action.payload.payload['email'].split('@')[0]
   state.campusId = action.payload.payload['campus_id']
   state.roles = action.payload.payload['roles']
+  state.isValidUser = action.payload.isValidUser
   state.message = null
   state.isLoading = true
 }
@@ -70,6 +88,7 @@ const logInFailedStateChange = (state) => {
   state.refreshToken = null
   state.email = null
   state.roles = []
+  state.isValidUser = false
   state.unityId = null
   state.campusId = null
   state.message = 'Failed to Log In'
@@ -81,6 +100,7 @@ const logOutStateChange = (state) => {
   state.refreshToken = null
   state.email = null
   state.roles = []
+  state.isValidUser = false
   state.unityId = null
   state.campusId = null
   state.message = null
