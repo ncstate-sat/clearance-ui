@@ -54,7 +54,7 @@ export default function AuditLog() {
   // CALLS TO API
   const [
     getAuditLog,
-    { data: logData, isFetching: isLoading, isSuccess, isError, error },
+    { data: logData, isFetching: isLoading, isSuccess, isError },
   ] = clearanceService.useLazyGetAuditLogQuery()
 
   // UI STATE
@@ -134,7 +134,7 @@ export default function AuditLog() {
 
     const queryParams = {
       page: pg,
-      limit: 10,
+      limit: 50,
       clearance_name: selCls?.[0],
       from_time: timeframe?.startDateTime?.toISOString(),
       to_time: timeframe?.endDateTime?.toISOString(),
@@ -180,53 +180,65 @@ export default function AuditLog() {
         <Pane>
           <Text>A record of all clearance assignments made by this tool.</Text>
         </Pane>
-        <Popover
-          position={Position.BOTTOM_RIGHT}
-          content={({ close }) => (
-            <Menu>
-              <Menu.Group>
-                <Menu.Item
-                  onSelect={() => {
-                    toggleFilter(BY_ASSIGNEE, true)
-                    toggleFilter(BY_ASSIGNER, false)
-                    handleFilterChange(BY_ASSIGNEE, '', [])
-                  }}
-                >
-                  Filter by Person
-                </Menu.Item>
-                <Menu.Item
-                  onSelect={() => {
-                    toggleFilter(BY_ASSIGNER, true)
-                    toggleFilter(BY_ASSIGNEE, false)
-                    handleFilterChange(BY_ASSIGNER, '', [])
-                  }}
-                >
-                  Filter by Assigner
-                </Menu.Item>
-                <Menu.Item onSelect={() => toggleFilter(BY_CLEARANCE_NAME)}>
-                  Filter by Clearance Name
-                </Menu.Item>
-                <Menu.Item onSelect={() => toggleFilter(BY_TIMEFRAME)}>
-                  Filter by Timeframe
-                </Menu.Item>
-              </Menu.Group>
-              <Menu.Divider />
-              <Menu.Group>
-                <Menu.Item
-                  intent='danger'
-                  onSelect={() => {
-                    setFilters(emptyFilters)
-                    close()
-                  }}
-                >
-                  Clear Filters
-                </Menu.Item>
-              </Menu.Group>
-            </Menu>
-          )}
-        >
-          <Button test-id='add-filter-btn'>Add Filter</Button>
-        </Popover>
+        <Pane>
+          <Button
+            marginRight={minorScale(2)}
+            onClick={() => {
+              setPage(0)
+              queryLogs(filters, 0, selectedPersonnel, selectedClearances)
+            }}
+            isLoading={isLoading}
+          >
+            Refresh
+          </Button>
+          <Popover
+            position={Position.BOTTOM_RIGHT}
+            content={({ close }) => (
+              <Menu>
+                <Menu.Group>
+                  <Menu.Item
+                    onSelect={() => {
+                      toggleFilter(BY_ASSIGNEE, true)
+                      toggleFilter(BY_ASSIGNER, false)
+                      handleFilterChange(BY_ASSIGNEE, '', [])
+                    }}
+                  >
+                    Filter by Person
+                  </Menu.Item>
+                  <Menu.Item
+                    onSelect={() => {
+                      toggleFilter(BY_ASSIGNER, true)
+                      toggleFilter(BY_ASSIGNEE, false)
+                      handleFilterChange(BY_ASSIGNER, '', [])
+                    }}
+                  >
+                    Filter by Assigner
+                  </Menu.Item>
+                  <Menu.Item onSelect={() => toggleFilter(BY_CLEARANCE_NAME)}>
+                    Filter by Clearance Name
+                  </Menu.Item>
+                  <Menu.Item onSelect={() => toggleFilter(BY_TIMEFRAME)}>
+                    Filter by Timeframe
+                  </Menu.Item>
+                </Menu.Group>
+                <Menu.Divider />
+                <Menu.Group>
+                  <Menu.Item
+                    intent='danger'
+                    onSelect={() => {
+                      setFilters(emptyFilters)
+                      close()
+                    }}
+                  >
+                    Clear Filters
+                  </Menu.Item>
+                </Menu.Group>
+              </Menu>
+            )}
+          >
+            <Button test-id='add-filter-btn'>Add Filter</Button>
+          </Popover>
+        </Pane>
       </Pane>
 
       {/** TODO: Refactor these into components (see AuditFilterCard.js) */}
