@@ -65,7 +65,9 @@ export default function LiaisonPermissions() {
   const autocompleteClearances = useMemo(() => {
     const clearanceNames = clearances.map((c) => c['name'])
     const selectedClearanceNames = selectedClearances.map((c) => c['name'])
-    return clearanceNames.filter((i) => !selectedClearanceNames.includes(i))
+    return clearanceNames
+      .filter((i) => !selectedClearanceNames.includes(i))
+      .sort()
   }, [clearances, selectedClearances])
 
   // Suggestion strings for personnel.
@@ -78,7 +80,9 @@ export default function LiaisonPermissions() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    return personnelStrings.filter((i) => !selectedPersonnelStrings.includes(i))
+    return personnelStrings
+      .filter((i) => !selectedPersonnelStrings.includes(i))
+      .sort()
   }, [personnel, selectedPersonnel])
 
   // UPDATES AFTER API RESPONSES

@@ -39,7 +39,9 @@ export default function ManageClearance() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    return personnelStrings.filter((i) => !selectedPersonnelStrings.includes(i))
+    return personnelStrings
+      .filter((i) => !selectedPersonnelStrings.includes(i))
+      .sort()
   }, [selectedPersonnel, personnel])
 
   // Get selected people strings as personnel objects.
