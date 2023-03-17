@@ -98,28 +98,34 @@ const myTheme = mergeTheme(defaultTheme, {
 
 const router = createBrowserRouter([
   {
-    path: '/assign',
-    element: <AssignClearance />,
-  },
-  {
-    path: '/manage',
-    element: <ManageClearance />,
-  },
-  {
-    path: '/liaison-permissions',
-    element: <LiaisonPermissions />,
-  },
-  {
-    path: '/audit',
-    element: <AuditLog />,
-  },
-  {
-    path: '/admin',
-    element: <Admin />,
-  },
-  {
-    path: '*',
-    element: <Navigate to='/assign' />,
+    path: '/',
+    element: <Auth />,
+    children: [
+      {
+        path: 'assign',
+        element: <AssignClearance />,
+      },
+      {
+        path: 'manage',
+        element: <ManageClearance />,
+      },
+      {
+        path: 'liaison-permissions',
+        element: <LiaisonPermissions />,
+      },
+      {
+        path: 'audit',
+        element: <AuditLog />,
+      },
+      {
+        path: 'admin',
+        element: <Admin />,
+      },
+      {
+        path: '*',
+        element: <Navigate to='/assign' />,
+      },
+    ],
   },
 ])
 
@@ -128,9 +134,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ThemeProvider value={myTheme}>
       <Provider store={store}>
         <LayoutProvider>
-          <Auth>
-            <RouterProvider router={router} />
-          </Auth>
+          <RouterProvider router={router} />
         </LayoutProvider>
       </Provider>
     </ThemeProvider>

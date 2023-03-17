@@ -13,7 +13,6 @@ import {
 import { useMemo, useState, useEffect } from 'react'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
 import NoResultsText from '../components/NoResultsText'
 
 import useClearance from '../hooks/useClearance'
@@ -81,7 +80,9 @@ export default function LiaisonPermissions() {
   const autocompleteClearances = useMemo(() => {
     const clearanceNames = clearances.map((c) => c['name'])
     const selectedClearanceNames = selectedClearances.map((c) => c['name'])
-    return clearanceNames.filter((i) => !selectedClearanceNames.includes(i))
+    return clearanceNames
+      .filter((i) => !selectedClearanceNames.includes(i))
+      .sort()
   }, [clearances, selectedClearances])
 
   // Suggestion strings for personnel.
@@ -94,7 +95,9 @@ export default function LiaisonPermissions() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    return personnelStrings.filter((i) => !selectedPersonnelStrings.includes(i))
+    return personnelStrings
+      .filter((i) => !selectedPersonnelStrings.includes(i))
+      .sort()
   }, [personnel, selectedPersonnel])
 
   // UPDATES AFTER API RESPONSES
@@ -171,7 +174,7 @@ export default function LiaisonPermissions() {
   }
 
   return (
-    <Layout title='Liaison Permissions'>
+    <>
       <Heading size={800}>Manage Liaison Permissions</Heading>
       <Text>View and edit the clearances a liaison can assign</Text>
 
@@ -313,7 +316,7 @@ export default function LiaisonPermissions() {
           )}
         </Table.Body>
       </Table>
-    </Layout>
+    </>
   )
 }
 

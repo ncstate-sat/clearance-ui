@@ -13,7 +13,6 @@ import {
 import { useMemo, useState, useEffect } from 'react'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
 import NoResultsText from '../components/NoResultsText'
 
 import usePersonnel from '../hooks/usePersonnel'
@@ -63,7 +62,9 @@ export default function ManageClearance() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    return personnelStrings.filter((i) => !selectedPersonnelStrings.includes(i))
+    return personnelStrings
+      .filter((i) => !selectedPersonnelStrings.includes(i))
+      .sort()
   }, [personnel, selectedPersonnel])
 
   // Respond to API response to clearance assignment request.
@@ -117,7 +118,7 @@ export default function ManageClearance() {
   }
 
   return (
-    <Layout title='Manage'>
+    <>
       <Heading size={800}>Manage Clearances</Heading>
       <Text>View and edit the clearances of an individual</Text>
 
@@ -214,7 +215,7 @@ export default function ManageClearance() {
           </Table.Body>
         </Table>
       )}
-    </Layout>
+    </>
   )
 }
 
