@@ -11,7 +11,6 @@ import { useMemo, useCallback, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import ContentCard from '../components/ContentCard'
 import FullWidthSpinner from '../components/FullWidthSpinner'
-import Layout from '../components/Layout'
 
 import usePersonnel from '../hooks/usePersonnel'
 import authService from '../apis/authService'
@@ -223,7 +222,7 @@ export default function ManageClearance() {
   }, [token])
 
   return (
-    <Layout title='Manage Users'>
+    <>
       <Heading size={800}>Manage Users</Heading>
       <Text>Add or remove accounts with administrative rights</Text>
 
@@ -350,6 +349,6 @@ export default function ManageClearance() {
       </Table>
 
       {(isLoadingUsers || addingRoles.length > 0) && <FullWidthSpinner />}
-    </Layout>
+    </>
   )
 }

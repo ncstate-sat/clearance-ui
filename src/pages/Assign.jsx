@@ -10,7 +10,6 @@ import {
 import { useMemo, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
 
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
@@ -93,7 +92,7 @@ export default function AssignClearance() {
   }
 
   return (
-    <Layout title='Assign'>
+    <>
       <Heading size={800}>Assign Clearances</Heading>
       <Text>Add clearances to an individual</Text>
 
@@ -195,7 +194,7 @@ export default function AssignClearance() {
       >
         Assign
       </Button>
-    </Layout>
+    </>
   )
 }
 

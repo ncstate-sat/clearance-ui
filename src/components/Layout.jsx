@@ -10,6 +10,7 @@ import {
 } from 'evergreen-ui'
 import { useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Outlet } from 'react-router-dom'
 import styled from 'styled-components'
 import { LayoutContext } from './LayoutProvider'
 import SideNav from './SideNav'
@@ -23,6 +24,9 @@ const HeaderContainer = styled(Pane)`
   width: 100%;
   top: 0;
   position: fixed;
+  transition: transform 0.2s ease;
+  transform: ${({ $isHidden }) =>
+    $isHidden ? 'translateY(-64px)' : 'translateY(0)'};
   z-index: 2;
 `
 
@@ -35,8 +39,12 @@ const HeaderContent = styled(Pane)`
 
 const ViewContainer = styled(Pane)`
   display: grid;
-  grid-template-columns: ${({ $isSidebarOpen }) =>
-    $isSidebarOpen ? `${majorScale(32)}px 1fr` : '0 1fr'};
+  grid-template-columns: ${({ $isHidden, $isSidebarOpen }) =>
+    $isHidden
+      ? `${majorScale(60)}px 1fr`
+      : $isSidebarOpen
+      ? `${majorScale(32)}px 1fr`
+      : '0 1fr'};
   column-gap: ${({ $isSidebarOpen }) => ($isSidebarOpen ? '16px' : '0')};
   width: ${majorScale(120)}px;
   max-width: 100%;
@@ -45,12 +53,13 @@ const ViewContainer = styled(Pane)`
 `
 
 const BodyContainer = styled(Pane)`
-  margin-top: 100px;
-  margin-left: ${({ $isSidebarOpen }) => ($isSidebarOpen ? '36px' : '8px')};
-  margin-right: 8px;
+  margin-top: ${({ $isHidden }) => ($isHidden ? '0' : '100px')};
+  margin-left: ${({ $isHidden, $isSidebarOpen }) =>
+    $isHidden ? '0' : $isSidebarOpen ? '36px' : '8px'};
+  margin-right: ${({ $isHidden }) => ($isHidden ? '0' : '8px')};
 `
 
-export default function Layout({ children }) {
+export default function Layout({ sidebarContent, hideApp, children }) {
   const { colors } = useTheme()
   const { isSidebarOpen, setIsSidebarOpen } = useContext(LayoutContext)
   const isLoggedIn = useSelector((state) => state.auth.token !== null)
@@ -61,6 +70,7 @@ export default function Layout({ children }) {
       <HeaderContainer
         backgroundColor={colors.gray50}
         borderColor={colors.gray100}
+        $isHidden={hideApp}
       >
         <HeaderContent>
           <Pane
@@ -75,7 +85,7 @@ export default function Layout({ children }) {
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               paddingRight={minorScale(2)}
             />
-            <Heading size={600}>Security Applications Portal</Heading>
+            <Heading size={600}>Security Applications</Heading>
           </Pane>
           <Pane display='flex' marginLeft='auto'>
             {isLoggedIn && (
@@ -84,10 +94,12 @@ export default function Layout({ children }) {
           </Pane>
         </HeaderContent>
       </HeaderContainer>
-      <SideNav />
-      <ViewContainer $isSidebarOpen={isSidebarOpen}>
+      <SideNav sidebarContent={sidebarContent} />
+      <ViewContainer $isSidebarOpen={isSidebarOpen} $isHidden={hideApp}>
         <div></div>
-        <BodyContainer $isSidebarOpen={isSidebarOpen}>{children}</BodyContainer>
+        <BodyContainer $isSidebarOpen={isSidebarOpen} $isHidden={hideApp}>
+          {hideApp ? children : <Outlet />}
+        </BodyContainer>
       </ViewContainer>
     </>
   )

@@ -13,7 +13,6 @@ import {
 import { useMemo, useState, useEffect } from 'react'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
 
 import usePersonnel from '../hooks/usePersonnel'
 
@@ -109,7 +108,7 @@ export default function ManageClearance() {
   }
 
   return (
-    <Layout title='Manage'>
+    <>
       <Heading size={800}>Manage Clearances</Heading>
       <Text>View and edit the clearances of an individual</Text>
 
@@ -196,7 +195,7 @@ export default function ManageClearance() {
           </Table.Body>
         </Table>
       )}
-    </Layout>
+    </>
   )
 }
 
