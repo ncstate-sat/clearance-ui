@@ -90,7 +90,7 @@ const Auth = ({ children }) => {
         <DescriptionContainer>
           <DescriptionContent></DescriptionContent>
           <Footer>
-            <Heading size={200}>© 2023 North Carolina State University</Heading>
+            <Heading size={200}></Heading>
             <a
               href='https://github.com/ncstate-sat/clearance-ui'
               target='_blank'
