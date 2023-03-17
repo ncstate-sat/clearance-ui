@@ -16,28 +16,17 @@ import {
   toaster,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect } from 'react'
+
 import axios from 'axios'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
+import NoResultsText from '../components/NoResultsText'
 import getEnvVariable from '../utils/getEnvVariable'
 
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
 
 import clearanceService from '../apis/clearanceService'
-
-const NoResultsText = styled(Pane)`
-  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
-  position: absolute;
-  bottom: 4px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: #cccccc;
-  font-size: 0.8rem;
-`
 
 export default function AssignClearance() {
   const token = useSelector((state) => state.auth.token)
@@ -54,6 +43,7 @@ export default function AssignClearance() {
   const [selectedClearances, setSelectedClearances] = useState([])
   const {
     clearances,
+    clearanceQuery,
     setClearanceQuery,
     length: clearancesLength,
     isTyping: isTypingClearances,
@@ -63,6 +53,7 @@ export default function AssignClearance() {
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
   const {
     personnel,
+    personnelQuery,
     setPersonnelQuery,
     length: personnelLength,
     isTyping: isTypingPersonnel,
@@ -76,7 +67,9 @@ export default function AssignClearance() {
   const autocompleteClearances = useMemo(() => {
     const clearanceNames = clearances.map((c) => c['name'])
     const selectedClearanceNames = selectedClearances.map((c) => c['name'])
-    return clearanceNames.filter((i) => !selectedClearanceNames.includes(i))
+    return clearanceNames
+      .filter((i) => !selectedClearanceNames.includes(i))
+      .sort()
   }, [clearances, selectedClearances])
 
   // Suggestion strings for personnel.
@@ -89,7 +82,9 @@ export default function AssignClearance() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    return personnelStrings.filter((i) => !selectedPersonnelStrings.includes(i))
+    return personnelStrings
+      .filter((i) => !selectedPersonnelStrings.includes(i))
+      .sort()
   }, [personnel, selectedPersonnel])
 
   useEffect(() => {
@@ -211,7 +206,7 @@ export default function AssignClearance() {
   }, [bulkPersonnel])
 
   return (
-    <Layout title='Assign'>
+    <>
       <Heading size={800}>Assign Clearances</Heading>
       <Text>Add clearances to an individual</Text>
 
@@ -268,6 +263,7 @@ export default function AssignClearance() {
               $visible={
                 !isLoadingPersonnel &&
                 !isTypingPersonnel &&
+                personnelQuery.length >= 3 &&
                 personnelLength === 0
               }
             >
@@ -326,6 +322,7 @@ export default function AssignClearance() {
           $visible={
             !isLoadingClearances &&
             !isTypingClearances &&
+            clearanceQuery.length >= 3 &&
             clearancesLength === 0
           }
         >
@@ -357,7 +354,7 @@ export default function AssignClearance() {
       >
         Assign
       </Button>
-    </Layout>
+    </>
   )
 }
 

@@ -13,7 +13,7 @@ import {
 import { useMemo, useState, useEffect } from 'react'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
+import NoResultsText from '../components/NoResultsText'
 
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
@@ -57,16 +57,32 @@ export default function LiaisonPermissions() {
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
   const [selectedClearances, setSelectedClearances] = useState([])
-  const { clearances, setClearanceQuery } = useClearance()
+  const {
+    clearances,
+    clearanceQuery,
+    setClearanceQuery,
+    length: clearancesLength,
+    isTyping: isTypingClearances,
+    isLoading: isLoadingClearances,
+  } = useClearance()
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
-  const { personnel, setPersonnelQuery } = usePersonnel()
+  const {
+    personnel,
+    personnelQuery,
+    setPersonnelQuery,
+    length: personnelLength,
+    isTyping: isTypingPersonnel,
+    isLoading: isLoadingPersonnel,
+  } = usePersonnel()
 
   // Suggestion strings for clearances.
   const autocompleteClearances = useMemo(() => {
     const clearanceNames = clearances.map((c) => c['name'])
     const selectedClearanceNames = selectedClearances.map((c) => c['name'])
-    return clearanceNames.filter((i) => !selectedClearanceNames.includes(i))
+    return clearanceNames
+      .filter((i) => !selectedClearanceNames.includes(i))
+      .sort()
   }, [clearances, selectedClearances])
 
   // Suggestion strings for personnel.
@@ -79,7 +95,9 @@ export default function LiaisonPermissions() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    return personnelStrings.filter((i) => !selectedPersonnelStrings.includes(i))
+    return personnelStrings
+      .filter((i) => !selectedPersonnelStrings.includes(i))
+      .sort()
   }, [personnel, selectedPersonnel])
 
   // UPDATES AFTER API RESPONSES
@@ -156,7 +174,7 @@ export default function LiaisonPermissions() {
   }
 
   return (
-    <Layout title='Liaison Permissions'>
+    <>
       <Heading size={800}>Manage Liaison Permissions</Heading>
       <Text>View and edit the clearances a liaison can assign</Text>
 
@@ -194,6 +212,16 @@ export default function LiaisonPermissions() {
           onInputChange={(e) => setPersonnelQuery(e.target.value)}
           test-id='personnel-input'
         />
+        <NoResultsText
+          $visible={
+            !isLoadingPersonnel &&
+            !isTypingPersonnel &&
+            personnelQuery.length >= 3 &&
+            personnelLength === 0
+          }
+        >
+          No Personnel Found
+        </NoResultsText>
       </ContentCard>
 
       <ContentCard>
@@ -220,6 +248,16 @@ export default function LiaisonPermissions() {
           onInputChange={(e) => setClearanceQuery(e.target.value)}
           test-id='clearance-input'
         />
+        <NoResultsText
+          $visible={
+            !isLoadingClearances &&
+            !isTypingClearances &&
+            clearanceQuery.length >= 3 &&
+            clearancesLength === 0
+          }
+        >
+          No Clearances Found
+        </NoResultsText>
       </ContentCard>
 
       <Button
@@ -278,7 +316,7 @@ export default function LiaisonPermissions() {
           )}
         </Table.Body>
       </Table>
-    </Layout>
+    </>
   )
 }
 

@@ -13,7 +13,7 @@ import {
 import { useMemo, useState, useEffect } from 'react'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
-import Layout from '../components/Layout'
+import NoResultsText from '../components/NoResultsText'
 
 import usePersonnel from '../hooks/usePersonnel'
 
@@ -43,7 +43,14 @@ export default function ManageClearance() {
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
-  const { personnel, setPersonnelQuery } = usePersonnel()
+  const {
+    personnel,
+    personnelQuery,
+    setPersonnelQuery,
+    length: personnelLength,
+    isTyping: isTypingPersonnel,
+    isLoading: isLoadingPersonnel,
+  } = usePersonnel()
 
   // Suggestion strings for personnel.
   const autocompletePersonnel = useMemo(() => {
@@ -55,7 +62,9 @@ export default function ManageClearance() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    return personnelStrings.filter((i) => !selectedPersonnelStrings.includes(i))
+    return personnelStrings
+      .filter((i) => !selectedPersonnelStrings.includes(i))
+      .sort()
   }, [personnel, selectedPersonnel])
 
   // Respond to API response to clearance assignment request.
@@ -108,7 +117,7 @@ export default function ManageClearance() {
   }
 
   return (
-    <Layout title='Manage'>
+    <>
       <Heading size={800}>Manage Clearances</Heading>
       <Text>View and edit the clearances of an individual</Text>
 
@@ -146,6 +155,16 @@ export default function ManageClearance() {
           onInputChange={(e) => setPersonnelQuery(e.target.value)}
           test-id='personnel-input'
         />
+        <NoResultsText
+          $visible={
+            !isLoadingPersonnel &&
+            !isTypingPersonnel &&
+            personnelQuery.length >= 3 &&
+            personnelLength === 0
+          }
+        >
+          No Personnel Found
+        </NoResultsText>
       </ContentCard>
 
       {selectedPersonnel.length > 0 && (
@@ -195,7 +214,7 @@ export default function ManageClearance() {
           </Table.Body>
         </Table>
       )}
-    </Layout>
+    </>
   )
 }
 
