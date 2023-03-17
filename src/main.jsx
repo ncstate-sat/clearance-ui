@@ -122,7 +122,7 @@ const router = createBrowserRouter([
         element: <Admin />,
       },
       {
-        path: '*',
+        path: '',
         element: <Navigate to='/assign' />,
       },
     ],

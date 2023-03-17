@@ -8,24 +8,13 @@ import {
   toaster,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect } from 'react'
-import styled from 'styled-components'
 import ContentCard from '../components/ContentCard'
+import NoResultsText from '../components/NoResultsText'
 
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
 
 import clearanceService from '../apis/clearanceService'
-
-const NoResultsText = styled(Pane)`
-  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
-  position: absolute;
-  bottom: 4px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: #cccccc;
-  font-size: 0.8rem;
-`
 
 export default function AssignClearance() {
   const [assignClearance, { isLoading, isSuccess, isError, data }] =
@@ -34,6 +23,7 @@ export default function AssignClearance() {
   const [selectedClearances, setSelectedClearances] = useState([])
   const {
     clearances,
+    clearanceQuery,
     setClearanceQuery,
     length: clearancesLength,
     isTyping: isTypingClearances,
@@ -43,6 +33,7 @@ export default function AssignClearance() {
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
   const {
     personnel,
+    personnelQuery,
     setPersonnelQuery,
     length: personnelLength,
     isTyping: isTypingPersonnel,
@@ -132,7 +123,10 @@ export default function AssignClearance() {
         />
         <NoResultsText
           $visible={
-            !isLoadingPersonnel && !isTypingPersonnel && personnelLength === 0
+            !isLoadingPersonnel &&
+            !isTypingPersonnel &&
+            personnelQuery.length >= 3 &&
+            personnelLength === 0
           }
         >
           No Personnel Found
@@ -167,6 +161,7 @@ export default function AssignClearance() {
           $visible={
             !isLoadingClearances &&
             !isTypingClearances &&
+            clearanceQuery.length >= 3 &&
             clearancesLength === 0
           }
         >
