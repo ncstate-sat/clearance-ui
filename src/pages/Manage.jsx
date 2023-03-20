@@ -96,7 +96,6 @@ export default function ManageClearance() {
 
   // Fetch clearance assignments for the selected person.
   useEffect(() => {
-    console.log(selectedPersonnel)
     if (selectedPersonnel.length > 0) {
       const campusId = selectedPersonnel[0]['campus_id']
 

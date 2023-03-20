@@ -15,7 +15,7 @@ const initialState = {
   isLoading: false,
 }
 
-const ALLOWED_ROLES = ['Admin', 'Liaison']
+export const ALLOWED_ROLES = ['Admin', 'Liaison']
 
 export const signInWithGoogle = createAsyncThunk(
   'auth/signInWithGoogle',
@@ -59,8 +59,7 @@ export const refreshToken = createAsyncThunk(
     localStorage.setItem('refresh-token', newRefreshToken)
     return {
       token: newToken,
-      refreshToken,
-      newRefreshToken,
+      refreshToken: newRefreshToken,
       payload,
       isValidUser,
     }

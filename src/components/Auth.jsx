@@ -46,7 +46,7 @@ const Footer = styled(Pane)`
   align-items: center;
 `
 
-const Auth = ({ children }) => {
+const Auth = () => {
   const isLoggedIn = useSelector((state) => state.auth.token !== null)
   const isValidUser = useSelector((state) => state.auth.isValidUser)
   const dispatch = useDispatch()
