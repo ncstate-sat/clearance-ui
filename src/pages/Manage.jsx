@@ -27,15 +27,7 @@ export default function ManageClearance() {
     },
   ] = clearanceService.useLazyGetAssignmentsQuery()
 
-  const [
-    revokeAssignments,
-    {
-      data: revokeAssignmentData,
-      isSuccess: isRevokeSuccess,
-      isError: isRevokeError,
-      originalArgs: revokeArgs,
-    },
-  ] = clearanceService.useRevokeClearancesMutation()
+  const [revokeAssignments] = clearanceService.useRevokeClearancesMutation()
 
   const [tableFilter, setTableFilter] = useState('')
 
@@ -74,29 +66,8 @@ export default function ManageClearance() {
     }
   }, [isGetSuccess, getAssignmentsData])
 
-  // Respond to API response to revoke request.
-  useEffect(() => {
-    if (isRevokeSuccess) {
-      setClearanceAssignments((prevAssignments) =>
-        prevAssignments
-          .filter((a) => a['id'] !== revokeArgs['clearanceIDs'][0])
-          .map((a) => ({ ...a }))
-      )
-      setLoadingRevokeRequests((requests) =>
-        requests.filter((r) => r !== revokeArgs['clearanceIDs'][0])
-      )
-      toaster.success('Revoke Succeeded')
-    } else if (isRevokeError) {
-      setLoadingRevokeRequests((requests) =>
-        requests.filter((r) => r !== revokeArgs['clearanceIDs'][0])
-      )
-      toaster.success('Revoke Failed')
-    }
-  }, [isRevokeSuccess, isRevokeError, revokeAssignmentData, revokeArgs])
-
   // Fetch clearance assignments for the selected person.
   useEffect(() => {
-    console.log(selectedPersonnel)
     if (selectedPersonnel.length > 0) {
       const campusId = selectedPersonnel[0]['campus_id']
 
@@ -115,6 +86,24 @@ export default function ManageClearance() {
       assigneeIDs: [selectedPersonnel[0]['campus_id']],
       clearanceIDs: [clearanceId],
     })
+      .unwrap()
+      .then(() => {
+        setClearanceAssignments((prevAssignments) =>
+          prevAssignments
+            .filter((a) => a['id'] !== clearanceId)
+            .map((a) => ({ ...a }))
+        )
+        setLoadingRevokeRequests((requests) =>
+          requests.filter((r) => r !== clearanceId)
+        )
+        toaster.success('Revoke Succeeded')
+      })
+      .catch(() => {
+        setLoadingRevokeRequests((requests) =>
+          requests.filter((r) => r !== clearanceId)
+        )
+        toaster.success('Revoke Failed')
+      })
   }
 
   return (
