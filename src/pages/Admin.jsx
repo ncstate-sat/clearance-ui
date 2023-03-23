@@ -259,6 +259,7 @@ export default function ManageClearance() {
           onClick={() => setAddingRoles(['Admin'])}
           marginTop='0.5rem'
           marginRight='0.5rem'
+          disabled={selectedPersonnel.length === 0}
           test-id='add-admin-btn'
         >
           Add Admin
@@ -268,6 +269,7 @@ export default function ManageClearance() {
           isLoading={addingRoles.length > 0}
           onClick={() => setAddingRoles(['Liaison'])}
           marginTop='0.5rem'
+          disabled={selectedPersonnel.length === 0}
           test-id='add-liaison-btn'
         >
           Add Liaison
