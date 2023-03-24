@@ -83,7 +83,9 @@ export default function SideNav({ sidebarContent }) {
                 useAnchor={false}
               />
             )}
-            <SideTab title='Audit Log' href='/audit' useAnchor={false} />
+            {roles.includes('Admin') && (
+              <SideTab title='Audit Log' href='/audit' useAnchor={false} />
+            )}
             {roles.includes('Admin') && (
               <SideTab title='Admin' href='/admin' useAnchor={false} />
             )}
