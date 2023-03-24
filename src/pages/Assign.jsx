@@ -72,7 +72,7 @@ export default function AssignClearance() {
     if (isSuccess) {
       setSelectedPersonnel([])
       setSelectedClearances([])
-      toaster.success('Request Submitted')
+      toaster.success('Clearance(s) Assigned Successfully')
     } else if (isError) {
       toaster.danger('Request Failed')
     }
