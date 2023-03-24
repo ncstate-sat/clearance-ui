@@ -28,8 +28,10 @@ const myTheme = mergeTheme(defaultTheme, {
         primary: {
           backgroundColor: '#cc0000',
           color: 'white',
-          _disabled: {
-            backgroundColor: '#e68080',
+          selectors: {
+            _disabled: {
+              backgroundColor: '#e68080',
+            },
           },
         },
         secondary: {
