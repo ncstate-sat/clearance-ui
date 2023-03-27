@@ -9,7 +9,6 @@ import store from './store/store'
 import 'react-datepicker/dist/react-datepicker.css'
 import './index.css'
 
-import AssignClearance from './pages/Assign'
 import ManageClearance from './pages/Manage'
 import LiaisonPermissions from './pages/LiaisonPermissions'
 import AuditLog from './pages/Audit'
@@ -104,10 +103,6 @@ const router = createBrowserRouter([
     element: <Auth />,
     children: [
       {
-        path: 'assign',
-        element: <AssignClearance />,
-      },
-      {
         path: 'manage',
         element: <ManageClearance />,
       },
@@ -125,7 +120,7 @@ const router = createBrowserRouter([
       },
       {
         path: '',
-        element: <Navigate to='/assign' />,
+        element: <Navigate to='/manage' />,
       },
     ],
   },
