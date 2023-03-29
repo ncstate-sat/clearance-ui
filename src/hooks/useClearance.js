@@ -39,7 +39,7 @@ const useClearance = (initialQuery = '') => {
 
   useEffect(() => {
     if (isError && error?.['name'] !== 'AbortError') {
-      toaster.danger('There was an error querying for clearances.')
+      toaster.danger(error ?? 'There was an error querying for clearances.')
     }
   }, [isError, error])
 
