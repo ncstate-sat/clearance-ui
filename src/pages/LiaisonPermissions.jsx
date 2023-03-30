@@ -23,7 +23,7 @@ export default function LiaisonPermissions() {
   const [
     getLiaisonPermissions,
     {
-      isFetching: isLoadingPermissions,
+      isFetching: isFetchingPermissions,
       data: permissionData,
       isSuccess: getPermissionSuccess,
       isError: getPermissionError,
@@ -178,7 +178,7 @@ export default function LiaisonPermissions() {
       <Heading size={800}>Manage Liaison Permissions</Heading>
       <Text>View and edit the clearances a liaison can assign</Text>
 
-      <ContentCard>
+      <ContentCard isLoading={isLoadingPersonnel}>
         <Heading size={600} marginBottom={minorScale(3)}>
           Select Liaison
         </Heading>
@@ -224,7 +224,7 @@ export default function LiaisonPermissions() {
         </NoResultsText>
       </ContentCard>
 
-      <ContentCard>
+      <ContentCard isLoading={isLoadingClearances}>
         <Heading size={600} marginBottom={minorScale(3)}>
           Select Clearance
         </Heading>
@@ -283,7 +283,7 @@ export default function LiaisonPermissions() {
           <Table.TextHeaderCell flexShrink={0}>Actions</Table.TextHeaderCell>
         </Table.Head>
         <Table.Body>
-          {isLoadingPermissions ? (
+          {isFetchingPermissions ? (
             <Pane className='center' padding={minorScale(6)}>
               <Spinner size={majorScale(4)} marginX='auto' />
             </Pane>

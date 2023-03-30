@@ -5,7 +5,13 @@ import clearanceService from '../apis/clearanceService'
 const useClearance = (initialQuery = '') => {
   const [
     getClearances,
-    { data = { clearances: [], length: null }, isError, error, isLoading },
+    {
+      data = { clearances: [], length: null },
+      isError,
+      error,
+      isLoading,
+      isFetching,
+    },
   ] = clearanceService.useLazyGetClearancesQuery()
 
   const [query, setQuery] = useState(initialQuery)
@@ -49,7 +55,7 @@ const useClearance = (initialQuery = '') => {
     setClearanceQuery: setQuery,
     length: data.length,
     isTyping,
-    isLoading,
+    isLoading: isLoading || isFetching,
   }
 }
 
