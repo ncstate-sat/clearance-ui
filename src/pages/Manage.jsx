@@ -23,8 +23,10 @@ export default function ManageClearance() {
     getAssignments,
     {
       isFetching: isFetchingAssignments,
-      data: getAssignmentsData,
       isSuccess: isGetSuccess,
+      isError: isGetError,
+      data: getAssignmentsData,
+      error: getAssignmentsError,
     },
   ] = clearanceService.useLazyGetAssignmentsQuery()
 
@@ -36,6 +38,7 @@ export default function ManageClearance() {
       isSuccess: isAssignSuccess,
       isError: isAssignError,
       data: assignData,
+      error: assignError,
     },
   ] = clearanceService.useAssignClearancesMutation()
 
@@ -92,15 +95,17 @@ export default function ManageClearance() {
   useEffect(() => {
     if (isGetSuccess) {
       setClearanceAssignments(getAssignmentsData['assignments'])
+    } else if (isGetError && getAssignmentsError?.['name'] !== 'AbortError') {
+      toaster.danger(getAssignmentsError ?? 'Request Failed')
     }
-  }, [isGetSuccess, getAssignmentsData])
+  }, [isGetSuccess, isGetError, getAssignmentsData, getAssignmentsError])
 
   // Handle response from Assign call.
   useEffect(() => {
     if (isAssignSuccess) {
       toaster.success('Clearance(s) Assigned Successfully')
-    } else if (isAssignError) {
-      toaster.danger('Request Failed')
+    } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
+      toaster.danger(assignError ?? 'Request Failed')
     }
   }, [isAssignSuccess, isAssignError, assignData])
 

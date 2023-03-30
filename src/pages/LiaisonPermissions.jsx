@@ -25,8 +25,9 @@ export default function LiaisonPermissions() {
     {
       isFetching: isFetchingPermissions,
       data: permissionData,
-      isSuccess: getPermissionSuccess,
-      isError: getPermissionError,
+      isSuccess: isGetPermissionSuccess,
+      isError: isGetPermissionError,
+      error: permissionError,
     },
   ] = clearanceService.useLazyGetLiaisonPermissionsQuery()
 
@@ -35,8 +36,9 @@ export default function LiaisonPermissions() {
     {
       isLoading: isAssigningPermission,
       data: assignData,
-      isSuccess: assignSuccess,
-      isError: assignError,
+      isSuccess: isAssignSuccess,
+      isError: isAssignError,
+      error: assignError,
     },
   ] = clearanceService.useAssignLiaisonPermissionMutation()
 
@@ -44,8 +46,9 @@ export default function LiaisonPermissions() {
     revokeLiaisonPermission,
     {
       data: revokeData,
-      isSuccess: revokeSuccess,
-      isError: revokeError,
+      isSuccess: isRevokeSuccess,
+      isError: isRevokeError,
+      error: revokeError,
       originalArgs: revokeArgs,
     },
   ] = clearanceService.useRevokeLiaisonPermissionMutation()
@@ -102,15 +105,24 @@ export default function LiaisonPermissions() {
 
   // UPDATES AFTER API RESPONSES
   useEffect(() => {
-    if (getPermissionSuccess) {
+    if (isGetPermissionSuccess) {
       setClearanceAssignments(permissionData['clearances'])
-    } else if (getPermissionError) {
+    } else if (
+      isGetPermissionError &&
+      permissionError?.['name'] !== 'AbortError'
+    ) {
       setClearanceAssignments([])
+      toaster.danger(permissionError ?? 'Could Not Get Permission Data')
     }
-  }, [getPermissionSuccess, getPermissionError, permissionData])
+  }, [
+    isGetPermissionSuccess,
+    isGetPermissionError,
+    permissionData,
+    permissionError,
+  ])
 
   useEffect(() => {
-    if (revokeSuccess) {
+    if (isRevokeSuccess) {
       setClearanceAssignments((prevAssignments) =>
         prevAssignments
           .filter((a) => a['id'] !== revokeArgs['clearanceIDs'][0])
@@ -120,22 +132,22 @@ export default function LiaisonPermissions() {
         requests.filter((r) => r !== revokeArgs['clearanceIDs'][0])
       )
       toaster.success('Revoke Succeeded')
-    } else if (revokeError) {
+    } else if (isRevokeError && revokeError?.['name'] !== 'AbortError') {
       setLoadingRevokeRequests((requests) =>
         requests.filter((r) => r !== revokeArgs['clearanceIDs'][0])
       )
-      toaster.success('Revoke Failed')
+      toaster.success(revokeError ?? 'Revoke Failed')
     }
-  }, [revokeSuccess, revokeError, revokeData, revokeArgs])
+  }, [isRevokeSuccess, isRevokeError, revokeData, revokeError, revokeArgs])
 
   useEffect(() => {
-    if (assignSuccess) {
+    if (isAssignSuccess) {
       setSelectedClearances([])
       toaster.success('Permissions Assigned')
-    } else if (assignError) {
-      toaster.danger('Request Failed')
+    } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
+      toaster.danger(assignError ?? 'Request Failed')
     }
-  }, [assignSuccess, assignError, assignData])
+  }, [isAssignSuccess, isAssignError, assignData, assignError])
 
   // EVENT HANDLERS
   useEffect(() => {

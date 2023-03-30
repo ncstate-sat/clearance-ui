@@ -45,7 +45,7 @@ const usePersonnel = (initialQuery = '') => {
 
   useEffect(() => {
     if (isError && error?.['name'] !== 'AbortError') {
-      toaster.danger('There was an error querying for personnel.')
+      toaster.danger(error ?? 'There was an error querying for personnel.')
     }
   }, [isError, error])
 
