@@ -192,10 +192,6 @@ export default function ManageClearance() {
               `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
           )}
           onChange={(selected) => {
-            if (selected.length > 1) {
-              selected = [selected[selected.length - 1]]
-            }
-
             const personnelObjects = []
             const allPersonnel = [...personnel, ...selectedPersonnel]
             const personnelStrings = allPersonnel.map(
