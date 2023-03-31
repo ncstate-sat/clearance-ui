@@ -22,7 +22,7 @@ export default function ManageClearance() {
   const [
     getAssignments,
     {
-      isFetching: isLoadingAssignments,
+      isFetching: isFetchingAssignments,
       isSuccess: isGetSuccess,
       isError: isGetError,
       data: getAssignmentsData,
@@ -180,7 +180,7 @@ export default function ManageClearance() {
       <Heading size={800}>Manage Clearances</Heading>
       <Text>View and edit the clearances of an individual</Text>
 
-      <ContentCard>
+      <ContentCard isLoading={isLoadingPersonnel}>
         <Heading size={600} marginBottom={minorScale(3)}>
           Select Person
         </Heading>
@@ -228,7 +228,7 @@ export default function ManageClearance() {
 
       {selectedPersonnel.length > 0 && (
         <Fragment>
-          <ContentCard>
+          <ContentCard isLoading={isLoadingClearances}>
             <Heading size={600} marginBottom={minorScale(3)}>
               Select Clearance
             </Heading>
@@ -292,7 +292,7 @@ export default function ManageClearance() {
               </Table.TextHeaderCell>
             </Table.Head>
             <Table.Body>
-              {isLoadingAssignments ? (
+              {isFetchingAssignments ? (
                 <Pane className='center' padding={minorScale(6)}>
                   <Spinner size={majorScale(4)} marginX='auto' />
                 </Pane>

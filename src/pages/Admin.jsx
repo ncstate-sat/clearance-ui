@@ -23,7 +23,11 @@ export default function ManageClearance() {
   const [users, setUsers] = useState([]) // All users in all lists.
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([]) // Strings selected from the people picker.
-  const { personnel, setPersonnelQuery } = usePersonnel() // Query for the people picker and get an array of personnel.
+  const {
+    personnel,
+    setPersonnelQuery,
+    isLoading: isLoadingPersonnel,
+  } = usePersonnel() // Query for the people picker and get an array of personnel.
 
   const [adminSearchQuery, setAdminSearchQuery] = useState('') // Search filter for the admin list.
   const [liaisonSearchQuery, setLiaisonSearchQuery] = useState('') // Search filter for the liaison list.
@@ -228,7 +232,7 @@ export default function ManageClearance() {
       <Heading size={800}>Manage Users</Heading>
       <Text>Add or remove accounts with administrative rights</Text>
 
-      <ContentCard>
+      <ContentCard isLoading={isLoadingPersonnel}>
         <Heading size={600} marginBottom={minorScale(3)}>
           Add Person
         </Heading>

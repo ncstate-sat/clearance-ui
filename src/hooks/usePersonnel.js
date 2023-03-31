@@ -5,7 +5,13 @@ import clearanceService from '../apis/clearanceService'
 const usePersonnel = (initialQuery = '') => {
   const [
     getPersonnel,
-    { data = { personnel: [], length: null }, isError, error, isLoading },
+    {
+      data = { personnel: [], length: null },
+      isError,
+      error,
+      isLoading,
+      isFetching,
+    },
   ] = clearanceService.useLazyGetPersonnelQuery()
 
   const [query, setQuery] = useState(initialQuery)
@@ -49,7 +55,7 @@ const usePersonnel = (initialQuery = '') => {
     setPersonnelQuery: setQuery,
     length: data.length,
     isTyping,
-    isLoading,
+    isLoading: isLoading || isFetching,
   }
 }
 
