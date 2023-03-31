@@ -163,6 +163,7 @@ export default function Timeframe({
             timeIntervals={15}
             timeFormat='h:mm aa'
             dateFormat='MM-dd-yyyy h:mm aa'
+            autoFocus
           />
         )}
       </LeftDateText>
@@ -176,6 +177,7 @@ export default function Timeframe({
             timeIntervals={15}
             timeFormat='h:mm aa'
             dateFormat='MM-dd-yyyy h:mm aa'
+            autoFocus
           />
         )}
       </RightDateText>
