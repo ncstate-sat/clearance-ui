@@ -74,8 +74,11 @@ export default function SideNav({ sidebarContent }) {
         <SidebarContent>
           <Tablist width='100%' marginTop='100px'>
             <SidebarHeading size={600}>Clearance Assignment</SidebarHeading>
-            <SideTab title='Assign' href='/assign' useAnchor={false} />
-            <SideTab title='Manage' href='/manage' useAnchor={false} />
+            <SideTab
+              title='Assign & Manage Clearances'
+              href='/manage'
+              useAnchor={false}
+            />
             {roles.includes('Admin') && (
               <SideTab
                 title='Liaison Permissions'
