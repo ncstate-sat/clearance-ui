@@ -18,6 +18,9 @@ const api = createApi({
           length: response['clearance_names'].length,
         }
       },
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
     getPersonnel: builder.query({
       query: ({ search }) => ({
@@ -33,12 +36,18 @@ const api = createApi({
           length: response['personnel'].length,
         }
       },
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
     getAssignments: builder.query({
       query: ({ campusId }) => ({
         url: `/assignments/${campusId}`,
         method: 'GET',
       }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
     assignClearances: builder.mutation({
       query: ({ assigneeIDs, clearanceIDs }) => ({
@@ -49,6 +58,9 @@ const api = createApi({
           clearance_ids: clearanceIDs,
         },
       }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
     revokeClearances: builder.mutation({
       query: ({ assigneeIDs, clearanceIDs }) => ({
@@ -59,6 +71,9 @@ const api = createApi({
           clearance_ids: clearanceIDs,
         },
       }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
     getAuditLog: builder.query({
       query: ({ params }) => ({
@@ -66,6 +81,9 @@ const api = createApi({
         method: 'GET',
         params: params,
       }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
     getLiaisonPermissions: builder.query({
       query: ({ campusId }) => ({
@@ -75,6 +93,9 @@ const api = createApi({
           campus_id: campusId,
         },
       }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
     assignLiaisonPermission: builder.mutation({
       query: ({ campusId, clearanceIDs }) => ({
@@ -85,6 +106,9 @@ const api = createApi({
           clearance_ids: clearanceIDs,
         },
       }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
     revokeLiaisonPermission: builder.mutation({
       query: ({ campusId, clearanceIDs }) => ({
@@ -95,6 +119,9 @@ const api = createApi({
           clearance_ids: clearanceIDs,
         },
       }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
     }),
   }),
 })

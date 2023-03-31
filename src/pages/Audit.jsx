@@ -53,7 +53,7 @@ export default function AuditLog() {
   // CALLS TO API
   const [
     getAuditLog,
-    { data: logData, isFetching: isLoading, isSuccess, isError },
+    { data: logData, isFetching, isSuccess, isError, error: logError },
   ] = clearanceService.useLazyGetAuditLogQuery()
 
   // UI STATE
@@ -162,10 +162,11 @@ export default function AuditLog() {
         newData = [...new Set(newData.map((d) => JSON.stringify(d)))]
         return newData.map((d) => JSON.parse(d))
       })
-    } else if (isError) {
+    } else if (isError && logError?.['name'] !== 'AbortError') {
       setLog([])
+      toaster.danger(logError ?? 'Request Failed')
     }
-  }, [isSuccess, isError, logData])
+  }, [isSuccess, isError, logData, logError])
 
   useEffect(() => {
     setPage(0)
@@ -190,7 +191,7 @@ export default function AuditLog() {
               setPage(0)
               queryLogs(filters, 0, selectedPersonnel, selectedClearances)
             }}
-            isLoading={isLoading}
+            isLoading={isFetching}
           >
             Refresh
           </Button>
@@ -372,7 +373,7 @@ export default function AuditLog() {
               </Table.Row>
             )
           })}
-          {isLoading ? (
+          {isFetching ? (
             <Pane className='center' padding={minorScale(6)}>
               <Spinner size={majorScale(4)} marginX='auto' />
             </Pane>
@@ -388,7 +389,7 @@ export default function AuditLog() {
 
       <Button
         onClick={() => setPage((p) => p + 1)}
-        disabled={log.length === 0 || isLoading}
+        disabled={log.length === 0 || isFetching}
       >
         Load More
       </Button>
