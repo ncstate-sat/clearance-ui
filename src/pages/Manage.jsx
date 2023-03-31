@@ -33,9 +33,11 @@ export default function ManageClearance() {
   const [
     getAssignments,
     {
-      isFetching: isLoadingAssignments,
-      data: getAssignmentsData,
+      isFetching: isFetchingAssignments,
       isSuccess: isGetSuccess,
+      isError: isGetError,
+      data: getAssignmentsData,
+      error: getAssignmentsError,
     },
   ] = clearanceService.useLazyGetAssignmentsQuery()
 
@@ -47,6 +49,7 @@ export default function ManageClearance() {
       isSuccess: isAssignSuccess,
       isError: isAssignError,
       data: assignData,
+      error: assignError,
     },
   ] = clearanceService.useAssignClearancesMutation()
 
@@ -109,16 +112,18 @@ export default function ManageClearance() {
   useEffect(() => {
     if (isGetSuccess) {
       setClearanceAssignments(getAssignmentsData['assignments'])
+    } else if (isGetError && getAssignmentsError?.['name'] !== 'AbortError') {
+      toaster.danger(getAssignmentsError ?? 'Request Failed')
     }
-  }, [isGetSuccess, getAssignmentsData])
+  }, [isGetSuccess, isGetError, getAssignmentsData, getAssignmentsError])
 
   // Handle response from Assign call.
   useEffect(() => {
     if (isAssignSuccess) {
       setBulkPersonnel([])
       toaster.success('Clearance(s) Assigned Successfully')
-    } else if (isAssignError) {
-      toaster.danger('Request Failed')
+    } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
+      toaster.danger(assignError ?? 'Request Failed')
     }
   }, [isAssignSuccess, isAssignError, assignData])
 
@@ -285,7 +290,7 @@ export default function ManageClearance() {
       <Heading size={800}>Manage Clearances</Heading>
       <Text>View and edit the clearances of an individual</Text>
 
-      <ContentCard>
+      <ContentCard isLoading={isLoadingPersonnel}>
         <Pane
           display='flex'
           flexDirection='row'
@@ -371,7 +376,7 @@ export default function ManageClearance() {
 
       {selectedPersonnel.length > 0 && (
         <Fragment>
-          <ContentCard>
+          <ContentCard isLoading={isLoadingClearances}>
             <Heading size={600} marginBottom={minorScale(3)}>
               Select Clearance
             </Heading>
@@ -435,7 +440,7 @@ export default function ManageClearance() {
               </Table.TextHeaderCell>
             </Table.Head>
             <Table.Body>
-              {isLoadingAssignments ? (
+              {isFetchingAssignments ? (
                 <Pane className='center' padding={minorScale(6)}>
                   <Spinner size={majorScale(4)} marginX='auto' />
                 </Pane>
