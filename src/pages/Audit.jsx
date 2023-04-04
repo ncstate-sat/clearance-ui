@@ -23,7 +23,7 @@ import Timeframe from '../components/Timeframe'
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
 
-const QUERY_LIMIT = 10
+const QUERY_LIMIT = 50
 
 // FILTER CONSTANTS
 const { BY_ASSIGNEE, BY_ASSIGNER, BY_CLEARANCE_NAME, BY_TIMEFRAME } =
@@ -139,7 +139,7 @@ export default function AuditLog() {
     const timeframe = flts[BY_TIMEFRAME].value
 
     const queryParams = {
-      page: pg,
+      skip: pg * QUERY_LIMIT,
       limit: QUERY_LIMIT + 1,
       clearance_name: selCls?.[0],
       from_time: timeframe?.startDateTime?.toISOString(),
