@@ -2,7 +2,8 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Login to clearance page", () => {
   test.beforeEach(async ({ page }) => {
-    const refreshToken = process.env["E2E_REFRESH_TOKEN"];
+    // const refreshToken = process.env["E2E_REFRESH_TOKEN"];
+    const refreshToken = process.env["E2E_REFRESH_TOKEN_ADMIN"];
 
     await page.addInitScript((rt) => {
       window.localStorage.setItem("refresh-token", rt);
@@ -25,7 +26,8 @@ test.describe("Login to clearance page", () => {
   });
 
   test("assign valid clearance to invalid user", async ({ page }) => {
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page.locator('#TagInput-1').fill('peter');
 
@@ -34,7 +36,8 @@ test.describe("Login to clearance page", () => {
   });
 
   test("assign one clearance to one user", async ({ page }) => {
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page
       .locator('[test-id="personnel-input"] input')
@@ -53,7 +56,8 @@ test.describe("Login to clearance page", () => {
   });
 
   test("assign multiple clearances to one user", async ({ page }) => {
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page.locator('#TagInput-1').fill('jtchampi');
     await page.getByText('John Champion (jtchampi@ncsu.edu) [200103374]').click();
@@ -71,7 +75,8 @@ test.describe("Login to clearance page", () => {
   });
 
   test("assign one clearance to multiple users", async ({ page }) => {
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page.locator('#TagInput-1').fill('jtchampi');
     await page.getByText('John Champion (jtchampi@ncsu.edu) [200103374]').click();
@@ -92,7 +97,8 @@ test.describe("Login to clearance page", () => {
   });
 
   test("assign multiple clearances to multiple users", async ({ page }) => {
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page.locator('#TagInput-1').fill('jtchampi');
     await page.getByText('John Champion (jtchampi@ncsu.edu) [200103374]').click();
@@ -113,7 +119,8 @@ test.describe("Login to clearance page", () => {
   });
 
   test("assign clearance - already assigned to the user", async ({page}) =>{
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page
       .locator('[test-id="personnel-input"] input')

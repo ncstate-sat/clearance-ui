@@ -2,7 +2,8 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Login to clearance page", () => {
   test.beforeEach(async ({ page }) => {
-    const refreshToken = process.env["E2E_REFRESH_TOKEN"];
+    // const refreshToken = process.env["E2E_REFRESH_TOKEN"];
+    const refreshToken = process.env["E2E_REFRESH_TOKEN_ADMIN"];
 
     await page.addInitScript((rt) => {
       window.localStorage.setItem("refresh-token", rt);
@@ -10,7 +11,8 @@ test.describe("Login to clearance page", () => {
   });
 
   test("manage clearances - view clearances for a user", async ({page}) =>{
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page
       .locator('[test-id="personnel-input"] input')
@@ -23,7 +25,8 @@ test.describe("Login to clearance page", () => {
   })
   
   test("revoke_clearance - one clearance from one user", async ({page}) =>{
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page
       .locator('[test-id="personnel-input"] input')
@@ -40,7 +43,8 @@ test.describe("Login to clearance page", () => {
   })
 
   test("revoke_clearance - multiple clearances from one user", async ({page}) =>{
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage"); 
 
     await page
       .locator('[test-id="personnel-input"] input')
