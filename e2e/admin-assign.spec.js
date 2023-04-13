@@ -10,7 +10,8 @@ test.describe("Login to clearance page", () => {
   });
 
   test("assign invalid clearances to valid user", async ({ page }) => {
-    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    await page.goto("/manage");    
 
     await page.locator('#TagInput-1').fill('jtchampi@ncsu.edu');
     await page
