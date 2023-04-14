@@ -111,7 +111,7 @@ export default function ManageClearance() {
 
   // Fetch clearance assignments for the selected person.
   useEffect(() => {
-    if (selectedPersonnel.length > 0) {
+    if (selectedPersonnel.length === 1) {
       const campusId = selectedPersonnel[0]['campus_id']
 
       const request = getAssignments({ campusId: campusId })
@@ -192,10 +192,6 @@ export default function ManageClearance() {
               `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
           )}
           onChange={(selected) => {
-            if (selected.length > 1) {
-              selected = [selected[selected.length - 1]]
-            }
-
             const personnelObjects = []
             const allPersonnel = [...personnel, ...selectedPersonnel]
             const personnelStrings = allPersonnel.map(
@@ -292,7 +288,14 @@ export default function ManageClearance() {
               </Table.TextHeaderCell>
             </Table.Head>
             <Table.Body>
-              {isFetchingAssignments ? (
+              {selectedPersonnel.length > 1 ? (
+                <Pane className='center' padding={minorScale(6)}>
+                  <Text>
+                    Clearances cannot be shown when more than one person is
+                    selected.
+                  </Text>
+                </Pane>
+              ) : isFetchingAssignments ? (
                 <Pane className='center' padding={minorScale(6)}>
                   <Spinner size={majorScale(4)} marginX='auto' />
                 </Pane>
