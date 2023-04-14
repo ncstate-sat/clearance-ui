@@ -4,10 +4,17 @@ on:
     branches: [main, master, test]
   pull_request:
     branches: [main, master, test]
+
+env:
+    REGISTRY_URL: satregistry.ehps.ncsu.edu:7001
+    PROJECT_NAME: clearance-ui
+    REPO_NAME: clearance-ui
+
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    #runs-on: ubuntu-latest
+    runs-on: sat-hosted
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
