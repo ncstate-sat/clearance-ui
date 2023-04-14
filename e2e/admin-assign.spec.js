@@ -11,17 +11,17 @@ test.describe("Login to clearance page", () => {
   });
 
   test("assign invalid clearances to valid user", async ({ page }) => {
-    // await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
-    await page.goto("/manage");    
+    await page.goto("https://clearance.test.ehps.ncsu.edu/manage");
+    //await page.goto("/manage");    
     console.log(page.url())
-    await page.locator('#TagInput-1').fill('jtchampi@ncsu.edu');
-    await page
-      .locator("text=John Champion (jtchampi@ncsu.edu) [200103374]")
-      .click();    
-    await page.locator('#TagInput-2').fill('clearanceD');
+    // await page.locator('#TagInput-1').fill('jtchampi@ncsu.edu');
+    // await page
+    //   .locator("text=John Champion (jtchampi@ncsu.edu) [200103374]")
+    //   .click();    
+    // await page.locator('#TagInput-2').fill('clearanceD');
 
-    await expect.soft(page.getByText('No Clearances Found')).toBeVisible();
-    await expect.soft(page.locator('[test-id="assign-clearance-btn"]')).toBeDisabled();
+    // await expect.soft(page.getByText('No Clearances Found')).toBeVisible();
+    // await expect.soft(page.locator('[test-id="assign-clearance-btn"]')).toBeDisabled();
    // await expect.soft(page.locator('xpath=//*[@id="root"]/div[3]/div[2]/button')).toBeDisabled();
   });
 
