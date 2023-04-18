@@ -77,7 +77,7 @@ const api = createApi({
     }),
     getAuditLog: builder.query({
       query: ({ params }) => ({
-        url: '/audit/',
+        url: '/audit',
         method: 'GET',
         params: params,
       }),
