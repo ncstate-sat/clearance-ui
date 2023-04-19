@@ -76,7 +76,7 @@ jobs:
           images: |
             ${{ env.REGISTRY_URL }}/${{env.PROJECT_NAME }}/${{ env.REPO_NAME }}
           tags: |
-            type=raw,value=${{ env.IMAGE_TAG_NAME }},priority=1001
+            type=raw,value='${{ env.IMAGE_TAG_NAME }}',priority=1001
             type=ref,event=branch
             type=semver,pattern={{raw}}
             type=sha
