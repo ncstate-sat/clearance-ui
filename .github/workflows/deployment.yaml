@@ -12,7 +12,7 @@ env:
   REGISTRY_URL: satregistry.ehps.ncsu.edu
   PROJECT_NAME: clearance-tool
   REPO_NAME: clearance-ui
-  SLACK_UPDATES: false
+  SLACK_UPDATES: true
   SLACK_CHANNEL_ID: C053DS40S22
   E2E_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_ADMIN }}
   E2E_LIAISON_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_LIAISON }}
