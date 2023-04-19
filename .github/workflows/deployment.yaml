@@ -14,7 +14,7 @@ env:
   REPO_NAME: clearance-ui
   SLACK_UPDATES: true
   SLACK_CHANNEL_ID: C053DS40S22
-  IMAGE_TAG_NAME: '{{branch}}.{{sha}}.{{date 'YYYY-MM-DD.HHmm'}}Z'
+  IMAGE_TAG_NAME: '{{branch}}.{{sha}}.{{date "YYYY-MM-DD.HHmm"}}Z'
   E2E_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_ADMIN }}
   E2E_LIAISON_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_LIAISON }}
   VITE_AUTH_SERVICE_URL: 'https://auth.services.test.ehps.ncsu.edu'
