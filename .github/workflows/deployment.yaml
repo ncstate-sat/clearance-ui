@@ -33,33 +33,33 @@ jobs:
           repository: SAT/sat-actions
           path: sat-actions
 
-      # - name: Setup Node
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 16
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-      # - name: Install Dependencies
-      #   run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-      # - name: Run Tests
-      #   id: test
-      #   run: |
-      #     npx playwright install
-      #     npm run e2e
+      - name: Run Tests
+        id: test
+        run: |
+          npx playwright install
+          npm run e2e
 
-      # - name: Send Failure Message on Slack if Tests Fail
-      #   if: ${{ failure() }}
-      #   uses: ./sat-actions/slack-updates
-      #   with:
-      #     channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
-      #     message: 'The tests for `clearance-ui` have failed.'
-      #   env:
-      #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      #     SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
+      - name: Send Failure Message on Slack if Tests Fail
+        if: ${{ failure() }}
+        uses: ./sat-actions/slack-updates
+        with:
+          channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
+          message: 'The tests for `clearance-ui` have failed.'
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
 
-      # - name: End the Job if the Tests Fail
-      #   if: ${{ failure() }}
-      #   run: exit 1
+      - name: End the Job if the Tests Fail
+        if: ${{ failure() }}
+        run: exit 1
 
       - name: Docker Login
         uses: ./sat-actions/docker-login
@@ -77,23 +77,12 @@ jobs:
           tags: |
             type=raw,value={{branch}}.{{sha}}.{{date 'YYYY-MM-DD.HHmm'}}Z
 
-      # - name: Update Docker Image
-      #   id: image-update
-      #   uses: ./sat-actions/update-image
-      #   with:
-      #     image-tag: ${{ steps.meta.outputs.tags }}
-      #     dockerfile: ./Dockerfile
-
-      - name: Modify Tag String
-        id: image-tag-string
-        env:
-          TAG: ${{ steps.meta.outputs.tags }}
-        run: |
-          echo "tag=${TAG##*:}" >> $GITHUB_OUTPUT
-
-      - name: Test Tag String
-        run: |
-          echo "${{ steps.image-tag-string.outputs.tag }}"
+      - name: Update Docker Image
+        id: image-update
+        uses: ./sat-actions/update-image
+        with:
+          image-tag: ${{ steps.meta.outputs.tags }}
+          dockerfile: ./Dockerfile
 
       - name: Send Failure Message on Slack if Image Upload Fails
         if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
@@ -109,11 +98,19 @@ jobs:
         if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
         run: exit 1
 
+      - name: Modify Tag String
+        id: image-tag-string
+        if: ${{ !failure() }}
+        env:
+          TAG: ${{ steps.meta.outputs.tags }}
+        run: |
+          echo "tag=${TAG##*:}" >> $GITHUB_OUTPUT
+
       - name: Send Success Message on Slack
         uses: ./sat-actions/slack-updates
         with:
           channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
-          message: 'A new image for `clearance-ui` has been uploaded to Harbor.```${{ steps.meta.outputs.tags }}```'
+          message: 'A new image for `clearance-ui` has been uploaded to Harbor.```${{ steps.image-tag-string.outputs.tag }}```'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
