@@ -91,6 +91,10 @@ jobs:
         run: |
           echo "tag=fragment::${TAG##*:}" >> $GITHUB_OUTPUT
 
+      - name: Test Tag String
+        run: |
+          echo "${{ steps.image-tag-string.outputs.tag }}"
+
       - name: Send Failure Message on Slack if Image Upload Fails
         if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
         uses: ./sat-actions/slack-updates
