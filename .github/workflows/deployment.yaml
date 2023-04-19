@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - develop
-      - dev-241/automate-tests
   workflow_dispatch:
 
 env:
