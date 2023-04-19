@@ -14,7 +14,6 @@ env:
   REPO_NAME: clearance-ui
   SLACK_UPDATES: true
   SLACK_CHANNEL_ID: C053DS40S22
-  IMAGE_TAG_NAME: "{{branch}}.{{sha}}.{{date 'YYYY-MM-DD.HHmm'}}Z"
   E2E_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_ADMIN }}
   E2E_LIAISON_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_LIAISON }}
   VITE_AUTH_SERVICE_URL: 'https://auth.services.test.ehps.ncsu.edu'
@@ -76,7 +75,7 @@ jobs:
           images: |
             ${{ env.REGISTRY_URL }}/${{env.PROJECT_NAME }}/${{ env.REPO_NAME }}
           tags: |
-            type=raw,value=${{ env.IMAGE_TAG_NAME }},priority=1001
+            type=raw,value={{branch}}.{{sha}}.{{date 'YYYY-MM-DD.HHmm'}}Z,priority=1001
             type=ref,event=branch
             type=semver,pattern={{raw}}
             type=sha
@@ -107,7 +106,7 @@ jobs:
         uses: ./sat-actions/slack-updates
         with:
           channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
-          message: 'A new image for `clearance-ui` has been uploaded to Harbor. The tag name for the image is `${{ env.IMAGE_TAG_NAME }}`'
+          message: 'A new image for `clearance-ui` has been uploaded to Harbor. The tag name is `${{ steps.meta.outputs.tags[0] }}'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
