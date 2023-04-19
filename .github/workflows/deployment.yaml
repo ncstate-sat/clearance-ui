@@ -12,7 +12,7 @@ env:
   REGISTRY_URL: satregistry.ehps.ncsu.edu
   PROJECT_NAME: clearance-tool
   REPO_NAME: clearance-ui
-  SLACK_UPDATES: true
+  SLACK_UPDATES: false
   SLACK_CHANNEL_ID: C053DS40S22
   E2E_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_ADMIN }}
   E2E_LIAISON_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_LIAISON }}
@@ -88,6 +88,10 @@ jobs:
           image-tag: ${{ steps.meta.outputs.tags }}
           dockerfile: ./Dockerfile
 
+      - name: Show Tags
+        run: |
+          echo "The tag names are ${{ steps.meta.outputs.tags }}"
+
       - name: Send Failure Message on Slack if Image Upload Fails
         if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
         uses: ./sat-actions/slack-updates
@@ -106,7 +110,7 @@ jobs:
         uses: ./sat-actions/slack-updates
         with:
           channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
-          message: 'A new image for `clearance-ui` has been uploaded to Harbor. The tag name is `${{ steps.meta.outputs.tags[0] }}'
+          message: 'A new image for `clearance-ui` has been uploaded to Harbor.'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
