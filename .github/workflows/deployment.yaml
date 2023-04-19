@@ -89,7 +89,7 @@ jobs:
         env:
           TAG: ${{ steps.meta.outputs.tags }}
         run: |
-          echo "tag=fragment::${TAG##*:}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG##*:}" >> $GITHUB_OUTPUT
 
       - name: Test Tag String
         run: |
