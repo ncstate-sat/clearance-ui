@@ -86,9 +86,10 @@ jobs:
 
       - name: Modify Tag String
         id: image-tag-string
+        env:
+          TAG: ${{ steps.meta.outputs.tags }}
         run: |
-          tag_strings="${{ split(steps.meta.outputs.tags), ':' }}"
-          echo "tag=tag_strings[1]" >> $TAG_NAME
+          echo "tag=fragment::${TAG##*:}" >> $TAG_NAME
 
       - name: Send Failure Message on Slack if Image Upload Fails
         if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
