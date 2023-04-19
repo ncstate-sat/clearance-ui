@@ -89,7 +89,7 @@ jobs:
         env:
           TAG: ${{ steps.meta.outputs.tags }}
         run: |
-          echo "tag=fragment::${TAG##*:}" >> $TAG_NAME
+          echo "tag=fragment::${TAG##*:}" >> $GITHUB_OUTPUT
 
       - name: Send Failure Message on Slack if Image Upload Fails
         if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
