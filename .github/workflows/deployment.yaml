@@ -16,7 +16,7 @@ env:
   REGISTRY_URL: satregistry.ehps.ncsu.edu
   PROJECT_NAME: clearance-tool
   REPO_NAME: clearance-ui
-  SLACK_UPDATES: false
+  SLACK_UPDATES: true
   SLACK_CHANNEL_ID: C053DS40S22
   E2E_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_ADMIN }}
   E2E_LIAISON_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_LIAISON }}
@@ -70,6 +70,15 @@ jobs:
       - name: End the Job if the Tests Fail
         if: ${{ failure() }}
         run: exit 1
+
+      - name: Send Success Message on Slack
+        uses: ./sat-actions/slack-updates
+        with:
+          channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
+          message: 'The tests for `${{ env.REPO_NAME }}` have passed.'
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
 
   build-image:
     name: Build Image
