@@ -5,13 +5,16 @@ on:
     branches:
       - main
       - develop
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - develop
 
 env:
   REGISTRY_URL: satregistry.ehps.ncsu.edu
   PROJECT_NAME: clearance-tool
   REPO_NAME: clearance-ui
-  SLACK_UPDATES: true
+  SLACK_UPDATES: false
   SLACK_CHANNEL_ID: C053DS40S22
   E2E_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_ADMIN }}
   E2E_LIAISON_REFRESH_TOKEN: ${{ secrets.E2E_REFRESH_TOKEN_LIAISON }}
@@ -19,8 +22,8 @@ env:
   VITE_CLEARANCE_SERVICE_URL: 'https://clearance.services.test.ehps.ncsu.edu'
 
 jobs:
-  update-image:
-    name: Update Image
+  run-tests:
+    name: Run Tests
     runs-on: sat-hosted
     steps:
       - name: Get Code
@@ -51,7 +54,7 @@ jobs:
         uses: ./sat-actions/slack-updates
         with:
           channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
-          message: 'The tests for `clearance-ui` have failed.'
+          message: 'The tests for `${{ env.REPO_NAME }}` have failed.'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
@@ -60,56 +63,70 @@ jobs:
         if: ${{ failure() }}
         run: exit 1
 
+  build-image:
+    name: Build Image
+    if: ${{ github.event_name == 'push' }}
+    runs-on: sat-hosted
+    steps:
+      - name: Get Code
+          uses: actions/checkout@v3
+
+        - name: Get SAT Actions
+          uses: actions/checkout@v3
+          with:
+            repository: SAT/sat-actions
+            path: sat-actions
+
       - name: Docker Login
-        uses: ./sat-actions/docker-login
-        with:
-          username: ${{ secrets.HARBOR_USERNAME }}
-          password: ${{ secrets.HARBOR_PASSWORD }}
-          registry-url: ${{ env.REGISTRY_URL }}
+          uses: ./sat-actions/docker-login
+          with:
+            username: ${{ secrets.HARBOR_USERNAME }}
+            password: ${{ secrets.HARBOR_PASSWORD }}
+            registry-url: ${{ env.REGISTRY_URL }}
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{env.PROJECT_NAME }}/${{ env.REPO_NAME }}
-          tags: |
-            type=raw,value={{branch}}.{{sha}}.{{date 'YYYY-MM-DD.HHmm'}}Z
+        - name: Docker meta
+          id: meta
+          uses: docker/metadata-action@v4
+          with:
+            images: |
+              ${{ env.REGISTRY_URL }}/${{env.PROJECT_NAME }}/${{ env.REPO_NAME }}
+            tags: |
+              type=raw,value={{branch}}.{{sha}}.{{date 'YYYY-MM-DD.HHmm'}}Z
 
-      - name: Update Docker Image
-        id: image-update
-        uses: ./sat-actions/update-image
-        with:
-          image-tag: ${{ steps.meta.outputs.tags }}
-          dockerfile: ./Dockerfile
+        - name: Update Docker Image
+          id: image-update
+          uses: ./sat-actions/update-image
+          with:
+            image-tag: ${{ steps.meta.outputs.tags }}
+            dockerfile: ./Dockerfile
 
-      - name: Send Failure Message on Slack if Image Upload Fails
-        if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
-        uses: ./sat-actions/slack-updates
-        with:
-          channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
-          message: 'The tests for `clearance-ui` have passed, but the image failed to upload to Harbor.'
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
+        - name: Send Failure Message on Slack if Image Upload Fails
+          if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
+          uses: ./sat-actions/slack-updates
+          with:
+            channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
+            message: 'The tests for `${{ env.REPO_NAME }}` have passed, but the image failed to upload to Harbor.'
+          env:
+            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+            SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
 
-      - name: End the Job if the Image Upload Fail
-        if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
-        run: exit 1
+        - name: End the Job if the Image Upload Fail
+          if: ${{ failure() && steps.image-update.conclusion == 'failure' }}
+          run: exit 1
 
-      - name: Modify Tag String
-        id: image-tag-string
-        if: ${{ !failure() }}
-        env:
-          TAG: ${{ steps.meta.outputs.tags }}
-        run: |
-          echo "tag=${TAG##*:}" >> $GITHUB_OUTPUT
+        - name: Modify Tag String
+          id: image-tag-string
+          if: ${{ !failure() }}
+          env:
+            TAG: ${{ steps.meta.outputs.tags }}
+          run: |
+            echo "tag=${TAG##*:}" >> $GITHUB_OUTPUT
 
-      - name: Send Success Message on Slack
-        uses: ./sat-actions/slack-updates
-        with:
-          channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
-          message: 'A new image for `clearance-ui` has been uploaded to Harbor.```${{ steps.image-tag-string.outputs.tag }}```'
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
+        - name: Send Success Message on Slack
+          uses: ./sat-actions/slack-updates
+          with:
+            channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
+            message: 'A new image for `${{ env.REPO_NAME }}` has been uploaded to Harbor.```${{ steps.image-tag-string.outputs.tag }}```'
+          env:
+            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+            SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
