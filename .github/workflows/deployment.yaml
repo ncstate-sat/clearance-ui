@@ -5,12 +5,11 @@ on:
     branches:
       - main
       - develop
-      - test-ci
   pull_request:
     branches:
       - main
       - develop
-      - test-ci
+  workflow_dispatch:
 
 env:
   REGISTRY_URL: satregistry.ehps.ncsu.edu
@@ -28,10 +27,6 @@ jobs:
     name: Run Tests
     runs-on: sat-hosted
     steps:
-      - name: Log Data
-        run: |
-          echo "${{ github.head_ref }}"
-
       - name: Get Code
         uses: actions/checkout@v3
         with:
