@@ -1,4 +1,4 @@
-name: Update Image
+name: Run Tests & Build Image
 
 on:
   push:
