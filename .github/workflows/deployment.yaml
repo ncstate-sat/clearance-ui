@@ -5,12 +5,12 @@ on:
     branches:
       - main
       - develop
-      - temporary-branch
+      - test-ci
   pull_request:
     branches:
       - main
       - develop
-      - temporary-branch
+      - test-ci
 
 env:
   REGISTRY_URL: satregistry.ehps.ncsu.edu
@@ -73,6 +73,7 @@ jobs:
 
   build-image:
     name: Build Image
+    needs: run-tests
     if: ${{ github.event_name == 'push' }}
     runs-on: sat-hosted
     steps:
