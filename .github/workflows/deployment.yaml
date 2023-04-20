@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - develop
+      - temporary-branch
   pull_request:
     branches:
       - main
       - develop
+      - temporary-branch
 
 env:
   REGISTRY_URL: satregistry.ehps.ncsu.edu
