@@ -12,9 +12,9 @@ import {
   WarningSignIcon,
   Switch,
   Tooltip,
-  Position,
   toaster,
   majorScale,
+  Position,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect, Fragment } from 'react'
 import { useSelector } from 'react-redux'
@@ -177,7 +177,10 @@ export default function ManageClearance() {
       .then(() => {
         setClearanceAssignments((prev) => {
           const oldValues = JSON.parse(JSON.stringify(prev))
-          const newValues = JSON.parse(JSON.stringify(selectedClearances))
+          const newValues = selectedClearances.map((cl) => ({
+            ...cl,
+            can_revoke: true,
+          }))
 
           const clearanceIDs = {}
           const newClearances = []
@@ -462,20 +465,32 @@ export default function ManageClearance() {
                       .toLowerCase()
                       .includes(tableFilter.toLowerCase())
                   })
+                  .sort((a, b) => (a['name'] > b['name'] ? 1 : -1))
                   .map((cl) => (
                     <Table.Row key={cl['id']}>
                       <Table.TextCell flexBasis='65%'>
                         {cl['name']}
                       </Table.TextCell>
                       <Table.TextCell flexShrink={0} textAlign='right'>
-                        <Button
-                          test-id='revoke-clearance-btn'
-                          appearance='secondary'
-                          onClick={() => onRevokeClearance(cl['id'])}
-                          isLoading={loadingRevokeRequests.includes(cl['id'])}
+                        <Tooltip
+                          isShown={cl['can_revoke'] ? false : undefined}
+                          content='You do not have permission to revoke this clearance.'
+                          position={Position.RIGHT}
                         >
-                          Revoke
-                        </Button>
+                          <div>
+                            <Button
+                              test-id='revoke-clearance-btn'
+                              appearance='secondary'
+                              disabled={!cl['can_revoke']}
+                              onClick={() => onRevokeClearance(cl['id'])}
+                              isLoading={loadingRevokeRequests.includes(
+                                cl['id']
+                              )}
+                            >
+                              Revoke
+                            </Button>
+                          </div>
+                        </Tooltip>
                       </Table.TextCell>
                     </Table.Row>
                   ))
