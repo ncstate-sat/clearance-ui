@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { Heading, Pane, minorScale } from 'evergreen-ui'
 import { refreshToken, signInWithGoogle } from '../store/slices/auth'
@@ -46,10 +47,22 @@ const Footer = styled(Pane)`
   align-items: center;
 `
 
+const LIAISON_PATHS = ['/manage']
+
 const Auth = () => {
   const isLoggedIn = useSelector((state) => state.auth.token !== null)
   const isValidUser = useSelector((state) => state.auth.isValidUser)
+  const roles = useSelector((state) => state.auth.roles)
+
   const dispatch = useDispatch()
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!LIAISON_PATHS.includes(pathname) && !roles.includes('Admin')) {
+      navigate('/manage')
+    }
+  }, [pathname, roles])
 
   useEffect(() => {
     dispatch(refreshToken())
