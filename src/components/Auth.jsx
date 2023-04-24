@@ -59,7 +59,11 @@ const Auth = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!LIAISON_PATHS.includes(pathname) && !roles.includes('Admin')) {
+    if (
+      isLoggedIn &&
+      !LIAISON_PATHS.includes(pathname) &&
+      !roles.includes('Admin')
+    ) {
       navigate('/manage')
     }
   }, [pathname, roles])
