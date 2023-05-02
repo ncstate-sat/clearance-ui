@@ -1,5 +1,8 @@
 node_modules
 build
 .env
+.envrc
 .git
 .gitignore
+.idea
+.github
