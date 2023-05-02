@@ -143,11 +143,11 @@ export default function ManageClearance() {
         )
         toaster.success('Revoke Succeeded')
       })
-      .catch(() => {
+      .catch((error) => {
         setLoadingRevokeRequests((requests) =>
           requests.filter((r) => r !== clearanceId)
         )
-        toaster.success('Revoke Failed')
+        toaster.danger(error ?? 'Revoke Failed. Please try again later.')
       })
   }
 
