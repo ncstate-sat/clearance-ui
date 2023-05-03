@@ -7,16 +7,16 @@ import {
   Text,
   Spinner,
   Pane,
-  Textarea,
   TickCircleIcon,
   WarningSignIcon,
-  Switch,
+  InfoSignIcon,
+  DownloadIcon,
   Tooltip,
   toaster,
   majorScale,
   Position,
 } from 'evergreen-ui'
-import { useMemo, useState, useEffect, Fragment } from 'react'
+import { useMemo, useState, useEffect, useRef, Fragment } from 'react'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
 import clearanceService from '../apis/clearanceService'
@@ -26,9 +26,11 @@ import getEnvVariable from '../utils/getEnvVariable'
 
 import usePersonnel from '../hooks/usePersonnel'
 import useClearance from '../hooks/useClearance'
+import useBulkUpload from '../hooks/useBulkUpload'
 
 export default function ManageClearance() {
   const token = useSelector((state) => state.auth.token)
+  const uploadRef = useRef()
 
   const [
     getAssignments,
@@ -58,11 +60,18 @@ export default function ManageClearance() {
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
-  const [bulkAssign, setBulkAssign] = useState(false)
   const [isVerifyingBulkPersonnel, setIsVerifyingBulkPersonnel] =
     useState(false)
-  const [bulkPersonnelText, setBulkPersonnelText] = useState('')
   const [bulkPersonnel, setBulkPersonnel] = useState([])
+  const {
+    setFile,
+    data: bulkUploadData,
+    error: bulkUploadError,
+  } = useBulkUpload()
+
+  useEffect(() => {
+    if (bulkUploadError) toaster.warning(bulkUploadError)
+  }, [bulkUploadError])
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
   const {
@@ -239,50 +248,67 @@ export default function ManageClearance() {
         return prevCopy
       })
     }
+
     setIsVerifyingBulkPersonnel(false)
   }
 
-  // Verify that the text matches people in the system.
-  const verifyBulkPersonnelData = async () => {
-    let strings = bulkPersonnelText.match(/([^\n]+)/g) || []
-    strings = [...new Set(strings.map((s) => ({ text: s, isLoading: true })))]
-    setBulkPersonnel(strings)
-    await inefficientlyVerifyPersonnelData(strings)
+  useEffect(() => {
+    if (bulkUploadData.length > 0) {
+      const parsedInput = [
+        ...new Set(bulkUploadData.map((s) => ({ text: s, isLoading: true }))),
+      ]
+      setBulkPersonnel(parsedInput)
+      inefficientlyVerifyPersonnelData(parsedInput)
+        .then(() => {})
+        .catch(() => {})
+    }
+  }, [bulkUploadData])
+
+  const onDownloadTemplate = () => {
+    const a = document.createElement('a')
+    a.href = '/personnel.csv'
+    a.target = '_blank'
+    a.download = true
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
   }
 
   const bulkUploadTable = useMemo(() => {
     if (bulkPersonnel.length === 0) return null
 
     return (
-      <Table>
+      <Table marginTop='1rem'>
         <Table.Body>
-          {bulkPersonnel.map((r) => (
-            <Table.Row key={JSON.stringify(r)}>
-              <Table.TextCell>{r['text']}</Table.TextCell>
-              <Table.TextCell textAlign='right' flexBasis={100} flexGrow={0}>
-                {r['isLoading'] ? (
-                  <Spinner size={16} float='right' />
-                ) : r['isVerified'] ? (
-                  <Tooltip
-                    position={Position.RIGHT}
-                    content='This person is verified and will be given all selected clearances.'
-                  >
-                    <TickCircleIcon
-                      color='success'
-                      test-id='verify-success-icon'
-                    />
-                  </Tooltip>
-                ) : (
-                  <Tooltip
-                    position={Position.RIGHT}
-                    content='This person is not in the system and will not be assigned any clearances.'
-                  >
-                    <WarningSignIcon color='danger' />
-                  </Tooltip>
-                )}
-              </Table.TextCell>
-            </Table.Row>
-          ))}
+          {bulkPersonnel
+            .filter((p) => p['isLoading'] || !p['isVerified'])
+            .map((r) => (
+              <Table.Row key={JSON.stringify(r)}>
+                <Table.TextCell>{r['text']}</Table.TextCell>
+                <Table.TextCell textAlign='right' flexBasis={100} flexGrow={0}>
+                  {r['isLoading'] ? (
+                    <Spinner size={16} float='right' />
+                  ) : r['isVerified'] ? (
+                    <Tooltip
+                      position={Position.RIGHT}
+                      content='This person is verified and will be given all selected clearances.'
+                    >
+                      <TickCircleIcon
+                        color='success'
+                        test-id='verify-success-icon'
+                      />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip
+                      position={Position.RIGHT}
+                      content='This person is not in the system and will not be assigned any clearances.'
+                    >
+                      <WarningSignIcon color='danger' />
+                    </Tooltip>
+                  )}
+                </Table.TextCell>
+              </Table.Row>
+            ))}
         </Table.Body>
       </Table>
     )
@@ -303,78 +329,70 @@ export default function ManageClearance() {
           <Heading size={600} display='inline-block'>
             Select Person
           </Heading>
-          <Pane display='inline-flex' flexDirection='row' alignItems='center'>
-            <Text>Bulk</Text>
-            <Switch
-              display='inline-block'
-              marginLeft='0.5rem'
-              checked={bulkAssign}
-              onChange={(e) => setBulkAssign(e.target.checked)}
-              test-id='bulk-select-switch'
-            />
-          </Pane>
-        </Pane>
-        {!bulkAssign ? (
-          <>
-            <TagInput
-              tagSubmitKey='enter'
-              width='100%'
-              values={selectedPersonnel.map(
-                (p) =>
-                  `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-              )}
-              onChange={(selected) => {
-                const personnelObjects = []
-                const allPersonnel = [...personnel, ...selectedPersonnel]
-                const personnelStrings = allPersonnel.map(
-                  (p) =>
-                    `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-                )
-                selected.forEach((s) => {
-                  const i = personnelStrings.indexOf(s)
-                  if (i >= 0) {
-                    personnelObjects.push(allPersonnel[i])
-                  }
-                })
-                setSelectedPersonnel(personnelObjects)
-              }}
-              autocompleteItems={autocompletePersonnel}
-              onInputChange={(e) => setPersonnelQuery(e.target.value)}
-              test-id='personnel-input'
-            />
-            <NoResultsText
-              $visible={
-                !isLoadingPersonnel &&
-                !isTypingPersonnel &&
-                personnelQuery.length >= 3 &&
-                personnelLength === 0
-              }
+          <input
+            style={{ display: 'none' }}
+            ref={uploadRef}
+            type='file'
+            onChange={(event) => setFile(event.target.files[0])}
+          />
+          <Pane>
+            <Tooltip
+              position={Position.TOP}
+              content='Up to 20 people can be added via CSV.'
             >
-              No Personnel Found
-            </NoResultsText>
-          </>
-        ) : (
-          <>
-            <Textarea
-              marginY='1rem'
-              placeholder='Paste a list of Campus IDs or Unity IDs separated by new lines.'
-              resize='vertical'
-              value={bulkPersonnelText}
-              onChange={(e) => setBulkPersonnelText(e.target.value)}
-              test-id='bulk-personnel-textarea'
+              <InfoSignIcon color='muted' marginRight='0.5rem' />
+            </Tooltip>
+            <DownloadIcon
+              color='default'
+              marginRight='0.5rem'
+              cursor='pointer'
+              onClick={onDownloadTemplate}
             />
             <Button
-              marginBottom='1rem'
-              onClick={verifyBulkPersonnelData}
+              onClick={() => uploadRef?.current?.click()}
               isLoading={isVerifyingBulkPersonnel}
-              disabled={isVerifyingBulkPersonnel}
-              test-id='bulk-verify-btn'
             >
-              Verify
+              Choose CSV
             </Button>
-            {bulkUploadTable}
-          </>
-        )}
+          </Pane>
+        </Pane>
+        <TagInput
+          tagSubmitKey='enter'
+          width='100%'
+          values={selectedPersonnel.map(
+            (p) =>
+              `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
+          )}
+          onChange={(selected) => {
+            const personnelObjects = []
+            const allPersonnel = [...personnel, ...selectedPersonnel]
+            const personnelStrings = allPersonnel.map(
+              (p) =>
+                `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
+            )
+            selected.forEach((s) => {
+              const i = personnelStrings.indexOf(s)
+              if (i >= 0) {
+                personnelObjects.push(allPersonnel[i])
+              }
+            })
+            setSelectedPersonnel(personnelObjects)
+          }}
+          autocompleteItems={autocompletePersonnel}
+          onInputChange={(e) => setPersonnelQuery(e.target.value)}
+          test-id='personnel-input'
+        />
+        {bulkUploadTable}
+        <NoResultsText
+          $visible={
+            !isLoadingPersonnel &&
+            !isTypingPersonnel &&
+            personnelQuery.length >= 3 &&
+            personnelLength === 0
+          }
+        >
+          No Personnel Found
+        </NoResultsText>
       </ContentCard>
 
       {selectedPersonnel.length > 0 && (
