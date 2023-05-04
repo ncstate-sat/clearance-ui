@@ -154,7 +154,7 @@ export default function AuditLog() {
 
   useEffect(() => {
     if (isSuccess) {
-      let newLogs = [...logData['assignments']]
+      let newLogs = [...logData['records']]
       if (newLogs.length < QUERY_LIMIT + 1) {
         setShowLoadMoreButton(false)
       } else if (newLogs.length === QUERY_LIMIT + 1) {
@@ -362,25 +362,61 @@ export default function AuditLog() {
         </ContentCard>
       )}
 
-      <Table marginY={minorScale(6)}>
+      <Table marginY={minorScale(6)} test-id='audit-table'>
         <Table.Head>
-          <Table.TextHeaderCell>Date Assigned</Table.TextHeaderCell>
-          <Table.TextHeaderCell>Clearance</Table.TextHeaderCell>
-          <Table.TextHeaderCell>Message</Table.TextHeaderCell>
-          <Table.TextHeaderCell>Assigned To</Table.TextHeaderCell>
-          <Table.TextHeaderCell>Done By</Table.TextHeaderCell>
+          <Table.TextHeaderCell
+            test-id='table-header'
+            flexBasis='18%'
+            flexGrow='0'
+          >
+            Date Assigned
+          </Table.TextHeaderCell>
+          <Table.TextHeaderCell test-id='table-header' flexBasis='5fr'>
+            Action
+          </Table.TextHeaderCell>
+          <Table.TextHeaderCell
+            test-id='table-header'
+            flexBasis='20%'
+            flexGrow='0'
+          >
+            Assigned To
+          </Table.TextHeaderCell>
+          <Table.TextHeaderCell
+            test-id='table-header'
+            flexBasis='20%'
+            flexGrow='0'
+          >
+            Done By
+          </Table.TextHeaderCell>
         </Table.Head>
         <Table.Body>
           {log.map((l) => {
             return (
-              <Table.Row key={JSON.stringify(l)}>
-                <Table.TextCell>
+              <Table.Row key={JSON.stringify(l)} test-id='table-row'>
+                <Table.TextCell
+                  test-id='table-cell'
+                  flexBasis='18%'
+                  flexGrow='0'
+                >
                   {new Date(l['timestamp']).toLocaleString()}
                 </Table.TextCell>
-                <Table.TextCell>{l['clearance']?.['name']}</Table.TextCell>
-                <Table.TextCell>{l['message']}</Table.TextCell>
-                <Table.TextCell>{l['assignee_id']}</Table.TextCell>
-                <Table.TextCell>{l['assigner_id']}</Table.TextCell>
+                <Table.TextCell test-id='table-cell' flexBasis='5fr'>
+                  {l['action']}
+                </Table.TextCell>
+                <Table.TextCell
+                  test-id='table-cell'
+                  flexBasis='20%'
+                  flexGrow='0'
+                >
+                  {l['assignee']}
+                </Table.TextCell>
+                <Table.TextCell
+                  test-id='table-cell'
+                  flexBasis='20%'
+                  flexGrow='0'
+                >
+                  {l['assigner']}
+                </Table.TextCell>
               </Table.Row>
             )
           })}

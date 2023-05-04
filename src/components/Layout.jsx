@@ -32,7 +32,7 @@ const HeaderContainer = styled(Pane)`
 
 const HeaderContent = styled(Pane)`
   display: flex;
-  width: ${majorScale(120)}px;
+  width: ${majorScale(160)}px;
   max-width: 100%;
   margin: auto;
 `
@@ -41,12 +41,12 @@ const ViewContainer = styled(Pane)`
   display: grid;
   grid-template-columns: ${({ $isHidden, $isSidebarOpen }) =>
     $isHidden
-      ? `${majorScale(60)}px 1fr`
+      ? `${majorScale(60)}px minmax(0, 1fr)`
       : $isSidebarOpen
-      ? `${majorScale(32)}px 1fr`
-      : '0 1fr'};
+      ? `${majorScale(32)}px minmax(0, 1fr)`
+      : '0 minmax(0, 1fr)'};
   column-gap: ${({ $isSidebarOpen }) => ($isSidebarOpen ? '16px' : '0')};
-  width: ${majorScale(120)}px;
+  width: ${majorScale(160)}px;
   max-width: 100%;
   margin: auto;
   transition: grid 0.2s ease;

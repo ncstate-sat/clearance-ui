@@ -17,19 +17,19 @@ const SidebarContainer = styled(Pane)`
   width: ${({ $isExtended }) =>
     $isExtended
       ? '50vw'
-      : `calc((100vw - ${majorScale(120)}px) / 2 + ${majorScale(32)}px)`};
+      : `calc((100vw - ${majorScale(160)}px) / 2 + ${majorScale(32)}px)`};
   height: 100%;
   position: fixed;
   zindex: 1;
   transform: ${({ $isOpen, $isExtended }) =>
     !$isOpen && !$isExtended
-      ? `translateX(calc((100vw - ${majorScale(120)}px) / -2 - ${majorScale(
+      ? `translateX(calc((100vw - ${majorScale(160)}px) / -2 - ${majorScale(
           32
         )}px))`
       : 'translateX(0)'};
   transition: transform 0.2s ease, width 0.2s ease;
 
-  @media (max-width: ${majorScale(120)}px) {
+  @media (max-width: ${majorScale(160)}px) {
     ${({ $isExtended }) =>
       !$isExtended &&
       css`
