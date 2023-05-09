@@ -11,14 +11,13 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     await page.goto('/manage')
   })
 
-  // TODO: Remove John's info from E2E tests
-  test('assign a clearance', async ({ page }) => {
+  test('assign and revoke a clearance', async ({ page }) => {
     await page.locator('[test-id="personnel-input"] input').fill('jtchampi')
     await page
       .getByText('John Champion (jtchampi@ncsu.edu) [200103374]')
       .click()
 
-    await page.locator('[test-id="clearance-input"] input').fill('vrb')
+    await page.locator('[test-id="clearance-input"] input').fill('ClearanceA')
     await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
 
     await page.locator('[test-id=assign-clearance-btn]').click()
@@ -26,14 +25,6 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     await expect(
       page.getByRole('heading', { name: 'Clearance(s) Assigned Successfully' })
     ).toBeVisible()
-  })
-
-  // TODO: Remove John's info from E2E tests
-  test('revoke the first clearance for John', async ({ page }) => {
-    await page.locator('[test-id="personnel-input"] input').fill('jtchampi')
-    await page
-      .getByText('John Champion (jtchampi@ncsu.edu) [200103374]')
-      .click()
 
     await page.locator('[test-id="revoke-clearance-btn"]').first().click()
 
@@ -53,8 +44,8 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
       })
     })
 
-    await page.locator('[test-id="personnel-input"] input').fill('staylor8')
-    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
+    await page.locator('[test-id="personnel-input"] input').fill('rsemmle')
+    await page.getByText('Ryan Semmler (rsemmle@ncsu.edu) [001132807]').click()
 
     await page.locator('[test-id="clearance-input"] input').fill('ClearanceA')
     await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
@@ -85,8 +76,8 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
       })
     })
 
-    await page.locator('[test-id="personnel-input"] input').fill('staylor8')
-    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
+    await page.locator('[test-id="personnel-input"] input').fill('rsemmle')
+    await page.getByText('Ryan Semmler (rsemmle@ncsu.edu) [001132807]').click()
 
     await page.locator('[test-id="clearance-input"] input').fill('ClearanceA')
     await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
@@ -135,7 +126,10 @@ test.describe('[Liaison] Assign & Manage Clearances page', () => {
       page.getByRole('heading', { name: 'Clearance(s) Assigned Successfully' })
     ).toBeVisible()
 
-    await page.locator('[test-id="revoke-clearance-btn"]').first().click()
+    await page
+      .locator('button:not([disabled])[test-id="revoke-clearance-btn"]')
+      .first()
+      .click()
 
     await expect(
       page.getByRole('heading', { name: 'Revoke Succeeded' })
