@@ -17,6 +17,7 @@ import authService from '../apis/authService'
 
 export default function ManageClearance() {
   const token = useSelector((state) => state.auth.token)
+  const email = useSelector((state) => state.auth.email)
 
   const [addingRoles, setAddingRoles] = useState([]) // Roles being added to the selected personnel.
   const [removingRoles, setRemovingRoles] = useState([]) // Roles being removed from the clicked personnel.
@@ -296,13 +297,19 @@ export default function ManageClearance() {
           {users
             .filter((u) => u['roles'].includes('Admin'))
             .filter((a) => a['email'].includes(adminSearchQuery))
+            .sort((a, b) => {
+              if (a['email'] > b['email']) return 1
+              else return -1
+            })
             .map((p) => (
-              <Table.Row key={p['email']}>
+              <Table.Row key={p['email']} test-id={p['email']}>
                 <Table.TextCell flexBasis='70%'>{p['email']}</Table.TextCell>
                 <Table.TextCell flexShrink={0}>
                   <Button
                     appearance='secondary'
                     isLoading={removingEmails.includes(p['email'])}
+                    disabled={p['email'] === email}
+                    test-id='revoke-btn'
                     onClick={() => {
                       setRemovingRoles((prevRemoving) => [
                         ...JSON.parse(JSON.stringify(prevRemoving)),
@@ -334,6 +341,10 @@ export default function ManageClearance() {
           {users
             .filter((u) => u['roles'].includes('Liaison'))
             .filter((a) => a['email'].includes(liaisonSearchQuery))
+            .sort((a, b) => {
+              if (a['email'] > b['email']) return 1
+              else return -1
+            })
             .map((p) => (
               <Table.Row key={p['email']}>
                 <Table.TextCell flexBasis='70%'>{p['email']}</Table.TextCell>

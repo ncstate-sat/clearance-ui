@@ -136,7 +136,7 @@ export default function LiaisonPermissions() {
       setLoadingRevokeRequests((requests) =>
         requests.filter((r) => r !== revokeArgs['clearanceIDs'][0])
       )
-      toaster.success(revokeError ?? 'Revoke Failed')
+      toaster.danger(revokeError ?? 'Revoke Failed. Please try again later.')
     }
   }, [isRevokeSuccess, isRevokeError, revokeData, revokeError, revokeArgs])
 

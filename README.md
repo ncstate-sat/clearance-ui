@@ -68,13 +68,13 @@ docker run -p 3000:3000 --env-file .env clearance-ui
 
 ## Running E2E Tests
 
-End-to-End tests must be ran with all environment variables present, with the exception of the Google Client ID.
+End-to-End tests must be ran with all environment variables present, with the exception of the Google Client ID. The Auth Service and Clearance Service must be running for the tests to be able to work.
 
 ### Using VSCode
 
 - **Required:** Install the Playwright VSCode extension.
-- **Required:** `E2E_REFRESH_TOKEN` is a required env var for authentication in the E2E tests.
-  - Either set it in your `.env` file or in your VSCode settings.
+- **Required:** `E2E_REFRESH_TOKEN` and `E2E_LIAISON_REFRESH_TOKEN` are required environment variables for authentication in the E2E tests.
+  - Either set them in your `.env` file or in your VSCode settings.
 
 Click the Beaker icon on the sidebar in VSCode to view all of the tests. You can set breakpoints, toggle
 the browser, or run individual tests with 1 click. It's pretty cool.
@@ -84,7 +84,7 @@ the browser, or run individual tests with 1 click. It's pretty cool.
 ### Manually
 
 ```
-E2E_REFRESH_TOKEN=<ask_for_e2e_jwt> npm run e2e
+E2E_REFRESH_TOKEN=<ask_for_e2e_jwt> E2E_LIAISON_REFRESH_TOKEN=<ask_for_liaison_e2e_jwt> npm run e2e
 # npm run e2e:report # gives a nice HTML report
 # npm run e2e ./path/to/test.spec.ts # run a specific test
 ```
