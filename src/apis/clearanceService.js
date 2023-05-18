@@ -40,6 +40,18 @@ const api = createApi({
         return response?.data?.detail
       },
     }),
+    getBulkPersonnel: builder.mutation({
+      query: ({ values }) => ({
+        url: '/personnel/bulk',
+        method: 'POST',
+        body: {
+          values: values,
+        },
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
     getAssignments: builder.query({
       query: ({ campusId }) => ({
         url: `/assignments/${campusId}`,

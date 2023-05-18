@@ -55,14 +55,23 @@ export default function ManageClearance() {
     },
   ] = clearanceService.useAssignClearancesMutation()
 
+  const [
+    getBulkPersonnel,
+    {
+      isLoading: isBulkPersonnelLoading,
+      isSuccess: isBulkPersonnelSuccess,
+      isError: isBulkPersonnelError,
+      data: bulkPersonnelData,
+      error: bulkPersonnelError,
+    },
+  ] = clearanceService.useGetBulkPersonnelMutation()
+
   const [tableFilter, setTableFilter] = useState('')
 
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
-  const [isVerifyingBulkPersonnel, setIsVerifyingBulkPersonnel] =
-    useState(false)
-  const [bulkPersonnel, setBulkPersonnel] = useState([])
+  const [bulkPersonnelNotFound, setBulkPersonnelNotFound] = useState([])
   const {
     setFile,
     data: bulkUploadData,
@@ -129,7 +138,7 @@ export default function ManageClearance() {
   // Handle response from Assign call.
   useEffect(() => {
     if (isAssignSuccess) {
-      setBulkPersonnel([])
+      setBulkPersonnelNotFound([])
       toaster.success('Clearance(s) Assigned Successfully')
     } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
       toaster.danger(assignError ?? 'Request Failed')
@@ -205,62 +214,32 @@ export default function ManageClearance() {
       })
   }
 
-  // Temporary function to do the job of the new API endpoint until that endpoint is done.
-  const inefficientlyVerifyPersonnelData = async (strings) => {
-    setIsVerifyingBulkPersonnel(true)
-    setSelectedPersonnel([])
-
-    for await (const s of strings) {
-      let response
-      let personnel
-      try {
-        response = await axios.get(
-          getEnvVariable('VITE_CLEARANCE_SERVICE_URL') +
-            `/personnel?search=${s['text']}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        personnel = response.data['personnel']
-      } catch (error) {
-        personnel = []
-      }
-
-      if (personnel.length === 1) {
-        setSelectedPersonnel((prev) => [
-          ...JSON.parse(JSON.stringify(prev)),
-          personnel[0],
-        ])
-      }
-      setBulkPersonnel((prev) => {
-        const prevCopy = JSON.parse(JSON.stringify(prev))
-        const index = prevCopy.findIndex((p) => p['text'] === s['text'])
-
-        if (personnel.length === 1) {
-          const text = `${personnel[0]['first_name']} ${personnel[0]['last_name']} (${personnel[0]['email']}) [${personnel[0]['campus_id']}]`
-          prevCopy[index] = { text: text, isVerified: true }
-        } else {
-          prevCopy[index] = { text: s['text'], isVerified: false }
-        }
-
-        return prevCopy
-      })
+  useEffect(() => {
+    if (isBulkPersonnelSuccess) {
+      const personnel = bulkPersonnelData['personnel']
+      const notFound = bulkPersonnelData['not_found']
+      setSelectedPersonnel(personnel)
+      setBulkPersonnelNotFound(notFound)
+    } else if (
+      isBulkPersonnelError &&
+      bulkPersonnelError?.['name'] !== 'AbortError'
+    ) {
+      toaster.danger(bulkPersonnelError ?? 'Request Failed')
     }
-
-    setIsVerifyingBulkPersonnel(false)
-  }
+  }, [
+    isBulkPersonnelSuccess,
+    isBulkPersonnelError,
+    bulkPersonnelData,
+    bulkPersonnelError,
+  ])
 
   useEffect(() => {
     if (bulkUploadData.length > 0) {
       const parsedInput = [
         ...new Set(bulkUploadData.map((s) => ({ text: s, isLoading: true }))),
       ]
-      setBulkPersonnel(parsedInput)
-      inefficientlyVerifyPersonnelData(parsedInput)
-        .then(() => {})
-        .catch(() => {})
+      setBulkPersonnelNotFound([])
+      getBulkPersonnel({ values: parsedInput.map((i) => i['text']) })
     }
   }, [bulkUploadData])
 
@@ -275,44 +254,28 @@ export default function ManageClearance() {
   }
 
   const bulkUploadTable = useMemo(() => {
-    if (bulkPersonnel.length === 0) return null
+    if (bulkPersonnelNotFound.length === 0) return null
 
     return (
       <Table marginTop='1rem'>
         <Table.Body>
-          {bulkPersonnel
-            .filter((p) => p['isLoading'] || !p['isVerified'])
-            .map((r) => (
-              <Table.Row key={JSON.stringify(r)}>
-                <Table.TextCell>{r['text']}</Table.TextCell>
-                <Table.TextCell textAlign='right' flexBasis={100} flexGrow={0}>
-                  {r['isLoading'] ? (
-                    <Spinner size={16} float='right' />
-                  ) : r['isVerified'] ? (
-                    <Tooltip
-                      position={Position.RIGHT}
-                      content='This person is verified and will be given all selected clearances.'
-                    >
-                      <TickCircleIcon
-                        color='success'
-                        test-id='verify-success-icon'
-                      />
-                    </Tooltip>
-                  ) : (
-                    <Tooltip
-                      position={Position.RIGHT}
-                      content='This person is not in the system and will not be assigned any clearances.'
-                    >
-                      <WarningSignIcon color='danger' />
-                    </Tooltip>
-                  )}
-                </Table.TextCell>
-              </Table.Row>
-            ))}
+          {bulkPersonnelNotFound.map((n) => (
+            <Table.Row key={JSON.stringify(n)}>
+              <Table.TextCell>{n}</Table.TextCell>
+              <Table.TextCell textAlign='right' flexBasis={100} flexGrow={0}>
+                <Tooltip
+                  position={Position.RIGHT}
+                  content='This person is not in the system and will not be assigned any clearances.'
+                >
+                  <WarningSignIcon color='danger' />
+                </Tooltip>
+              </Table.TextCell>
+            </Table.Row>
+          ))}
         </Table.Body>
       </Table>
     )
-  }, [bulkPersonnel])
+  }, [bulkPersonnelNotFound])
 
   return (
     <>
@@ -350,7 +313,7 @@ export default function ManageClearance() {
             />
             <Button
               onClick={() => uploadRef?.current?.click()}
-              isLoading={isVerifyingBulkPersonnel}
+              isLoading={isBulkPersonnelLoading}
             >
               Choose CSV
             </Button>
