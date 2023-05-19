@@ -7,7 +7,7 @@ import {
   Text,
   Spinner,
   Pane,
-  TickCircleIcon,
+  Menu,
   WarningSignIcon,
   InfoSignIcon,
   DownloadIcon,
@@ -15,6 +15,7 @@ import {
   toaster,
   majorScale,
   Position,
+  Popover,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect, useRef, Fragment } from 'react'
 import { useSelector } from 'react-redux'
@@ -299,24 +300,24 @@ export default function ManageClearance() {
             onChange={(event) => setFile(event.target.files[0])}
           />
           <Pane>
-            <Tooltip
-              position={Position.TOP}
-              content='Up to 20 people can be added via CSV.'
-            >
-              <InfoSignIcon color='muted' marginRight='0.5rem' />
-            </Tooltip>
-            <DownloadIcon
-              color='default'
-              marginRight='0.5rem'
-              cursor='pointer'
-              onClick={onDownloadTemplate}
-            />
             <Button
-              onClick={() => uploadRef?.current?.click()}
-              isLoading={isBulkPersonnelLoading}
+              onClick={onDownloadTemplate}
+              marginRight='0.5rem'
+              appearance='minimal'
             >
-              Choose CSV
+              Download Template CSV
             </Button>
+            <Tooltip
+              content='Up to 20 people can be added via CSV.'
+              position={Position.TOP_RIGHT}
+            >
+              <Button
+                onClick={() => uploadRef?.current?.click()}
+                isLoading={isBulkPersonnelLoading}
+              >
+                Choose CSV
+              </Button>
+            </Tooltip>
           </Pane>
         </Pane>
         <TagInput
