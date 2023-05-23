@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import path from 'path'
 
 test.describe('[Admin] Assign & Manage Clearances page', () => {
   test.beforeEach(async ({ page }) => {
@@ -138,5 +139,23 @@ test.describe('[Liaison] Assign & Manage Clearances page', () => {
     await expect(
       page.locator('[test-id="revoke-clearance-btn"]').first()
     ).toBeDisabled()
+  })
+
+  test.skip('bulk upload a list of people', async ({ page }) => {
+    await page.locator('[test-id="choose-csv-btn"]').first().click()
+
+    const filePath = path.resolve('./e2e/bulk-upload-personnel-ids.csv')
+    console.log(filePath)
+
+    await page.getByTestId('file-upload').setInputFiles(filePath)
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(4990)
+
+    const selectedCount = await page.$$eval(
+      '[test-id="file-upload"] strong',
+      (elements) => elements.length
+    )
+
+    await expect(selectedCount).toBeGreaterThan(1)
   })
 })

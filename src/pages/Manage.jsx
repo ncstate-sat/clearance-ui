@@ -7,30 +7,23 @@ import {
   Text,
   Spinner,
   Pane,
-  Menu,
   WarningSignIcon,
-  InfoSignIcon,
-  DownloadIcon,
   Tooltip,
   toaster,
   majorScale,
   Position,
-  Popover,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect, useRef, Fragment } from 'react'
 import { useSelector } from 'react-redux'
-import axios from 'axios'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import NoResultsText from '../components/NoResultsText'
-import getEnvVariable from '../utils/getEnvVariable'
 
 import usePersonnel from '../hooks/usePersonnel'
 import useClearance from '../hooks/useClearance'
 import useBulkUpload from '../hooks/useBulkUpload'
 
 export default function ManageClearance() {
-  const token = useSelector((state) => state.auth.token)
   const uploadRef = useRef()
 
   const [
@@ -297,6 +290,7 @@ export default function ManageClearance() {
             style={{ display: 'none' }}
             ref={uploadRef}
             type='file'
+            test-id='file-upload'
             onChange={(event) => setFile(event.target.files[0])}
           />
           <Pane>
@@ -314,6 +308,7 @@ export default function ManageClearance() {
               <Button
                 onClick={() => uploadRef?.current?.click()}
                 isLoading={isBulkPersonnelLoading}
+                test-id='choose-csv-btn'
               >
                 Choose CSV
               </Button>
