@@ -241,7 +241,7 @@ export default function ManageClearance() {
     const a = document.createElement('a')
     a.href = '/personnel.csv'
     a.target = '_blank'
-    a.download = true
+    a.download = 'personnel_template'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
