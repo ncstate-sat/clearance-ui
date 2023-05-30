@@ -20,33 +20,41 @@ test.describe('Liaison Access to Pages', () => {
     expect(pathname).toEqual('/manage')
   })
 
-  test.skip('it should not be able to access the `audit` page as a liaison', async ({
+  test('it should not be able to access the `audit` page as a liaison', async ({
     page,
   }) => {
-    const reponse = await page.waitForResponse((response) => response.url('/audit'))
+    await page.goto('/audit')
+    //Wait for the redirection, from '/audit' to 'manage, to finish before conducting the testing.
+    setTimeout(() => {
+      const url = page.url()
+      const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
+      expect(pathname).toEqual('/manage')
+    }, 2000);
 
-    const url = response.url()
-    const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
-    expect(pathname).toEqual('/manage')
   })
 
-  test.skip('it should not be able to access the `liaison-permissions` page as a liaison', async ({
+  test('it should not be able to access the `liaison-permissions` page as a liaison', async ({
     page,
   }) => {
     await page.goto('/liaison-permissions')
+    //Wait for the redirection, from '/audit' to 'manage, to finish before conducting the testing.    
+    setTimeout(() => {
+      const url = page.url()
+      const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
+      expect(pathname).toEqual('/manage')
+    }, 2000);
 
-    const url = page.url()
-    const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
-    expect(pathname).toEqual('/manage')
   })
 
-  test.skip('it should not be able to access the `admin` page as a liaison', async ({
+  test('it should not be able to access the `admin` page as a liaison', async ({
     page,
   }) => {
     await page.goto('/admin')
-
-    const url = page.url()
-    const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
-    expect(pathname).toEqual('/manage')
+    //Wait for the redirection, from '/audit' to 'manage, to finish before conducting the testing.
+    setTimeout(() => {
+      const url = page.url()
+      const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
+      expect(pathname).toEqual('/manage')
+    }, 2000);      
   })
 })
