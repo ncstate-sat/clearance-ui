@@ -7,20 +7,25 @@ import {
   Text,
   Spinner,
   Pane,
+  WarningSignIcon,
   Tooltip,
   toaster,
   majorScale,
   Position,
 } from 'evergreen-ui'
-import { useMemo, useState, useEffect, Fragment } from 'react'
+import { useMemo, useState, useEffect, useRef, Fragment } from 'react'
+import { useSelector } from 'react-redux'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import NoResultsText from '../components/NoResultsText'
 
 import usePersonnel from '../hooks/usePersonnel'
 import useClearance from '../hooks/useClearance'
+import useBulkUpload from '../hooks/useBulkUpload'
 
 export default function ManageClearance() {
+  const uploadRef = useRef()
+
   const [
     getAssignments,
     {
@@ -44,10 +49,32 @@ export default function ManageClearance() {
     },
   ] = clearanceService.useAssignClearancesMutation()
 
+  const [
+    getBulkPersonnel,
+    {
+      isLoading: isBulkPersonnelLoading,
+      isSuccess: isBulkPersonnelSuccess,
+      isError: isBulkPersonnelError,
+      data: bulkPersonnelData,
+      error: bulkPersonnelError,
+    },
+  ] = clearanceService.useGetBulkPersonnelMutation()
+
   const [tableFilter, setTableFilter] = useState('')
 
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
+
+  const [bulkPersonnelNotFound, setBulkPersonnelNotFound] = useState([])
+  const {
+    setFile,
+    data: bulkUploadData,
+    error: bulkUploadError,
+  } = useBulkUpload()
+
+  useEffect(() => {
+    if (bulkUploadError) toaster.warning(bulkUploadError)
+  }, [bulkUploadError])
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
   const {
@@ -105,6 +132,7 @@ export default function ManageClearance() {
   // Handle response from Assign call.
   useEffect(() => {
     if (isAssignSuccess) {
+      setBulkPersonnelNotFound([])
       toaster.success('Clearance(s) Assigned Successfully')
     } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
       toaster.danger(assignError ?? 'Request Failed')
@@ -180,15 +208,113 @@ export default function ManageClearance() {
       })
   }
 
+  useEffect(() => {
+    if (isBulkPersonnelSuccess) {
+      const personnel = bulkPersonnelData['personnel']
+      const notFound = bulkPersonnelData['not_found']
+      setSelectedPersonnel(personnel)
+      setBulkPersonnelNotFound(notFound)
+    } else if (
+      isBulkPersonnelError &&
+      bulkPersonnelError?.['name'] !== 'AbortError'
+    ) {
+      toaster.danger(bulkPersonnelError ?? 'Request Failed')
+    }
+  }, [
+    isBulkPersonnelSuccess,
+    isBulkPersonnelError,
+    bulkPersonnelData,
+    bulkPersonnelError,
+  ])
+
+  useEffect(() => {
+    if (bulkUploadData.length > 0) {
+      const parsedInput = [
+        ...new Set(bulkUploadData.map((s) => ({ text: s, isLoading: true }))),
+      ]
+      setBulkPersonnelNotFound([])
+      getBulkPersonnel({ values: parsedInput.map((i) => i['text']) })
+    }
+  }, [bulkUploadData])
+
+  const onDownloadTemplate = () => {
+    const a = document.createElement('a')
+    a.href = '/personnel.csv'
+    a.target = '_blank'
+    a.download = 'personnel_template'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+
+  const bulkUploadTable = useMemo(() => {
+    if (bulkPersonnelNotFound.length === 0) return null
+
+    return (
+      <Table marginTop='1rem'>
+        <Table.Body>
+          {bulkPersonnelNotFound.map((n) => (
+            <Table.Row key={JSON.stringify(n)}>
+              <Table.TextCell>{n}</Table.TextCell>
+              <Table.TextCell textAlign='right' flexBasis={100} flexGrow={0}>
+                <Tooltip
+                  position={Position.RIGHT}
+                  content='This person is not in the system and will not be assigned any clearances.'
+                >
+                  <WarningSignIcon color='danger' />
+                </Tooltip>
+              </Table.TextCell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    )
+  }, [bulkPersonnelNotFound])
+
   return (
     <>
       <Heading size={800}>Manage Clearances</Heading>
       <Text>View and edit the clearances of an individual</Text>
 
       <ContentCard isLoading={isLoadingPersonnel}>
-        <Heading size={600} marginBottom={minorScale(3)}>
-          Select Person
-        </Heading>
+        <Pane
+          display='flex'
+          flexDirection='row'
+          justifyContent='space-between'
+          marginBottom={minorScale(3)}
+        >
+          <Heading size={600} display='inline-block'>
+            Select Person
+          </Heading>
+          <input
+            style={{ display: 'none' }}
+            ref={uploadRef}
+            type='file'
+            test-id='file-upload'
+            onChange={(event) => setFile(event.target.files[0])}
+          />
+          <Pane>
+            <Button
+              onClick={onDownloadTemplate}
+              marginRight='0.5rem'
+              appearance='minimal'
+            >
+              Download Template CSV
+            </Button>
+            <Tooltip
+              content='Up to 20 people can be added via CSV.'
+              position={Position.TOP_RIGHT}
+            >
+              <Button
+                onClick={() => uploadRef?.current?.click()}
+                isLoading={isBulkPersonnelLoading}
+                test-id='choose-csv-btn'
+              >
+                Choose CSV
+              </Button>
+            </Tooltip>
+          </Pane>
+        </Pane>
         <TagInput
           tagSubmitKey='enter'
           width='100%'
@@ -215,6 +341,7 @@ export default function ManageClearance() {
           onInputChange={(e) => setPersonnelQuery(e.target.value)}
           test-id='personnel-input'
         />
+        {bulkUploadTable}
         <NoResultsText
           $visible={
             !isLoadingPersonnel &&
