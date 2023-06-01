@@ -37,12 +37,6 @@ const myTheme = mergeTheme(defaultTheme, {
           background: 'none',
           border: '1px solid #cc0000',
           color: '#cc0000',
-          selectors: {
-            _disabled: {
-              color: '#cccccc',
-              borderColor: '#cccccc',
-            },
-          },
         },
         minimal: {
           _hover: {
