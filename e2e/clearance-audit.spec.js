@@ -2,20 +2,21 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Audit Log page', () => {
   test.beforeEach(async ({ page }) => {
-    // const refreshToken = process.env['E2E_REFRESH_TOKEN']
-    const refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRkdWJleUBuY3N1LmVkdSIsImV4cCI6MTY4NTczMDg2NX0.weaFMzy4hjG5-SSeodDyFpqyNMeqbf3D8L6XDxTxuu4"
+    const refreshToken = process.env['E2E_REFRESH_TOKEN']
 
     await page.addInitScript((rt) => {
       window.localStorage.setItem('refresh-token', rt)
     }, refreshToken)
 
-    await page.goto('https://clearance.test.ehps.ncsu.edu/audit', {waitUntil: "domcontentloaded"})
+    await page.goto('/audit')
     
   })
 
   test('it should display four columns and at least one row', async ({
     page,
   }) => {
+
+    //Make sure the page is loaded.
     await expect(page.getByRole('heading', { name: 'Audit Log' })).toBeVisible();
     
     // Make sure we have four columns.
