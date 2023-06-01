@@ -9,11 +9,16 @@ test.describe('Audit Log page', () => {
     }, refreshToken)
 
     await page.goto('/audit')
+    
   })
 
   test('it should display four columns and at least one row', async ({
     page,
   }) => {
+
+    //Make sure the page is loaded.
+    await expect(page.getByRole('heading', { name: 'Audit Log' })).toBeVisible();
+    
     // Make sure we have four columns.
     const headerCells = await page.getByTestId('table-header').count()
     expect(headerCells).toBe(4)
