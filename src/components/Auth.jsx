@@ -71,7 +71,7 @@ const Auth = () => {
   useEffect(() => {
     dispatch(refreshToken())
 
-    if (!isLoggedIn) {
+    const setupGoogleIdentityServices = () => {
       if (window.google?.accounts?.id) {
         window.google.accounts.id.initialize({
           client_id: getEnvVariable('VITE_GOOGLE_IDENTITY_CLIENT_ID'),
@@ -82,9 +82,14 @@ const Auth = () => {
           document.getElementById('login-button-div'),
           { theme: 'outline', size: 'large' }
         )
-      } else {
-        window.location.reload()
       }
+    }
+
+    setupGoogleIdentityServices()
+    window.addEventListener('load', setupGoogleIdentityServices)
+
+    return () => {
+      window.removeEventListener('load', setupGoogleIdentityServices)
     }
   }, [isLoggedIn])
 
