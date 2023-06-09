@@ -197,9 +197,8 @@ export default function LiaisonPermissions() {
         <TagInput
           tagSubmitKey='enter'
           width='100%'
-          values={selectedPersonnel.map(
-            (p) =>
-              `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
+          values={selectedPersonnel.map((p) =>
+            `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
           )}
           onChange={(selected) => {
             if (selected.length > 1) {
@@ -208,9 +207,8 @@ export default function LiaisonPermissions() {
 
             const personnelObjects = []
             const allPersonnel = [...personnel, ...selectedPersonnel]
-            const personnelStrings = allPersonnel.map(
-              (p) =>
-                `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
+            const personnelStrings = allPersonnel.map((p) =>
+              `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
             )
             selected.forEach((s) => {
               const i = personnelStrings.indexOf(s)

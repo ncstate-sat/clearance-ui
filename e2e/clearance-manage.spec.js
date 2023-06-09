@@ -101,6 +101,33 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
 
     await page.unroute(/\/assignments\/revoke$/)
   })
+
+  test('select persons with missing details', async ({ page }) => {
+    const personnel = [
+      {
+        first_name: '',
+        middle_name: '',
+        last_name: 'Dunbar Driver #1',
+        email: '',
+        campus_id: '100015229',
+      },
+    ]
+
+    await page.route(/\/personnel\?search=100015229/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ personnel: personnel }),
+      })
+    })
+
+    await page.locator('[test-id="personnel-input"] input').fill('100015229')
+    await page.getByText('Dunbar Driver #1 () [100015229]').click()
+
+    await expect(
+      page.getByText('Dunbar Driver #1 () [100015229]')
+    ).toBeVisible()
+  })
 })
 
 test.describe('[Liaison] Assign & Manage Clearances page', () => {
