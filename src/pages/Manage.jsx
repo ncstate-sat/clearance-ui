@@ -452,7 +452,7 @@ export default function ManageClearance() {
                           content='You do not have permission to revoke this clearance.'
                           position={Position.RIGHT}
                         >
-                          <div>
+                          <div style={{ display: 'inline-block' }}>
                             <Button
                               test-id='revoke-clearance-btn'
                               appearance='secondary'
