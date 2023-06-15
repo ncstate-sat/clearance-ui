@@ -162,10 +162,37 @@ test.describe('[Liaison] Assign & Manage Clearances page', () => {
     await expect(
       page.getByRole('heading', { name: 'Revoke Succeeded' })
     ).toBeVisible()
+  })
+
+  test('verify disabled revoke buttons appear disabled', async ({ page }) => {
+    await page.locator('[test-id="personnel-input"] input').fill('staylor8')
+    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
+
+    await page.locator('[test-id="clearance-input"] input').fill('ClearanceA')
+    await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
+
+    await page.locator('[test-id=assign-clearance-btn]').click()
 
     await expect(
-      page.locator('[test-id="revoke-clearance-btn"]').first()
-    ).toBeDisabled()
+      page.getByRole('heading', { name: 'Clearance(s) Assigned Successfully' })
+    ).toBeVisible()
+
+    const enabledButton = await page
+      .locator('button:not([disabled])[test-id="revoke-clearance-btn"]')
+      .first()
+    const disabledButton = await page
+      .locator('button[disabled][test-id="revoke-clearance-btn"]')
+      .first()
+
+    const enabledColor = await enabledButton.evaluate((el) =>
+      window.getComputedStyle(el).getPropertyValue('color')
+    )
+    const disabledColor = await disabledButton.evaluate((el) =>
+      window.getComputedStyle(el).getPropertyValue('color')
+    )
+
+    expect(enabledColor).toBe('rgb(204, 0, 0)')
+    expect(disabledColor).toBe('rgb(204, 204, 204)')
   })
 
   test.skip('bulk upload a list of people', async ({ page }) => {
