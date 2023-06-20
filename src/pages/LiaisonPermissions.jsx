@@ -1,5 +1,6 @@
 import {
   Button,
+  Dialog,
   Heading,
   minorScale,
   Table,
@@ -11,6 +12,7 @@ import {
   majorScale,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import NoResultsText from '../components/NoResultsText'
@@ -18,7 +20,11 @@ import NoResultsText from '../components/NoResultsText'
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
 
+import authService from '../apis/authService'
+
 export default function LiaisonPermissions() {
+  const token = useSelector((state) => state.auth.token)
+
   // CALLS TO API
   const [
     getLiaisonPermissions,
@@ -55,6 +61,11 @@ export default function LiaisonPermissions() {
 
   // UI STATE
   const [tableFilter, setTableFilter] = useState('')
+  const [shouldProcessRequest, setShouldProcessRequest] = useState(false)
+  const [shouldAddLiaisonPermissionModal, setShouldAddLiaisonPermissionModal] =
+    useState(false)
+  const [shouldAddLiaisonPermission, setShouldAddLiaisonPermission] =
+    useState(false)
 
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
@@ -143,6 +154,7 @@ export default function LiaisonPermissions() {
   useEffect(() => {
     if (isAssignSuccess) {
       setSelectedClearances([])
+      setClearanceAssignments(assignData['record']['clearances'])
       toaster.success('Permissions Assigned')
     } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
       toaster.danger(assignError ?? 'Request Failed')
@@ -173,9 +185,80 @@ export default function LiaisonPermissions() {
     })
   }
 
-  const submitRequestHandler = () => {
+  useEffect(() => {
+    if (shouldProcessRequest && selectedPersonnel.length > 0) {
+      // Check if this liaison already has access to the tool. If not, add him or her.
+      authService
+        .get('/role-accounts?role=Liaison', {
+          headers: {
+            Authorization: 'Bearer ' + token,
+          },
+        })
+        .then((response) => {
+          const liaisonAccounts = response.data['accounts']
+          const thisLiaison = liaisonAccounts.find(
+            (l) => l['email'] === selectedPersonnel[0]['email']
+          )
+
+          if (!thisLiaison) {
+            // Ask if we should add this liaison.
+            setShouldAddLiaisonPermissionModal(true)
+          } else {
+            setShouldAddLiaisonPermissionModal(false)
+            submitRequestHandler()
+          }
+        })
+        .catch((error) => {
+          if (
+            !error.response.status === 401 &&
+            !error.response?.data?.['detail'] === 'Token is expired'
+          ) {
+            console.error(error)
+            setShouldAddLiaisonPermissionModal(false)
+          }
+        })
+    }
+  }, [shouldProcessRequest, selectedPersonnel, token])
+
+  useEffect(() => {
+    if (shouldAddLiaisonPermission && selectedPersonnel.length > 0) {
+      authService
+        .put(
+          '/update-account-roles',
+          {
+            email: selectedPersonnel[0]['email'],
+            add_roles: ['Liaison'],
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + token,
+            },
+          }
+        )
+        .then(() => {
+          toaster.success('User has been granted Liaison access.')
+          submitRequestHandler()
+        })
+        .catch((error) => {
+          if (
+            !error.response.status === 401 &&
+            !error.response?.data?.['detail'] === 'Token is expired'
+          ) {
+            console.error(error)
+            setShouldAddLiaisonPermission(false)
+            toaster.danger('There was an error granting access.')
+          }
+        })
+    }
+  }, [shouldAddLiaisonPermission, selectedPersonnel, token])
+
+  const submitRequestHandler = async () => {
     if (selectedPersonnel.length === 0 || selectedClearances.length === 0)
       return
+
+    setShouldProcessRequest(false)
+    setShouldAddLiaisonPermissionModal(false)
+    setShouldAddLiaisonPermission(false)
 
     const clearanceIds = selectedClearances.map((c) => c['id'])
 
@@ -189,6 +272,24 @@ export default function LiaisonPermissions() {
     <>
       <Heading size={800}>Manage Liaison Permissions</Heading>
       <Text>View and edit the clearances a liaison can assign</Text>
+
+      <Dialog
+        isShown={shouldAddLiaisonPermissionModal}
+        title='Grant Access?'
+        cancelLabel={"Don't Grant Access"}
+        confirmLabel='Grant Access'
+        onCloseComplete={() => {
+          setShouldAddLiaisonPermissionModal(false)
+          submitRequestHandler()
+        }}
+        onConfirm={(close) => {
+          setShouldAddLiaisonPermission(true)
+          close()
+        }}
+      >
+        This person does not currently have access to the tool as a Liaison.
+        Would you like to grant access?
+      </Dialog>
 
       <ContentCard isLoading={isLoadingPersonnel}>
         <Heading size={600} marginBottom={minorScale(3)}>
@@ -277,7 +378,7 @@ export default function LiaisonPermissions() {
         disabled={
           selectedClearances.length === 0 || selectedPersonnel.length === 0
         }
-        onClick={submitRequestHandler}
+        onClick={() => setShouldProcessRequest(true)}
         test-id='assign-permission-btn'
       >
         Give Permission
