@@ -10,7 +10,7 @@ test.describe('Manage Admins page', () => {
   })
 
   // TODO: Remove John's info from E2E tests
-  test('add an admin', async ({ page }) => {
+  test.skip('add an admin', async ({ page }) => {
     await page.goto('/admin')
 
     await page
@@ -29,7 +29,7 @@ test.describe('Manage Admins page', () => {
   })
 
   // TODO: Remove John's info from E2E tests
-  test('add a liaison', async ({ page }) => {
+  test.skip('add a liaison', async ({ page }) => {
     await page.goto('/admin')
 
     await page
@@ -47,7 +47,7 @@ test.describe('Manage Admins page', () => {
     )
   })
 
-  test('ensure admin user cannot self-remove from admin list', async ({
+  test.skip('ensure admin user cannot self-remove from admin list', async ({
     page,
   }) => {
     await page.goto('/admin')

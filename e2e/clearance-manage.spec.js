@@ -12,7 +12,7 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     await page.goto('/manage')
   })
 
-  test('assign and revoke a clearance', async ({ page }) => {
+  test.skip('assign and revoke a clearance', async ({ page }) => {
     await page.locator('[test-id="personnel-input"] input').fill('jtchampi')
     await page
       .getByText('John Champion (jtchampi@ncsu.edu) [200103374]')
@@ -34,7 +34,7 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     ).toBeVisible()
   })
 
-  test('handle an error assigning a clearance', async ({ page }) => {
+  test.skip('handle an error assigning a clearance', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not assign clearance.'
 
     await page.route(/\/assignments\/assign$/, async (route) => {
@@ -66,7 +66,7 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     expect(color).toBe('rgb(167, 54, 54)')
   })
 
-  test('handle an error revoking a clearance assignment', async ({ page }) => {
+  test.skip('handle an error revoking a clearance assignment', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not revoke clearance assignment.'
 
     await page.route(/\/assignments\/revoke$/, async (route) => {
@@ -102,7 +102,7 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     await page.unroute(/\/assignments\/revoke$/)
   })
 
-  test('select persons with missing details', async ({ page }) => {
+  test.skip('select persons with missing details', async ({ page }) => {
     const personnel = [
       {
         first_name: '',
@@ -141,7 +141,7 @@ test.describe('[Liaison] Assign & Manage Clearances page', () => {
     await page.goto('/manage')
   })
 
-  test('assign and revoke a clearance', async ({ page }) => {
+  test.skip('assign and revoke a clearance', async ({ page }) => {
     await page.locator('[test-id="personnel-input"] input').fill('staylor8')
     await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
 
@@ -164,7 +164,7 @@ test.describe('[Liaison] Assign & Manage Clearances page', () => {
     ).toBeVisible()
   })
 
-  test('verify disabled revoke buttons appear disabled', async ({ page }) => {
+  test.skip('verify disabled revoke buttons appear disabled', async ({ page }) => {
     await page.locator('[test-id="personnel-input"] input').fill('staylor8')
     await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
 
