@@ -3,4 +3,4 @@
 
 npm run prettier-format
 npx eslint-config-prettier ./index.js
-git add -A .
+git add -u
