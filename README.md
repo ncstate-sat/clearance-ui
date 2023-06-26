@@ -23,6 +23,12 @@ The application must be served on a URL registered with Google Identity Services
 npm install
 ```
 
+2. Set up Husky for pre-commit.
+```
+npm run prepare
+```
+[Husky](https://typicode.github.io/husky/) is a package that sets up pre-commit hooks for git. Whenever you make a commit, the code is linted to standard formatting rules.
+
 2. Run the app.
 
 ```
