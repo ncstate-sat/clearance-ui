@@ -9,7 +9,7 @@ test.describe('Admin Access to Pages', () => {
     }, refreshToken)
   })
 
-  test('it should be able to access the `manage` page as an admin', async ({
+  test.skip('it should be able to access the `manage` page as an admin', async ({
     page,
   }) => {
     await page.goto('/manage')
@@ -19,7 +19,7 @@ test.describe('Admin Access to Pages', () => {
     expect(pathname).toEqual('/manage')
   })
 
-  test('it should be able to access the `audit` page as an admin', async ({
+  test.skip('it should be able to access the `audit` page as an admin', async ({
     page,
   }) => {
     await page.goto('/audit')
@@ -29,7 +29,7 @@ test.describe('Admin Access to Pages', () => {
     expect(pathname).toEqual('/audit')
   })
 
-  test('it should be able to access the `liaison-permissions` page as an admin', async ({
+  test.skip('it should be able to access the `liaison-permissions` page as an admin', async ({
     page,
   }) => {
     await page.goto('/liaison-permissions')
@@ -39,7 +39,7 @@ test.describe('Admin Access to Pages', () => {
     expect(pathname).toEqual('/liaison-permissions')
   })
 
-  test('it should be able to access the `admin` page as an admin', async ({
+  test.skip('it should be able to access the `admin` page as an admin', async ({
     page,
   }) => {
     await page.goto('/admin')

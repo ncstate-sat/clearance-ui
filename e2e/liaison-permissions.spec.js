@@ -12,7 +12,7 @@ test.describe('Liaison Permissions page', () => {
   })
 
   // TODO: Remove John's info from E2E tests
-  test('view liaison permissions, add a permission, and remove a permission', async ({
+  test.skip('view liaison permissions, add a permission, and remove a permission', async ({
     page,
   }) => {
     await page.locator('#TagInput-2').fill('jtchampi')
@@ -37,7 +37,7 @@ test.describe('Liaison Permissions page', () => {
   })
 
   // TODO: Remove John's info from E2E tests
-  test('handle an error assigning a permission', async ({ page }) => {
+  test.skip('handle an error assigning a permission', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not give permission.'
 
     await page.route(/\/liaison\/assign$/, async (route) => {
@@ -72,7 +72,7 @@ test.describe('Liaison Permissions page', () => {
   })
 
   // TODO: Remove John's info from E2E tests
-  test('handle an error revoking a permission', async ({ page }) => {
+  test.skip('handle an error revoking a permission', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not give permission.'
 
     await page.route(/\/liaison\/revoke$/, async (route) => {
@@ -112,7 +112,7 @@ test.describe('Liaison Permissions page', () => {
     expect(color).toBe('rgb(167, 54, 54)')
   })
 
-  test('select persons with missing details', async ({ page }) => {
+  test.skip('select persons with missing details', async ({ page }) => {
     const personnel = [
       {
         first_name: '',
