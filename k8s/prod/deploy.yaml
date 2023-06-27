@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: clearance-frontend
-          image: satregistry.ehps.ncsu.edu/clearance-tool/clearance-ui:main.2023-02-16
+          image: satregistry.ehps.ncsu.edu/clearance-tool/clearance-ui:main
           imagePullPolicy: Always
           env:
           - name: VITE_GOOGLE_IDENTITY_CLIENT_ID
