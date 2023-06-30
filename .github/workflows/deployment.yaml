@@ -78,8 +78,10 @@ jobs:
   build-image:
     name: Build Image
     needs: run-tests
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.ref_name == 'develop' || github.ref_name == 'main' }}
     runs-on: sat-hosted
+    outputs:
+      image_tag: ${{ steps.image-tag-string.outputs.tag }}
     steps:
       - name: Get Code
         uses: actions/checkout@v3
@@ -143,3 +145,87 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
+
+  deploy-image-to-test:
+    name: Deploying Image
+    needs: [run-tests, build-image]
+    if: ${{ github.ref_name == 'develop' }}
+    runs-on: sat-hosted
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: Get SAT Actions
+        uses: actions/checkout@v3
+        with:
+          repository: SAT/sat-actions
+          path: sat-actions
+      - uses: azure/setup-kubectl@v3
+      - name: Store 'test' Kube config GITHUB_ENV File
+        run: |
+          echo "KUBECONFIG<<EOF" >> $GITHUB_ENV
+          cat ~/.kube/config.test >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ env.KUBECONFIG }}
+      - name: Display Tag
+        run: echo ${{ needs.build-image.outputs.image_tag }}
+      - uses: azure/k8s-deploy@v4.5
+        with:
+          namespace: clearance
+          action: deploy
+          strategy: basic
+          images: ${{ env.REGISTRY_URL }}/${{ env.PROJECT_NAME }}/${{ env.REPO_NAME }}:${{ needs.build-image.outputs.image_tag }}
+          manifests: |
+            deploy/test
+      - name: Send Success Message
+        uses: ./sat-actions/slack-updates
+        with:
+          channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
+          message: "Image: ```${{ needs.build-image.outputs.image_tag }}``` Deployed to Test. :fireworks:"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
+
+  deploy-image-to-production:
+      name: Deploying Image
+      needs: [run-tests, build-image]
+      if: ${{ github.ref_name == 'main' }}
+      runs-on: sat-hosted
+      steps:
+        - name: Get Code
+          uses: actions/checkout@v3
+        - name: Get SAT Actions
+          uses: actions/checkout@v3
+          with:
+            repository: SAT/sat-actions
+            path: sat-actions
+        - uses: azure/setup-kubectl@v3
+        - name: Store 'test' Kube config GITHUB_ENV File
+          run: |
+            echo "KUBECONFIG<<EOF" >> $GITHUB_ENV
+            cat ~/.kube/config.prod >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+        - uses: azure/k8s-set-context@v3
+          with:
+            method: kubeconfig
+            kubeconfig: ${{ env.KUBECONFIG }}
+        - name: Display Tag
+          run: echo ${{ needs.build-image.outputs.image_tag }}
+        - uses: azure/k8s-deploy@v4.5
+          with:
+            namespace: clearance
+            action: deploy
+            strategy: basic
+            images: ${{ env.REGISTRY_URL }}/${{ env.PROJECT_NAME }}/${{ env.REPO_NAME }}:${{ needs.build-image.outputs.image_tag }}
+            manifests: |
+              deploy/prod
+        - name: Send Success Message
+          uses: ./sat-actions/slack-updates
+          with:
+            channel-id: ${{ github.event.inputs.slack-channel-id || env.SLACK_CHANNEL_ID }}
+            message: "Image: ```${{ needs.build-image.outputs.image_tag }}``` Deployed to Production. :fireworks:"
+          env:
+            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+            SLACK_UPDATES: ${{ github.event.inputs.slack-updates || env.SLACK_UPDATES }}
