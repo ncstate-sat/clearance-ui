@@ -1,16 +1,20 @@
 import {
   Button,
   Heading,
-  minorScale,
+  IconButton,
+  HelpIcon,
   Table,
   TagInput,
   Text,
   toaster,
+  Tooltip,
+  Position,
 } from 'evergreen-ui'
 import { useMemo, useCallback, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import ContentCard from '../components/ContentCard'
 import FullWidthSpinner from '../components/FullWidthSpinner'
+import openInNewTab from '../utils/openInNewTab'
 
 import usePersonnel from '../hooks/usePersonnel'
 import authService from '../apis/authService'
@@ -230,13 +234,28 @@ export default function ManageClearance() {
 
   return (
     <>
-      <Heading size={800}>Manage Users</Heading>
+      <Heading size={800}>
+        Manage Users
+        <Tooltip
+          content='Click to view a guide on managing users of the tool.'
+          position={Position.RIGHT}
+        >
+          <IconButton
+            size='small'
+            appearance='none'
+            icon={HelpIcon}
+            test-id='help-button-page'
+            onClick={() =>
+              openInNewTab(
+                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#admin-manage-users'
+              )
+            }
+          />
+        </Tooltip>
+      </Heading>
       <Text>Add or remove accounts with administrative rights</Text>
 
-      <ContentCard isLoading={isLoadingPersonnel}>
-        <Heading size={600} marginBottom={minorScale(3)}>
-          Add Person
-        </Heading>
+      <ContentCard header='Add Person' isLoading={isLoadingPersonnel}>
         <TagInput
           tagSubmitKey='enter'
           width='100%'

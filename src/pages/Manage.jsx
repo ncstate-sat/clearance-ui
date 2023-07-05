@@ -12,12 +12,14 @@ import {
   toaster,
   majorScale,
   Position,
+  IconButton,
+  HelpIcon,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect, useRef, Fragment } from 'react'
-import { useSelector } from 'react-redux'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import NoResultsText from '../components/NoResultsText'
+import openInNewTab from '../utils/openInNewTab'
 
 import usePersonnel from '../hooks/usePersonnel'
 import useClearance from '../hooks/useClearance'
@@ -273,10 +275,31 @@ export default function ManageClearance() {
 
   return (
     <>
-      <Heading size={800}>Manage Clearances</Heading>
+      <Heading size={800}>
+        Assign & Manage Clearances
+        <Tooltip
+          content={'Click to view a guide on managing clearances.'}
+          position={Position.RIGHT}
+        >
+          <IconButton
+            size='small'
+            appearance='none'
+            icon={HelpIcon}
+            test-id='help-button-page'
+            onClick={() =>
+              openInNewTab(
+                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#assign-and-manage-clearances'
+              )
+            }
+          />
+        </Tooltip>
+      </Heading>
       <Text>View and edit the clearances of an individual</Text>
 
-      <ContentCard isLoading={isLoadingPersonnel}>
+      <ContentCard
+        isLoading={isLoadingPersonnel}
+        helpLink={'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/'}
+      >
         <Pane
           display='flex'
           flexDirection='row'
@@ -354,10 +377,10 @@ export default function ManageClearance() {
 
       {selectedPersonnel.length > 0 && (
         <Fragment>
-          <ContentCard isLoading={isLoadingClearances}>
-            <Heading size={600} marginBottom={minorScale(3)}>
-              Select Clearance
-            </Heading>
+          <ContentCard
+            header='Select Clearance'
+            isLoading={isLoadingClearances}
+          >
             <TagInput
               tagSubmitKey='enter'
               width='100%'

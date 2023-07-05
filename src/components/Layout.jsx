@@ -89,6 +89,19 @@ export default function Layout({ sidebarContent, hideApp, children }) {
             <Heading size={600}>Security Applications</Heading>
           </Pane>
           <Pane display='flex' marginLeft='auto'>
+            <Button
+              appearance='none'
+              test-id='help-button-main'
+              onClick={() =>
+                window.open(
+                  'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/',
+                  '_blank',
+                  'noreferrer'
+                )
+              }
+            >
+              Help
+            </Button>
             {isLoggedIn && (
               <Button onClick={() => dispatch(logOut())}>Sign Out</Button>
             )}
