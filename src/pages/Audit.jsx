@@ -15,6 +15,7 @@ import {
   majorScale,
   minorScale,
   toaster,
+  HelpIcon,
 } from 'evergreen-ui'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import clearanceService from '../apis/clearanceService'
@@ -23,6 +24,7 @@ import ContentCard from '../components/ContentCard'
 import Timeframe from '../components/Timeframe'
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
+import openInNewTab from '../utils/openInNewTab'
 
 const QUERY_LIMIT = 50
 
@@ -190,7 +192,25 @@ export default function AuditLog() {
 
   return (
     <>
-      <Heading size={800}>Audit Log</Heading>
+      <Heading size={800}>
+        Audit Log
+        <Tooltip
+          content='Click to view a guide on the Audit Log.'
+          position={Position.RIGHT}
+        >
+          <IconButton
+            size='small'
+            appearance='none'
+            icon={HelpIcon}
+            test-id='help-button-page'
+            onClick={() =>
+              openInNewTab(
+                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#audit-logs'
+              )
+            }
+          />
+        </Tooltip>
+      </Heading>
       <Pane display='flex' flexDirection='row' justifyContent='space-between'>
         <Pane>
           <Text>A record of all clearance assignments made by this tool.</Text>
@@ -258,7 +278,11 @@ export default function AuditLog() {
 
       {/** TODO: Refactor these into components (see AuditFilterCard.js) */}
       {(filters[BY_ASSIGNEE].enabled || filters[BY_ASSIGNER].enabled) && (
-        <ContentCard>
+        <ContentCard
+          header={
+            filters[BY_ASSIGNEE].enabled ? 'Select Person' : 'Select Assigner'
+          }
+        >
           <Tooltip content='Remove'>
             <IconButton
               onClick={() => {
@@ -273,9 +297,6 @@ export default function AuditLog() {
               test-id='remove-filter-btn'
             />
           </Tooltip>
-          <Heading size={600} marginBottom={minorScale(3)}>
-            {filters[BY_ASSIGNEE].enabled ? 'Select Person' : 'Select Assigner'}
-          </Heading>
           <TagInput
             tagSubmitKey='enter'
             width='100%'
@@ -305,7 +326,7 @@ export default function AuditLog() {
       )}
 
       {filters[BY_CLEARANCE_NAME].enabled && (
-        <ContentCard>
+        <ContentCard header='Search Clearances'>
           <Tooltip content='Remove'>
             <IconButton
               onClick={() => toggleFilter(BY_CLEARANCE_NAME)}
@@ -317,9 +338,6 @@ export default function AuditLog() {
               test-id='remove-filter-btn'
             />
           </Tooltip>
-          <Heading size={600} marginBottom={minorScale(3)}>
-            Search Clearances
-          </Heading>
           <TagInput
             tagSubmitKey='enter'
             width='100%'
@@ -334,7 +352,7 @@ export default function AuditLog() {
       )}
 
       {filters[BY_TIMEFRAME].enabled && (
-        <ContentCard>
+        <ContentCard header='Search Timeframe'>
           <Tooltip content='Remove'>
             <IconButton
               onClick={() => toggleFilter(BY_TIMEFRAME)}
@@ -346,9 +364,6 @@ export default function AuditLog() {
               test-id='remove-filter-btn'
             />
           </Tooltip>
-          <Heading size={600} marginBottom={minorScale(3)}>
-            Search Timeframe
-          </Heading>
           <Timeframe
             startDateTime={filters[BY_TIMEFRAME].value?.startDateTime}
             endDateTime={filters[BY_TIMEFRAME].value?.endDateTime}
