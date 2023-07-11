@@ -10,12 +10,17 @@ import {
   Pane,
   toaster,
   majorScale,
+  IconButton,
+  HelpIcon,
+  Tooltip,
+  Position,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import NoResultsText from '../components/NoResultsText'
+import openInNewTab from '../utils/openInNewTab'
 
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
@@ -270,7 +275,25 @@ export default function LiaisonPermissions() {
 
   return (
     <>
-      <Heading size={800}>Manage Liaison Permissions</Heading>
+      <Heading size={800}>
+        Liaison Permissions
+        <Tooltip
+          content={"Click to view a guide on managing Liaisons' permissions."}
+          position={Position.RIGHT}
+        >
+          <IconButton
+            size='small'
+            appearance='none'
+            icon={HelpIcon}
+            test-id='help-button-page'
+            onClick={() =>
+              openInNewTab(
+                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#liaison-permissions'
+              )
+            }
+          />
+        </Tooltip>
+      </Heading>
       <Text>View and edit the clearances a liaison can assign</Text>
 
       <Dialog
@@ -291,10 +314,7 @@ export default function LiaisonPermissions() {
         Would you like to grant access?
       </Dialog>
 
-      <ContentCard isLoading={isLoadingPersonnel}>
-        <Heading size={600} marginBottom={minorScale(3)}>
-          Select Liaison
-        </Heading>
+      <ContentCard header='Select Liaison' isLoading={isLoadingPersonnel}>
         <TagInput
           tagSubmitKey='enter'
           width='100%'
@@ -335,10 +355,7 @@ export default function LiaisonPermissions() {
         </NoResultsText>
       </ContentCard>
 
-      <ContentCard isLoading={isLoadingClearances}>
-        <Heading size={600} marginBottom={minorScale(3)}>
-          Select Clearance
-        </Heading>
+      <ContentCard header='Select Clearance' isLoading={isLoadingClearances}>
         <TagInput
           tagSubmitKey='enter'
           width='100%'

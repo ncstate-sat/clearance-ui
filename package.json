@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "serve": "node ./serve/server.js",
-    "e2e": "npx playwright test"
+    "e2e": "npx playwright test",
+    "prettier-format": "prettier --write 'src/**/*.{js,jsx}'",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.2",
@@ -29,6 +31,9 @@
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
+    "eslint-config-prettier": "^8.8.0",
+    "husky": "^8.0.0",
+    "prettier": "^2.8.8",
     "vite": "^4.1.0"
   }
 }

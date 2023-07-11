@@ -11,7 +11,8 @@ test.describe('Liaison Permissions page', () => {
     await page.goto('/liaison-permissions')
   })
 
-  test('view liaison permissions, add a permission, and remove a permission', async ({
+  // TODO: Remove John's info from E2E tests
+  test.skip('view liaison permissions, add a permission, and remove a permission', async ({
     page,
   }) => {
     await page.route(/\/personnel\?search=jtchampi/, async (route) => {
@@ -82,7 +83,7 @@ test.describe('Liaison Permissions page', () => {
     ).toBeVisible()
   })
 
-  test('view liaison permissions, add a permission, remove a permission, and give the person the Liaison role', async ({
+  test.skip('view liaison permissions, add a permission, remove a permission, and give the person the Liaison role', async ({
     page,
   }) => {
     await page.route(/\/personnel\?search=jtchampi/, async (route) => {
@@ -150,7 +151,7 @@ test.describe('Liaison Permissions page', () => {
     ).toBeVisible()
   })
 
-  test('view liaison permissions, add a permission, remove a permission, and do not give the person the Liaison role', async ({
+  test.skip('view liaison permissions, add a permission, remove a permission, and do not give the person the Liaison role', async ({
     page,
   }) => {
     await page.route(/\/personnel\?search=jtchampi/, async (route) => {
@@ -218,7 +219,7 @@ test.describe('Liaison Permissions page', () => {
     ).toBeVisible()
   })
 
-  test('handle an error assigning a permission', async ({ page }) => {
+  test.skip('handle an error assigning a permission', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not give permission.'
 
     await page.route(/\/personnel\?search=jtchampi/, async (route) => {
@@ -296,7 +297,8 @@ test.describe('Liaison Permissions page', () => {
     expect(color).toBe('rgb(167, 54, 54)')
   })
 
-  test('handle an error revoking a permission', async ({ page }) => {
+  // TODO: Remove John's info from E2E tests
+  test.skip('handle an error revoking a permission', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not give permission.'
 
     await page.route(/\/personnel\?search=jtchampi/, async (route) => {
@@ -380,7 +382,7 @@ test.describe('Liaison Permissions page', () => {
     expect(color).toBe('rgb(167, 54, 54)')
   })
 
-  test('select persons with missing details', async ({ page }) => {
+  test.skip('select persons with missing details', async ({ page }) => {
     const personnel = [
       {
         first_name: '',

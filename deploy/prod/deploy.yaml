@@ -19,20 +19,18 @@ spec:
     metadata:
       labels:
         app: clearance-frontend
-      annotations:
-        enable.version-checker.io/clearance-frontend: "true"
     spec:
       containers:
         - name: clearance-frontend
-          image: satregistry.ehps.ncsu.edu/clearance-tool/clearance-ui:main.2023-02-16
+          image: satregistry.ehps.ncsu.edu/clearance-tool/clearance-ui:main
           imagePullPolicy: Always
           env:
           - name: VITE_GOOGLE_IDENTITY_CLIENT_ID
             value: "4944492663-6msau4peegvm3oqa9pbgsmncorfkj5sa.apps.googleusercontent.com"
           - name: VITE_CLEARANCE_SERVICE_URL
-            value: "https://clearance.services.test.ehps.ncsu.edu"
+            value: "https://clearance.services.ehps.ncsu.edu"
           - name: VITE_AUTH_SERVICE_URL
-            value: "https://auth.services.test.ehps.ncsu.edu"
+            value: "https://auth.services.ehps.ncsu.edu"
           command: ["npm"]
           args: ["run", "serve"]
 
@@ -58,10 +56,11 @@ metadata:
     namespace: clearance
     annotations:
       kubernetes.io/ingress.class: public
-      cert-manager.io/cluster-issuer: sectigo-staging
+      cert-manager.io/cluster-issuer: sectigo-production
+      nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8, 152.1.0.0/16, 152.7.0.0/16, 152.14.0.0/16"
 spec:
     rules:
-    - host: clearance.test.ehps.ncsu.edu
+    - host: clearance.ehps.ncsu.edu
       http:
         paths:
         - path: /
@@ -74,5 +73,5 @@ spec:
     tls:
     -
       hosts:
-        - clearance.test.ehps.ncsu.edu
+        - clearance.ehps.ncsu.edu
       secretName: clearance-front-tls

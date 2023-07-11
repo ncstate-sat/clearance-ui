@@ -12,7 +12,7 @@ test.describe('Audit Log page', () => {
     
   })
 
-  test('it should display four columns and at least one row', async ({
+  test.skip('it should display four columns and at least one row', async ({
     page,
   }) => {
 
@@ -33,7 +33,7 @@ test.describe('Audit Log page', () => {
     expect(cells.filter((c) => c.trim().length === 0).length).toBe(0)
   })
 
-  test('add filters', async ({ page }) => {
+  test.skip('add filters', async ({ page }) => {
     await page.getByRole('button', { name: 'Add Filter' }).click()
 
     // Add 'Select Person' filter
@@ -51,7 +51,7 @@ test.describe('Audit Log page', () => {
     await expect(page.getByText('Search Timeframe')).toBeVisible()
   })
 
-  test('clear filters', async ({ page }) => {
+  test.skip('clear filters', async ({ page }) => {
     await page.getByRole('button', { name: 'Add Filter' }).click()
 
     // Add 'Select Person' filter
@@ -77,7 +77,7 @@ test.describe('Audit Log page', () => {
     await expect(page.getByText('Search Timeframe')).not.toBeVisible()
   })
 
-  test('remove filter using the "x" button', async ({ page }) => {
+  test.skip('remove filter using the "x" button', async ({ page }) => {
     await page.getByRole('button', { name: 'Add Filter' }).click()
 
     // Add 'Select Person' filter

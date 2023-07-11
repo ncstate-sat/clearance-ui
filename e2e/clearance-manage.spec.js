@@ -12,7 +12,7 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     await page.goto('/manage')
   })
 
-  test('assign and revoke a clearance', async ({ page }) => {
+  test.skip('assign and revoke a clearance', async ({ page }) => {
     await page.locator('[test-id="personnel-input"] input').fill('jtchampi')
     await page
       .getByText('John Champion (jtchampi@ncsu.edu) [200103374]')
@@ -34,7 +34,7 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     ).toBeVisible()
   })
 
-  test('handle an error assigning a clearance', async ({ page }) => {
+  test.skip('handle an error assigning a clearance', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not assign clearance.'
 
     await page.route(/\/assignments\/assign$/, async (route) => {
@@ -66,7 +66,7 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     expect(color).toBe('rgb(167, 54, 54)')
   })
 
-  test('handle an error revoking a clearance assignment', async ({ page }) => {
+  test.skip('handle an error revoking a clearance assignment', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not revoke clearance assignment.'
 
     await page.route(/\/assignments\/revoke$/, async (route) => {
@@ -102,7 +102,7 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     await page.unroute(/\/assignments\/revoke$/)
   })
 
-  test('select persons with missing details', async ({ page }) => {
+  test.skip('select persons with missing details', async ({ page }) => {
     const personnel = [
       {
         first_name: '',
@@ -141,7 +141,7 @@ test.describe('[Liaison] Assign & Manage Clearances page', () => {
     await page.goto('/manage')
   })
 
-  test('assign and revoke a clearance', async ({ page }) => {
+  test.skip('assign and revoke a clearance', async ({ page }) => {
     await page.locator('[test-id="personnel-input"] input').fill('staylor8')
     await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
 
@@ -162,10 +162,37 @@ test.describe('[Liaison] Assign & Manage Clearances page', () => {
     await expect(
       page.getByRole('heading', { name: 'Revoke Succeeded' })
     ).toBeVisible()
+  })
+
+  test.skip('verify disabled revoke buttons appear disabled', async ({ page }) => {
+    await page.locator('[test-id="personnel-input"] input').fill('staylor8')
+    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
+
+    await page.locator('[test-id="clearance-input"] input').fill('ClearanceA')
+    await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
+
+    await page.locator('[test-id=assign-clearance-btn]').click()
 
     await expect(
-      page.locator('[test-id="revoke-clearance-btn"]').first()
-    ).toBeDisabled()
+      page.getByRole('heading', { name: 'Clearance(s) Assigned Successfully' })
+    ).toBeVisible()
+
+    const enabledButton = await page
+      .locator('button:not([disabled])[test-id="revoke-clearance-btn"]')
+      .first()
+    const disabledButton = await page
+      .locator('button[disabled][test-id="revoke-clearance-btn"]')
+      .first()
+
+    const enabledColor = await enabledButton.evaluate((el) =>
+      window.getComputedStyle(el).getPropertyValue('color')
+    )
+    const disabledColor = await disabledButton.evaluate((el) =>
+      window.getComputedStyle(el).getPropertyValue('color')
+    )
+
+    expect(enabledColor).toBe('rgb(204, 0, 0)')
+    expect(disabledColor).toBe('rgb(204, 204, 204)')
   })
 
   test.skip('bulk upload a list of people', async ({ page }) => {

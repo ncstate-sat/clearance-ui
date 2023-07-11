@@ -73,7 +73,7 @@ export default function AuditFilterCard({
   }
 
   return (
-    <ContentCard>
+    <ContentCard header={title || defaultTitle}>
       <Tooltip content='Remove'>
         <IconButton
           onClick={onRemove}
@@ -85,9 +85,6 @@ export default function AuditFilterCard({
           test-id='remove-filter-btn'
         />
       </Tooltip>
-      <Heading size={400} marginBottom={minorScale(3)}>
-        {title || defaultTitle}
-      </Heading>
       {filterType === AUDIT_FILTERS.BY_TIMEFRAME && <Text>{timelineText}</Text>}
       {filterType !== AUDIT_FILTERS.BY_TIMEFRAME && (
         <TagInput
