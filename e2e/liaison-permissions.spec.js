@@ -15,10 +15,57 @@ test.describe('Liaison Permissions page', () => {
   test.skip('view liaison permissions, add a permission, and remove a permission', async ({
     page,
   }) => {
-    await page.locator('#TagInput-2').fill('jtchampi')
-    await page
-      .getByText('John Champion (jtchampi@ncsu.edu) [200103374]')
-      .click()
+    await page.route(/\/personnel\?search=jtchampi/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          personnel: [
+            {
+              first_name: 'Shawn',
+              middle_name: '',
+              last_name: 'Taylor',
+              email: 'staylor8@ncsu.edu',
+              campus_id: '001120834',
+            },
+          ],
+        }),
+      })
+    })
+
+    await page.route(/\/role-accounts\?role=Liaison/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          accounts: [
+            {
+              email: 'staylor8@ncsu.edu',
+              name: 'Shawn Taylor',
+              roles: ['Liaison'],
+              authorizations: [],
+            },
+          ],
+        }),
+      })
+    })
+
+    await page.route(/\/update-account-roles/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          account: {
+            email: 'staylor8@ncsu.edu',
+            name: 'Shawn Taylor',
+            roles: ['Liaison'],
+          },
+        }),
+      })
+    })
+
+    await page.locator('#TagInput-2').fill('staylor8')
+    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
 
     await page.locator('#TagInput-4').fill('ClearanceA')
     await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
@@ -36,9 +83,186 @@ test.describe('Liaison Permissions page', () => {
     ).toBeVisible()
   })
 
-  // TODO: Remove John's info from E2E tests
+  test.skip('view liaison permissions, add a permission, remove a permission, and give the person the Liaison role', async ({
+    page,
+  }) => {
+    await page.route(/\/personnel\?search=jtchampi/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          personnel: [
+            {
+              first_name: 'Shawn',
+              middle_name: '',
+              last_name: 'Taylor',
+              email: 'staylor8@ncsu.edu',
+              campus_id: '001120834',
+            },
+          ],
+        }),
+      })
+    })
+
+    await page.route(/\/role-accounts\?role=Liaison/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          accounts: [],
+        }),
+      })
+    })
+
+    await page.route(/\/update-account-roles/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          account: {
+            email: 'staylor8@ncsu.edu',
+            name: 'Shawn Taylor',
+            roles: ['Liaison'],
+          },
+        }),
+      })
+    })
+
+    await page.locator('#TagInput-2').fill('staylor8')
+    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
+
+    await page.locator('#TagInput-4').fill('ClearanceA')
+    await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
+
+    await page.locator('[test-id=assign-permission-btn]').click()
+
+    await page
+      .getByRole('button', { name: 'Grant Access', exact: true })
+      .click()
+
+    await expect(
+      page.getByRole('heading', { name: 'Permissions Assigned' })
+    ).toBeVisible()
+
+    await page.locator('[test-id=revoke-permission-btn]').first().click()
+
+    await expect(
+      page.getByRole('heading', { name: 'Revoke Succeeded' })
+    ).toBeVisible()
+  })
+
+  test.skip('view liaison permissions, add a permission, remove a permission, and do not give the person the Liaison role', async ({
+    page,
+  }) => {
+    await page.route(/\/personnel\?search=jtchampi/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          personnel: [
+            {
+              first_name: 'Shawn',
+              middle_name: '',
+              last_name: 'Taylor',
+              email: 'staylor8@ncsu.edu',
+              campus_id: '001120834',
+            },
+          ],
+        }),
+      })
+    })
+
+    await page.route(/\/role-accounts\?role=Liaison/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          accounts: [],
+        }),
+      })
+    })
+
+    await page.route(/\/update-account-roles/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          account: {
+            email: 'staylor8@ncsu.edu',
+            name: 'Shawn Taylor',
+            roles: ['Liaison'],
+          },
+        }),
+      })
+    })
+
+    await page.locator('#TagInput-2').fill('staylor8')
+    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
+
+    await page.locator('#TagInput-4').fill('ClearanceA')
+    await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
+
+    await page.locator('[test-id=assign-permission-btn]').click()
+
+    await page
+      .getByRole('button', { name: "Don't Grant Access", exact: true })
+      .click()
+
+    await expect(
+      page.getByRole('heading', { name: 'Permissions Assigned' })
+    ).toBeVisible()
+
+    await page.locator('[test-id=revoke-permission-btn]').first().click()
+
+    await expect(
+      page.getByRole('heading', { name: 'Revoke Succeeded' })
+    ).toBeVisible()
+  })
+
   test.skip('handle an error assigning a permission', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not give permission.'
+
+    await page.route(/\/personnel\?search=jtchampi/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          personnel: [
+            {
+              first_name: 'Shawn',
+              middle_name: '',
+              last_name: 'Taylor',
+              email: 'staylor8@ncsu.edu',
+              campus_id: '001120834',
+            },
+          ],
+        }),
+      })
+    })
+
+    await page.route(/\/role-accounts\?role=Liaison/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          accounts: [],
+        }),
+      })
+    })
+
+    await page.route(/\/update-account-roles/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          account: {
+            email: 'staylor8@ncsu.edu',
+            name: 'Shawn Taylor',
+            roles: ['Liaison'],
+          },
+        }),
+      })
+    })
 
     await page.route(/\/liaison\/assign$/, async (route) => {
       await route.fulfill({
@@ -48,15 +272,17 @@ test.describe('Liaison Permissions page', () => {
       })
     })
 
-    await page.locator('#TagInput-2').fill('jtchampi')
-    await page
-      .getByText('John Champion (jtchampi@ncsu.edu) [200103374]')
-      .click()
+    await page.locator('#TagInput-2').fill('staylor8')
+    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
 
     await page.locator('#TagInput-4').fill('ClearanceA')
     await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
 
     await page.locator('[test-id=assign-permission-btn]').click()
+
+    await page
+      .getByRole('button', { name: 'Grant Access', exact: true })
+      .click()
 
     await expect(
       page.getByRole('heading', { name: ERROR_MESSAGE })
@@ -75,6 +301,48 @@ test.describe('Liaison Permissions page', () => {
   test.skip('handle an error revoking a permission', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not give permission.'
 
+    await page.route(/\/personnel\?search=jtchampi/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          personnel: [
+            {
+              first_name: 'Shawn',
+              middle_name: '',
+              last_name: 'Taylor',
+              email: 'staylor8@ncsu.edu',
+              campus_id: '001120834',
+            },
+          ],
+        }),
+      })
+    })
+
+    await page.route(/\/role-accounts\?role=Liaison/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          accounts: [],
+        }),
+      })
+    })
+
+    await page.route(/\/update-account-roles/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          account: {
+            email: 'staylor8@ncsu.edu',
+            name: 'Shawn Taylor',
+            roles: ['Liaison'],
+          },
+        }),
+      })
+    })
+
     await page.route(/\/liaison\/revoke$/, async (route) => {
       await route.fulfill({
         status: 500,
@@ -83,15 +351,17 @@ test.describe('Liaison Permissions page', () => {
       })
     })
 
-    await page.locator('#TagInput-2').fill('jtchampi')
-    await page
-      .getByText('John Champion (jtchampi@ncsu.edu) [200103374]')
-      .click()
+    await page.locator('#TagInput-2').fill('staylor8')
+    await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
 
     await page.locator('#TagInput-4').fill('ClearanceA')
     await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
 
     await page.locator('[test-id=assign-permission-btn]').click()
+
+    await page
+      .getByRole('button', { name: 'Grant Access', exact: true })
+      .click()
 
     await expect(
       page.getByRole('heading', { name: 'Permissions Assigned' })
