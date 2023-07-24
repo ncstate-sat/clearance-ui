@@ -12,9 +12,14 @@ import {
   Position,
 } from 'evergreen-ui'
 import styled from 'styled-components'
+import ContentCard from '../components/ContentCard'
+import PeoplePicker from '../components/PeoplePicker'
+import Timeframe from '../components/Timeframe'
 import openInNewTab from '../utils/openInNewTab'
 
-const REPORT_TYPES = ['Doors', 'People', 'Transactions']
+const REPORT_TYPES = ['Door Clearances', 'People Clearances', 'Transactions']
+const PEOPLE_PICKER_FILTER = [REPORT_TYPES[1], REPORT_TYPES[2]]
+const TIMEFRAME_FILTER = [REPORT_TYPES[2]]
 
 const TRANSACTIONS_REPORT_DATA = [
   {
@@ -42,7 +47,7 @@ const TRANSACTIONS_REPORT_DATA = [
 
 const PEOPLE_REPORT_DATA = [
   {
-    name: 'AS1-PS-Purchasing Doors 24/7-C2',
+    clearanceName: 'AS1-PS-Purchasing Doors 24/7-C2',
     personnel: [
       {
         firstName: 'Rhonda',
@@ -68,7 +73,7 @@ const PEOPLE_REPORT_DATA = [
     ],
   },
   {
-    name: 'AS1-TRANS-Transportation Staff-C2',
+    clearanceName: 'AS1-TRANS-Transportation Staff-C2',
     personnel: [
       {
         firstName: 'Rhonda',
@@ -94,7 +99,8 @@ const PEOPLE_REPORT_DATA = [
     ],
   },
   {
-    name: 'CE Facilities Operations-AS1-01-E1138-Back Loading DockDr-C1',
+    clearanceName:
+      'CE Facilities Operations-AS1-01-E1138-Back Loading DockDr-C1',
     personnel: [
       {
         firstName: 'Rhonda',
@@ -116,6 +122,70 @@ const PEOPLE_REPORT_DATA = [
         campusId: '001125976',
         department: 'Housing Facilities Admin',
         status: 'TMP',
+      },
+    ],
+  },
+]
+
+const DOOR_REPORT_DATA = [
+  {
+    clearanceName: 'CE Facilities Operations-Talley-4221-C2',
+    doors: [
+      {
+        name: 'TSU - 1100 South Corridor 1150',
+        isElevator: false,
+        scheduleName: 'Always',
+      },
+      {
+        name: 'TSU - 4221 Copy and Supply Room',
+        isElevator: false,
+        scheduleName: 'Always',
+      },
+      {
+        name: 'TSU - Elevator Car Two (2)',
+        isElevator: true,
+        scheduleName: 'TSU- 6a-1a Access',
+      },
+    ],
+  },
+  {
+    clearanceName: 'CE Facilities Operations-Talley-Camp Out-C2',
+    doors: [
+      {
+        name: 'TSU - 1100 South Corridor 1150',
+        isElevator: false,
+        scheduleName: 'Always',
+      },
+      {
+        name: 'TSU - 4221 Copy and Supply Room',
+        isElevator: false,
+        scheduleName: 'Always',
+      },
+      {
+        name: 'TSU - Elevator Car Two (2)',
+        isElevator: true,
+        scheduleName: 'TSU- 6a-1a Access',
+      },
+    ],
+  },
+  {
+    clearanceName:
+      'CE Facilities Operations-Talley-Employee Entrance Special Events-C2',
+    doors: [
+      {
+        name: 'TSU - 1100 South Corridor 1150',
+        isElevator: false,
+        scheduleName: 'Always',
+      },
+      {
+        name: 'TSU - 4221 Copy and Supply Room',
+        isElevator: false,
+        scheduleName: 'Always',
+      },
+      {
+        name: 'TSU - Elevator Car Two (2)',
+        isElevator: true,
+        scheduleName: 'TSU- 6a-1a Access',
       },
     ],
   },
@@ -176,9 +246,9 @@ const PeopleTable = ({ data }) => {
         {data.map((clearance) => (
           <>
             <Table.Row height={'2.5rem'}>
-              <TableSectionHeader>{clearance['name']}</TableSectionHeader>
+              <TableSectionHeader>{clearance.clearanceName}</TableSectionHeader>
             </Table.Row>
-            {clearance['personnel'].map((person) => {
+            {clearance.personnel.map((person) => {
               return (
                 <Table.Row>
                   <Table.TextCell>{person.firstName || ''}</Table.TextCell>
@@ -196,8 +266,45 @@ const PeopleTable = ({ data }) => {
   )
 }
 
+const DoorTable = ({ data }) => {
+  return (
+    <Table marginTop='2rem'>
+      <Table.Head>
+        <Table.TextHeaderCell>Door Name</Table.TextHeaderCell>
+        <Table.TextHeaderCell>Type</Table.TextHeaderCell>
+        <Table.TextHeaderCell>Schedule</Table.TextHeaderCell>
+      </Table.Head>
+      <Table.Body>
+        {data.map((clearance) => (
+          <>
+            <Table.Row height={'2.5rem'}>
+              <TableSectionHeader>{clearance.clearanceName}</TableSectionHeader>
+            </Table.Row>
+            {clearance.doors.map((door) => {
+              return (
+                <Table.Row>
+                  <Table.TextCell>{door.name || ''}</Table.TextCell>
+                  <Table.TextCell>
+                    {door.isElevator ? 'Elevator' : 'Door'}
+                  </Table.TextCell>
+                  <Table.TextCell>{door.scheduleName || ''}</Table.TextCell>
+                </Table.Row>
+              )
+            })}
+          </>
+        ))}
+      </Table.Body>
+    </Table>
+  )
+}
+
 export default function Reports() {
-  const [reportType, setReportType] = useState('Doors')
+  const [reportType, setReportType] = useState(REPORT_TYPES[0])
+
+  // Filter selections
+  const [selectedPersonnel, setSelectedPersonnel] = useState([])
+  const [startTime, setStartTime] = useState()
+  const [endTime, setEndTime] = useState()
 
   return (
     <>
@@ -230,9 +337,28 @@ export default function Reports() {
           </Button>
         ))}
       </Group>
-      {/* {reportType === 'Doors' && <TransactionTable data={TRANSACTIONS_REPORT_DATA} />} */}
-      {reportType === 'People' && <PeopleTable data={PEOPLE_REPORT_DATA} />}
-      {reportType === 'Transactions' && (
+      {PEOPLE_PICKER_FILTER.includes(reportType) && (
+        <PeoplePicker
+          header='Filter by Person'
+          selectedPersonnel={selectedPersonnel}
+          setSelectedPersonnel={setSelectedPersonnel}
+        />
+      )}
+      {TIMEFRAME_FILTER.includes(reportType) && (
+        <ContentCard header='Filter by Timeframe'>
+          <Timeframe
+            startDateTime={startTime}
+            endDateTime={endTime}
+            onChangeStartTime={setStartTime}
+            onChangeEndTime={setEndTime}
+          />
+        </ContentCard>
+      )}
+      {reportType === REPORT_TYPES[0] && <DoorTable data={DOOR_REPORT_DATA} />}
+      {reportType === REPORT_TYPES[1] && (
+        <PeopleTable data={PEOPLE_REPORT_DATA} />
+      )}
+      {reportType === REPORT_TYPES[2] && (
         <TransactionTable data={TRANSACTIONS_REPORT_DATA} />
       )}
     </>
