@@ -21,8 +21,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import clearanceService from '../apis/clearanceService'
 import { AUDIT_FILTERS } from '../components/AuditFilterCard'
 import ContentCard from '../components/ContentCard'
+import ClearancePicker from '../components/ClearancePicker'
 import Timeframe from '../components/Timeframe'
-import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
 import openInNewTab from '../utils/openInNewTab'
 
@@ -110,16 +110,6 @@ export default function AuditLog() {
   const selectedClearances = filters[BY_CLEARANCE_NAME].value || []
 
   const { personnel, setPersonnelQuery } = usePersonnel()
-  const { clearances, setClearanceQuery } = useClearance()
-
-  // Suggestion strings for clearances.
-  const autocompleteClearances = useMemo(() => {
-    const clearanceNames = clearances.map((c) => c['name'])
-    const selectedClearanceNames = selectedClearances.map((c) => c['name'])
-    return clearanceNames
-      .filter((i) => !selectedClearanceNames.includes(i))
-      .sort()
-  }, [clearances, selectedClearances])
 
   // Suggestion strings for personnel.
   const autocompletePersonnel = useMemo(() => {
@@ -144,7 +134,7 @@ export default function AuditLog() {
     const queryParams = {
       skip: pg * QUERY_LIMIT,
       limit: QUERY_LIMIT + 1,
-      clearance_name: selCls?.[0],
+      clearance_name: selCls?.[0]?.['name'],
       from_time: timeframe?.startDateTime?.toISOString(),
       to_time: timeframe?.endDateTime?.toISOString(),
       assignee_id: flts[BY_ASSIGNEE].enabled ? campusId : undefined,
@@ -326,29 +316,13 @@ export default function AuditLog() {
       )}
 
       {filters[BY_CLEARANCE_NAME].enabled && (
-        <ContentCard header='Search Clearances'>
-          <Tooltip content='Remove'>
-            <IconButton
-              onClick={() => toggleFilter(BY_CLEARANCE_NAME)}
-              icon={<CrossIcon size={20} />}
-              border='none'
-              position='absolute'
-              top={0}
-              right={0}
-              test-id='remove-filter-btn'
-            />
-          </Tooltip>
-          <TagInput
-            tagSubmitKey='enter'
-            width='100%'
-            values={selectedClearances}
-            onChange={(values) =>
-              handleFilterChange(BY_CLEARANCE_NAME, 'input', values)
-            }
-            autocompleteItems={autocompleteClearances}
-            onInputChange={(e) => setClearanceQuery(e.target.value)}
-          />
-        </ContentCard>
+        <ClearancePicker
+          selectedClearances={selectedClearances}
+          setSelectedClearances={(values) =>
+            handleFilterChange(BY_CLEARANCE_NAME, 'input', values)
+          }
+          onClose={() => toggleFilter(BY_CLEARANCE_NAME)}
+        />
       )}
 
       {filters[BY_TIMEFRAME].enabled && (

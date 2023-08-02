@@ -66,7 +66,9 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
     expect(color).toBe('rgb(167, 54, 54)')
   })
 
-  test.skip('handle an error revoking a clearance assignment', async ({ page }) => {
+  test.skip('handle an error revoking a clearance assignment', async ({
+    page,
+  }) => {
     const ERROR_MESSAGE = '[TEST] Could not revoke clearance assignment.'
 
     await page.route(/\/assignments\/revoke$/, async (route) => {
@@ -128,6 +130,38 @@ test.describe('[Admin] Assign & Manage Clearances page', () => {
       page.getByText('Dunbar Driver #1 () [100015229]')
     ).toBeVisible()
   })
+
+  test('select a clearance that contains commas', async ({ page }) => {
+    await page.route(/\/assignments$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          clearance_names: [
+            {
+              id: 8360,
+              name: 'MRC-ECE 401/A, 446, 454, 454D-DEPT',
+            },
+          ],
+        }),
+      })
+    })
+
+    await page.locator('[test-id="personnel-input"] input').fill('jtchampi')
+    await page
+      .getByText('John Champion (jtchampi@ncsu.edu) [200103374]')
+      .click()
+
+    await page.locator('[test-id="clearance-input"] input').fill('454')
+    await page.locator('//div[@id="TagInputAutocomplete-0-item-0"]').click()
+
+    await expect(
+      page
+        .getByRole('strong')
+        .filter({ hasText: 'MRC-ECE 401/A 446 454 454D-DEPT' })
+        .locator('svg')
+    ).toBeVisible()
+  })
 })
 
 test.describe('[Liaison] Assign & Manage Clearances page', () => {
@@ -164,7 +198,9 @@ test.describe('[Liaison] Assign & Manage Clearances page', () => {
     ).toBeVisible()
   })
 
-  test.skip('verify disabled revoke buttons appear disabled', async ({ page }) => {
+  test.skip('verify disabled revoke buttons appear disabled', async ({
+    page,
+  }) => {
     await page.locator('[test-id="personnel-input"] input').fill('staylor8')
     await page.getByText('Shawn Taylor (staylor8@ncsu.edu) [001120834]').click()
 
