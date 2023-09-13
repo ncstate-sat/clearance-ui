@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { response } from 'express'
 
 test.describe('Liaison Access to Pages', () => {
   test.beforeEach(async ({ page }) => {
@@ -29,21 +28,19 @@ test.describe('Liaison Access to Pages', () => {
       const url = page.url()
       const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
       expect(pathname).toEqual('/manage')
-    }, 2000);
-
+    }, 2000)
   })
 
   test.skip('it should not be able to access the `liaison-permissions` page as a liaison', async ({
     page,
   }) => {
     await page.goto('/liaison-permissions')
-    //Wait for the redirection, from '/audit' to 'manage, to finish before conducting the testing.    
+    //Wait for the redirection, from '/audit' to 'manage, to finish before conducting the testing.
     setTimeout(() => {
       const url = page.url()
       const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
       expect(pathname).toEqual('/manage')
-    }, 2000);
-
+    }, 2000)
   })
 
   test.skip('it should not be able to access the `admin` page as a liaison', async ({
@@ -55,6 +52,6 @@ test.describe('Liaison Access to Pages', () => {
       const url = page.url()
       const pathname = url.match(/https?:\/\/[^\/]+(.*)/)[1]
       expect(pathname).toEqual('/manage')
-    }, 2000);      
+    }, 2000)
   })
 })
