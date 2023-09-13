@@ -13,16 +13,24 @@ export default function () {
       const controller = new AbortController()
 
       const timeout = setTimeout(async () => {
-        const response = await clearanceAxios.get(
-          `/liaison/needs-acknowledgement/${'200103374'}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        try {
+          const response = await clearanceAxios.get(
+            `/liaison/needs-acknowledgement`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+          setShouldShowDialog(response.data['needs_acknowledgement'])
+        } catch (error) {
+          if (
+            !error.response.status === 401 &&
+            !error.response?.data?.['detail'] === 'Token is expired'
+          ) {
+            toaster.danger(error.response.data['needs_acknowledgement'])
           }
-        )
-
-        setShouldShowDialog(response.data['needs_acknowledgement'])
+        }
       }, 500)
 
       return () => {
@@ -34,15 +42,11 @@ export default function () {
 
   const handleAcknowledgement = async () => {
     try {
-      await clearanceAxios.put(
-        `/liaison/save-acknowledgement/${'200103374'}`,
-        null,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      await clearanceAxios.put(`/liaison/save-acknowledgement`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       setShouldShowDialog(false)
     } catch (error) {
@@ -64,6 +68,7 @@ export default function () {
       hasClose={false}
       hasCancel={false}
       shouldCloseOnOverlayClick={false}
+      confirmLabel='Acknowledge'
       isShown={shouldShowDialog}
       onCloseComplete={handleAcknowledgement}
     >
