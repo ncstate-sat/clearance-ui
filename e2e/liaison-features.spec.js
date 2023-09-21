@@ -24,6 +24,12 @@ test.describe('Liaison-specific features', () => {
 
     await page.goto('/manage')
 
+    // hitting escape shouldn't let you dismiss the modal
+    await page.keyboard.press('Escape')
+    await expect(
+      page.getByRole('button', { name: 'Acknowledge' })
+    ).toBeVisible()
+
     await page.getByRole('button', { name: 'Acknowledge' }).click()
 
     await expect(
