@@ -71,6 +71,7 @@ export default function () {
       confirmLabel='Acknowledge'
       isShown={shouldShowDialog}
       onCloseComplete={handleAcknowledgement}
+      shouldCloseOnEscapePress={false}
     >
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et
       pulvinar nisi, rhoncus lobortis quam. Nunc hendrerit auctor consectetur.
