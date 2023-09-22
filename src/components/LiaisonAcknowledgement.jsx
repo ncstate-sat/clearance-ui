@@ -71,15 +71,12 @@ export default function () {
       confirmLabel='Acknowledge'
       isShown={shouldShowDialog}
       onCloseComplete={handleAcknowledgement}
+      shouldCloseOnEscapePress={false}
     >
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et
-      pulvinar nisi, rhoncus lobortis quam. Nunc hendrerit auctor consectetur.
-      Integer ante nisl, dignissim sit amet bibendum id, malesuada vel ligula.
-      Duis scelerisque maximus scelerisque. Etiam eget volutpat urna, ac tempus
-      massa. Etiam sollicitudin diam ut porttitor semper. In massa dolor,
-      iaculis non congue quis, tempor a odio. Mauris eget urna pellentesque,
-      vulputate metus scelerisque, pharetra mauris. Integer nec erat ut lorem
-      volutpat lacinia. Nullam volutpat tellus ac gravida dignissim.
+      To the best of my knowledge all people listed in the participation reports
+      are valid and active members of campus. I certify that I have reviewed the
+      list of people and the list of doors that participate in the clearances
+      that grant access to the spaces I manage on campus.
     </Dialog>
   )
 }
