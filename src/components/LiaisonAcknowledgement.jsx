@@ -72,11 +72,45 @@ export default function () {
       isShown={shouldShowDialog}
       onCloseComplete={handleAcknowledgement}
       shouldCloseOnEscapePress={false}
+      title='Security Liaison Responsibilities Terms and Conditions'
     >
-      To the best of my knowledge all people listed in the participation reports
-      are valid and active members of campus. I certify that I have reviewed the
-      list of people and the list of doors that participate in the clearances
-      that grant access to the spaces I manage on campus.
+      Per NC State Regulations
+      <a
+        target='_blank'
+        href='https://policies.ncsu.edu/regulation/reg-04-05-04/'
+      >
+        {' '}
+        04.05.04{' '}
+      </a>
+      A Security Liaison is an individual who has been delegated the authority
+      to act on behalf of a College/Unit/Department with the Security
+      Applications and Technologies Department (SAT).
+      <ul>
+        <li>
+          The primary point of accountability for their business unit for
+          transactions with SAT including:
+          <ul>
+            <li>Clearance assignment actions</li>
+            <li>Building locking schedule changes</li>
+            <li>Equipment installation and repair requests</li>
+            <li>Video requests</li>
+          </ul>
+        </li>
+        <li>Reviews departmental requests for appropriate business use</li>
+        <li>
+          Assigns and revokes clearances at the direction of the business unit
+        </li>
+        <li>
+          Receives and reviews transaction and and clearance audit reports and
+          makes appropriate changes in a timely fashion
+        </li>
+        <li>
+          Communicates changes in Security Liaisons status to
+          College/Unit/Department leadership and SAT
+        </li>
+      </ul>
+      By selecting the button below I acknowledge that I have read and agree
+      with my duties and responsibilities as a Security Liaison
     </Dialog>
   )
 }
