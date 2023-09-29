@@ -19,10 +19,10 @@ import { useMemo, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
+import ClearancePicker from '../components/ClearancePicker'
 import NoResultsText from '../components/NoResultsText'
 import openInNewTab from '../utils/openInNewTab'
 
-import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
 
 import authService from '../apis/authService'
@@ -76,14 +76,6 @@ export default function LiaisonPermissions() {
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
   const [selectedClearances, setSelectedClearances] = useState([])
-  const {
-    clearances,
-    clearanceQuery,
-    setClearanceQuery,
-    length: clearancesLength,
-    isTyping: isTypingClearances,
-    isLoading: isLoadingClearances,
-  } = useClearance()
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
   const {
@@ -94,15 +86,6 @@ export default function LiaisonPermissions() {
     isTyping: isTypingPersonnel,
     isLoading: isLoadingPersonnel,
   } = usePersonnel()
-
-  // Suggestion strings for clearances.
-  const autocompleteClearances = useMemo(() => {
-    const clearanceNames = clearances.map((c) => c['name'])
-    const selectedClearanceNames = selectedClearances.map((c) => c['name'])
-    return clearanceNames
-      .filter((i) => !selectedClearanceNames.includes(i))
-      .sort()
-  }, [clearances, selectedClearances])
 
   // Suggestion strings for personnel.
   const autocompletePersonnel = useMemo(() => {
@@ -355,38 +338,10 @@ export default function LiaisonPermissions() {
         </NoResultsText>
       </ContentCard>
 
-      <ContentCard header='Select Clearance' isLoading={isLoadingClearances}>
-        <TagInput
-          tagSubmitKey='enter'
-          width='100%'
-          values={selectedClearances.map((c) => c['name'])}
-          onChange={(selected) => {
-            const clearanceObjects = []
-            const allClearances = [...clearances, ...selectedClearances]
-            const clearanceStrings = allClearances.map((c) => `${c['name']}`)
-            selected.forEach((s) => {
-              const i = clearanceStrings.indexOf(s)
-              if (i >= 0) {
-                clearanceObjects.push(allClearances[i])
-              }
-            })
-            setSelectedClearances(clearanceObjects)
-          }}
-          autocompleteItems={autocompleteClearances}
-          onInputChange={(e) => setClearanceQuery(e.target.value)}
-          test-id='clearance-input'
-        />
-        <NoResultsText
-          $visible={
-            !isLoadingClearances &&
-            !isTypingClearances &&
-            clearanceQuery.length >= 3 &&
-            clearancesLength === 0
-          }
-        >
-          No Clearances Found
-        </NoResultsText>
-      </ContentCard>
+      <ClearancePicker
+        selectedClearances={selectedClearances}
+        setSelectedClearances={setSelectedClearances}
+      />
 
       <Button
         appearance='primary'
