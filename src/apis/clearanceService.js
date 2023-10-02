@@ -135,6 +135,16 @@ const api = createApi({
         return response?.data?.detail
       },
     }),
+    getReportsByUser: builder.query({
+      query: () => ({
+        url: '/reports/usage/monthly-by-user',
+        method: 'GET',
+        responseHandler: (response) => response.text(),
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
   }),
 })
 

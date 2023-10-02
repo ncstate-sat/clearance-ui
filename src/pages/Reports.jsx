@@ -5,13 +5,16 @@ import {
   Text,
   Group,
   Button,
+  DownloadIcon,
   Tooltip,
   Table,
   IconButton,
   HelpIcon,
   Position,
+  toaster,
 } from 'evergreen-ui'
 import styled from 'styled-components'
+import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import PeoplePicker from '../components/PeoplePicker'
 import Timeframe from '../components/Timeframe'
@@ -299,12 +302,30 @@ const DoorTable = ({ data }) => {
 }
 
 export default function Reports() {
+  const [getReports] = clearanceService.useLazyGetReportsByUserQuery()
+
   const [reportType, setReportType] = useState(REPORT_TYPES[0])
 
   // Filter selections
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
   const [startTime, setStartTime] = useState()
   const [endTime, setEndTime] = useState()
+
+  const downloadLiaisonAssignmentsReportHandler = async () => {
+    try {
+      const payload = await getReports().unwrap()
+
+      const blob = new Blob([payload], { type: 'text/csv' })
+      const a = document.createElement('a')
+      a.href = window.URL.createObjectURL(blob)
+      a.setAttribute('download', 'liaison-assignments.csv')
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    } catch (error) {
+      toaster.danger(error ?? 'There was an error downloading the file.')
+    }
+  }
 
   return (
     <>
@@ -330,13 +351,24 @@ export default function Reports() {
         </Heading>
         <Text>View who has clearances and who uses them.</Text>
       </Pane>
-      <Group>
-        {REPORT_TYPES.map((t) => (
-          <Button onClick={() => setReportType(t)} isActive={reportType === t}>
-            {t}
-          </Button>
-        ))}
-      </Group>
+      <Pane display='flex' flexDirection='row' justifyContent='space-between'>
+        <Group>
+          {REPORT_TYPES.map((t) => (
+            <Button
+              onClick={() => setReportType(t)}
+              isActive={reportType === t}
+            >
+              {t}
+            </Button>
+          ))}
+        </Group>
+        <Button
+          iconAfter={DownloadIcon}
+          onClick={downloadLiaisonAssignmentsReportHandler}
+        >
+          Liaison Assignments
+        </Button>
+      </Pane>
       {PEOPLE_PICKER_FILTER.includes(reportType) && (
         <PeoplePicker
           header='Filter by Person'
