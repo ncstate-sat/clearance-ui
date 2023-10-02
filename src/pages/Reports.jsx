@@ -365,6 +365,7 @@ export default function Reports() {
         <Button
           iconAfter={DownloadIcon}
           onClick={downloadLiaisonAssignmentsReportHandler}
+          test-id='liaison-assignments-download-btn'
         >
           Liaison Assignments
         </Button>
