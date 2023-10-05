@@ -225,6 +225,9 @@ export default function LiaisonPermissions() {
         )
         .then(() => {
           toaster.success('User has been granted Liaison access.')
+          setShouldProcessRequest(false)
+          setShouldAddLiaisonPermissionModal(false)
+          setShouldAddLiaisonPermission(false)
         })
         .catch((error) => {
           if (
