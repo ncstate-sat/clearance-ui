@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Pane,
   Heading,
@@ -11,6 +11,7 @@ import {
   IconButton,
   HelpIcon,
   Position,
+  minorScale,
   toaster,
 } from 'evergreen-ui'
 import styled from 'styled-components'
@@ -27,172 +28,49 @@ const TIMEFRAME_FILTER = [REPORT_TYPES[2]]
 const TRANSACTIONS_REPORT_DATA = [
   {
     date: new Date('9/13/22 4:59 PM'),
-    doorName: 'EB1 - 3058 Lab',
+    door_name: 'EB1 - 3058 Lab',
     name: 'Ashley Noelle Simpson',
-    campusId: '200293592',
-    stateCode: 'Admit',
+    campus_id: '200293592',
+    state_code: 'Admit',
   },
   {
     date: new Date('9/13/22 4:36 PM'),
-    doorName: 'EB1 - 3058 Lab',
+    door_name: 'EB1 - 3058 Lab',
     name: 'Joseph B. Tracy',
-    campusId: '0004056039',
-    stateCode: 'Admit',
+    campus_id: '0004056039',
+    state_code: 'Admit',
   },
   {
     date: new Date('9/13/22 4:59 PM'),
-    doorName: 'EB1 - 3058 Lab',
+    door_name: 'EB1 - 3058 Lab',
     name: null,
-    campusId: null,
-    stateCode: 'DoorForced',
+    campus_id: null,
+    state_code: 'DoorForced',
   },
 ]
 
-const PEOPLE_REPORT_DATA = [
-  {
-    clearanceName: 'AS1-PS-Purchasing Doors 24/7-C2',
-    personnel: [
-      {
-        firstName: 'Rhonda',
-        lastName: 'Barnes',
-        campusId: '000005984',
-        department: 'Procurement Services',
-        status: 'SPA',
-      },
-      {
-        firstName: 'Elizabeth',
-        lastName: 'Milchuck',
-        campusId: '200179642',
-        department: 'Procurement Services',
-        status: 'SPA',
-      },
-      {
-        firstName: 'Jason',
-        lastName: 'Walker',
-        campusId: '001125976',
-        department: 'Housing Facilities Admin',
-        status: 'TMP',
-      },
-    ],
-  },
-  {
-    clearanceName: 'AS1-TRANS-Transportation Staff-C2',
-    personnel: [
-      {
-        firstName: 'Rhonda',
-        lastName: 'Barnes',
-        campusId: '000005984',
-        department: 'Procurement Services',
-        status: 'SPA',
-      },
-      {
-        firstName: 'Elizabeth',
-        lastName: 'Milchuck',
-        campusId: '200179642',
-        department: 'Procurement Services',
-        status: 'SPA',
-      },
-      {
-        firstName: 'Jason',
-        lastName: 'Walker',
-        campusId: '001125976',
-        department: 'Housing Facilities Admin',
-        status: 'TMP',
-      },
-    ],
-  },
-  {
-    clearanceName:
-      'CE Facilities Operations-AS1-01-E1138-Back Loading DockDr-C1',
-    personnel: [
-      {
-        firstName: 'Rhonda',
-        lastName: 'Barnes',
-        campusId: '000005984',
-        department: 'Procurement Services',
-        status: 'SPA',
-      },
-      {
-        firstName: 'Elizabeth',
-        lastName: 'Milchuck',
-        campusId: '200179642',
-        department: 'Procurement Services',
-        status: 'SPA',
-      },
-      {
-        firstName: 'Jason',
-        lastName: 'Walker',
-        campusId: '001125976',
-        department: 'Housing Facilities Admin',
-        status: 'TMP',
-      },
-    ],
-  },
-]
-
-const DOOR_REPORT_DATA = [
-  {
-    clearanceName: 'CE Facilities Operations-Talley-4221-C2',
+const DOOR_REPORT_DATA = {
+  'VTE-G-NA-TAU Finger Barn Gate 24/7-DEPT': {
+    door_count: 3,
     doors: [
       {
         name: 'TSU - 1100 South Corridor 1150',
-        isElevator: false,
-        scheduleName: 'Always',
+        is_elevator: false,
+        schedule_name: 'Always',
       },
       {
         name: 'TSU - 4221 Copy and Supply Room',
-        isElevator: false,
-        scheduleName: 'Always',
+        is_elevator: false,
+        schedule_name: 'Always',
       },
       {
         name: 'TSU - Elevator Car Two (2)',
-        isElevator: true,
-        scheduleName: 'TSU- 6a-1a Access',
+        is_elevator: true,
+        schedule_name: 'TSU- 6a-1a Access',
       },
     ],
   },
-  {
-    clearanceName: 'CE Facilities Operations-Talley-Camp Out-C2',
-    doors: [
-      {
-        name: 'TSU - 1100 South Corridor 1150',
-        isElevator: false,
-        scheduleName: 'Always',
-      },
-      {
-        name: 'TSU - 4221 Copy and Supply Room',
-        isElevator: false,
-        scheduleName: 'Always',
-      },
-      {
-        name: 'TSU - Elevator Car Two (2)',
-        isElevator: true,
-        scheduleName: 'TSU- 6a-1a Access',
-      },
-    ],
-  },
-  {
-    clearanceName:
-      'CE Facilities Operations-Talley-Employee Entrance Special Events-C2',
-    doors: [
-      {
-        name: 'TSU - 1100 South Corridor 1150',
-        isElevator: false,
-        scheduleName: 'Always',
-      },
-      {
-        name: 'TSU - 4221 Copy and Supply Room',
-        isElevator: false,
-        scheduleName: 'Always',
-      },
-      {
-        name: 'TSU - Elevator Car Two (2)',
-        isElevator: true,
-        scheduleName: 'TSU- 6a-1a Access',
-      },
-    ],
-  },
-]
+}
 
 const TableSectionHeader = styled(Pane)`
   background-color: #f9fafc;
@@ -225,10 +103,10 @@ const TransactionTable = ({ data }) => (
           <Table.TextCell>
             {d.date ? d.date.toLocaleString() : ''}
           </Table.TextCell>
-          <Table.TextCell>{d.doorName || ''}</Table.TextCell>
+          <Table.TextCell>{d.door_name || ''}</Table.TextCell>
           <Table.TextCell>{d.name || ''}</Table.TextCell>
-          <Table.TextCell>{d.campusId || ''}</Table.TextCell>
-          <Table.TextCell>{d.stateCode || ''}</Table.TextCell>
+          <Table.TextCell>{d.campus_id || ''}</Table.TextCell>
+          <Table.TextCell>{d.state_code || ''}</Table.TextCell>
         </Table.Row>
       ))}
     </Table.Body>
@@ -246,19 +124,19 @@ const PeopleTable = ({ data }) => {
         <Table.TextHeaderCell>Status</Table.TextHeaderCell>
       </Table.Head>
       <Table.Body>
-        {data.map((clearance) => (
+        {Object.keys(data).map((key) => (
           <>
-            <Table.Row height={'2.5rem'}>
-              <TableSectionHeader>{clearance.clearanceName}</TableSectionHeader>
+            <Table.Row height={'2.5rem'} key={key}>
+              <TableSectionHeader>{key}</TableSectionHeader>
             </Table.Row>
-            {clearance.personnel.map((person) => {
+            {data[key].assignees.map((person) => {
               return (
-                <Table.Row>
-                  <Table.TextCell>{person.firstName || ''}</Table.TextCell>
-                  <Table.TextCell>{person.lastName || ''}</Table.TextCell>
-                  <Table.TextCell>{person.campusId || ''}</Table.TextCell>
-                  <Table.TextCell>{person.department || ''}</Table.TextCell>
-                  <Table.TextCell>{person.status || ''}</Table.TextCell>
+                <Table.Row key={person['campus_id'] || ''}>
+                  <Table.TextCell>{person['first'] || ''}</Table.TextCell>
+                  <Table.TextCell>{person['last'] || ''}</Table.TextCell>
+                  <Table.TextCell>{person['campus_id'] || ''}</Table.TextCell>
+                  <Table.TextCell>{person['department'] || ''}</Table.TextCell>
+                  <Table.TextCell>{person['status'] || ''}</Table.TextCell>
                 </Table.Row>
               )
             })}
@@ -278,19 +156,19 @@ const DoorTable = ({ data }) => {
         <Table.TextHeaderCell>Schedule</Table.TextHeaderCell>
       </Table.Head>
       <Table.Body>
-        {data.map((clearance) => (
+        {Object.keys(data).map((key) => (
           <>
-            <Table.Row height={'2.5rem'}>
-              <TableSectionHeader>{clearance.clearanceName}</TableSectionHeader>
+            <Table.Row height={'2.5rem'} key={key}>
+              <TableSectionHeader>{key}</TableSectionHeader>
             </Table.Row>
-            {clearance.doors.map((door) => {
+            {data[key].doors.map((door) => {
               return (
                 <Table.Row>
-                  <Table.TextCell>{door.name || ''}</Table.TextCell>
+                  <Table.TextCell>{door['name'] || ''}</Table.TextCell>
                   <Table.TextCell>
-                    {door.isElevator ? 'Elevator' : 'Door'}
+                    {door['is_elevator'] ? 'Elevator' : 'Door'}
                   </Table.TextCell>
-                  <Table.TextCell>{door.scheduleName || ''}</Table.TextCell>
+                  <Table.TextCell>{door['schedule_name'] || ''}</Table.TextCell>
                 </Table.Row>
               )
             })}
@@ -301,15 +179,60 @@ const DoorTable = ({ data }) => {
   )
 }
 
-export default function Reports() {
-  const [getReports] = clearanceService.useLazyGetReportsByUserQuery()
+const FeatureNotImplemented = () => (
+  <Pane textAlign='center' paddingTop='40px'>
+    <Text fontSize={minorScale(4)} fontWeight='700'>
+      This feature is not yet implemented.
+    </Text>
+  </Pane>
+)
 
+export default function Reports() {
+  // Current location in the section
   const [reportType, setReportType] = useState(REPORT_TYPES[0])
+  const [activeReports, setActiveReports] = useState([])
 
   // Filter selections
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
   const [startTime, setStartTime] = useState()
   const [endTime, setEndTime] = useState()
+
+  const [getReports] = clearanceService.useLazyGetReportsByUserQuery()
+  const {
+    data: doorReportData,
+    error: doorReportError,
+    isSuccess: isDoorReportSuccess,
+    isError: isDoorReportError,
+    isLoading: isDoorReportLoading,
+  } = clearanceService.useGetReportsByDoorsQuery()
+  const {
+    data: personsReportData,
+    error: personsReportError,
+    isSuccess: isPersonReportSuccess,
+    isError: isPersonReportError,
+    isLoading: isPersonReportLoading,
+  } = clearanceService.useGetReportsByPersonsQuery({
+    assignee_name:
+      selectedPersonnel.length > 0
+        ? `${selectedPersonnel[0]['first_name']} ${selectedPersonnel[0]['last_name']}`
+        : undefined,
+  })
+  const {
+    data: transactionsReportData,
+    error: transactionsReportError,
+    isSuccess: isTransactionsReportSuccess,
+    isError: isTransactionsReportError,
+    isLoading: isTransactionsReportLoading,
+  } = clearanceService.useGetReportsByTransactionsQuery()
+
+  useEffect(() => {
+    const active = []
+    if (isDoorReportSuccess) active.push(REPORT_TYPES[0])
+    if (isPersonReportSuccess) active.push(REPORT_TYPES[1])
+    if (isTransactionsReportSuccess) active.push(REPORT_TYPES[2])
+
+    setActiveReports(active)
+  }, [isDoorReportSuccess, isPersonReportSuccess, isTransactionsReportSuccess])
 
   const downloadLiaisonAssignmentsReportHandler = async () => {
     try {
@@ -370,30 +293,45 @@ export default function Reports() {
           Liaison Assignments
         </Button>
       </Pane>
-      {PEOPLE_PICKER_FILTER.includes(reportType) && (
-        <PeoplePicker
-          header='Filter by Person'
-          selectedPersonnel={selectedPersonnel}
-          setSelectedPersonnel={setSelectedPersonnel}
-        />
-      )}
-      {TIMEFRAME_FILTER.includes(reportType) && (
-        <ContentCard header='Filter by Timeframe'>
-          <Timeframe
-            startDateTime={startTime}
-            endDateTime={endTime}
-            onChangeStartTime={setStartTime}
-            onChangeEndTime={setEndTime}
+      {PEOPLE_PICKER_FILTER.includes(reportType) &&
+        activeReports.includes(reportType) && (
+          <PeoplePicker
+            header='Filter by Person'
+            selectedPersonnel={selectedPersonnel}
+            setSelectedPersonnel={setSelectedPersonnel}
           />
-        </ContentCard>
-      )}
-      {reportType === REPORT_TYPES[0] && <DoorTable data={DOOR_REPORT_DATA} />}
-      {reportType === REPORT_TYPES[1] && (
-        <PeopleTable data={PEOPLE_REPORT_DATA} />
-      )}
-      {reportType === REPORT_TYPES[2] && (
-        <TransactionTable data={TRANSACTIONS_REPORT_DATA} />
-      )}
+        )}
+      {TIMEFRAME_FILTER.includes(reportType) &&
+        activeReports.includes(reportType) && (
+          <ContentCard header='Filter by Timeframe'>
+            <Timeframe
+              startDateTime={startTime}
+              endDateTime={endTime}
+              onChangeStartTime={setStartTime}
+              onChangeEndTime={setEndTime}
+            />
+          </ContentCard>
+        )}
+      {reportType === REPORT_TYPES[0] &&
+        (activeReports.includes(reportType) ? (
+          <DoorTable data={isDoorReportSuccess ? doorReportData : {}} />
+        ) : (
+          <FeatureNotImplemented />
+        ))}
+      {reportType === REPORT_TYPES[1] &&
+        (activeReports.includes(reportType) ? (
+          <PeopleTable data={isPersonReportSuccess ? personsReportData : {}} />
+        ) : (
+          <FeatureNotImplemented />
+        ))}
+      {reportType === REPORT_TYPES[2] &&
+        (activeReports.includes(reportType) ? (
+          <TransactionTable
+            data={isTransactionsReportSuccess ? transactionsReportData : []}
+          />
+        ) : (
+          <FeatureNotImplemented />
+        ))}
     </>
   )
 }

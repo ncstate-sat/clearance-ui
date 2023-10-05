@@ -145,6 +145,48 @@ const api = createApi({
         return response?.data?.detail
       },
     }),
+    getReportsByDoors: builder.query({
+      query: () => ({
+        url: `/reports/clearances/doors`,
+        method: 'GET',
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
+    getReportsByPersons: builder.query({
+      query: ({
+        assignee_name,
+        clearance_id,
+        assignees_page_size,
+        assignees_page,
+        clearances_limit,
+        clearances_skip,
+      }) => ({
+        url: '/reports/clearances/persons',
+        method: 'GET',
+        params: {
+          assignee_name,
+          clearance_id,
+          assignees_page_size,
+          assignees_page,
+          clearances_limit,
+          clearances_skip,
+        },
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
+    getReportsByTransactions: builder.query({
+      query: () => ({
+        url: '/reports/usage/transactions',
+        method: 'GET',
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
   }),
 })
 
