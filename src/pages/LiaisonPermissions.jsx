@@ -144,6 +144,7 @@ export default function LiaisonPermissions() {
       setSelectedClearances([])
       setClearanceAssignments(assignData['record']['clearances'])
       toaster.success('Permissions Assigned')
+      setShouldProcessRequest(true)
     } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
       toaster.danger(assignError ?? 'Request Failed')
     }
@@ -193,7 +194,6 @@ export default function LiaisonPermissions() {
             setShouldAddLiaisonPermissionModal(true)
           } else {
             setShouldAddLiaisonPermissionModal(false)
-            submitRequestHandler()
           }
         })
         .catch((error) => {
@@ -225,7 +225,9 @@ export default function LiaisonPermissions() {
         )
         .then(() => {
           toaster.success('User has been granted Liaison access.')
-          submitRequestHandler()
+          setShouldProcessRequest(false)
+          setShouldAddLiaisonPermissionModal(false)
+          setShouldAddLiaisonPermission(false)
         })
         .catch((error) => {
           if (
@@ -286,15 +288,20 @@ export default function LiaisonPermissions() {
         confirmLabel='Grant Access'
         onCloseComplete={() => {
           setShouldAddLiaisonPermissionModal(false)
-          submitRequestHandler()
+          setShouldProcessRequest(false)
+        }}
+        onCancel={(close) => {
+          setShouldProcessRequest(false)
+          close()
         }}
         onConfirm={(close) => {
           setShouldAddLiaisonPermission(true)
           close()
         }}
       >
-        This person does not currently have access to the tool as a Liaison.
-        Would you like to grant access?
+        You've just given this person clearances to assign, but this person does
+        not currently have access to the tool as a Liaison. Would you like to
+        give them access to use this tool?
       </Dialog>
 
       <ContentCard header='Select Liaison' isLoading={isLoadingPersonnel}>
@@ -350,7 +357,9 @@ export default function LiaisonPermissions() {
         disabled={
           selectedClearances.length === 0 || selectedPersonnel.length === 0
         }
-        onClick={() => setShouldProcessRequest(true)}
+        onClick={() => {
+          submitRequestHandler()
+        }}
         test-id='assign-permission-btn'
       >
         Give Permission
