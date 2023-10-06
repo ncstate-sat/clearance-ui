@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, memo } from 'react'
 import {
   Pane,
   Heading,
@@ -19,6 +19,7 @@ import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import PeoplePicker from '../components/PeoplePicker'
 import Timeframe from '../components/Timeframe'
+import Pagination from '../components/Pagination'
 import openInNewTab from '../utils/openInNewTab'
 
 const REPORT_TYPES = ['Door Clearances', 'People Clearances', 'Transactions']
@@ -88,6 +89,14 @@ const TableSectionHeader = styled(Pane)`
   color: #696f8c;
 `
 
+const FeatureNotImplemented = () => (
+  <Pane textAlign='center' paddingTop='40px'>
+    <Text fontSize={minorScale(4)} fontWeight='700'>
+      This feature is not yet implemented.
+    </Text>
+  </Pane>
+)
+
 const TransactionTable = ({ data }) => (
   <Table marginTop='2rem'>
     <Table.Head>
@@ -113,37 +122,132 @@ const TransactionTable = ({ data }) => (
   </Table>
 )
 
-const PeopleTable = ({ data }) => {
+const PeopleTable = ({ selectedPersonnel }) => {
+  const CLEARANCES_LIMIT = 10
+  const ASSIGNEE_LIMIT = 50
+  const [page, setPage] = useState(0)
+  const [assigneePage, setAssigneePage] = useState(0)
+  const [assigneeCount, setAssigneeCount] = useState()
+  const [selectedClearanceId, setSelectedClearanceId] = useState()
+
+  const { data, error, isError, isLoading } =
+    clearanceService.useGetReportsByPersonsQuery({
+      assignee_name:
+        selectedPersonnel.length > 0
+          ? `${selectedPersonnel[0]['first_name']} ${selectedPersonnel[0]['last_name']}`
+          : undefined,
+      clearances_limit: CLEARANCES_LIMIT,
+      clearances_skip: page * CLEARANCES_LIMIT,
+      clearance_id: selectedClearanceId,
+      assignees_page: selectedClearanceId ? page : undefined,
+      assignees_page_size: selectedClearanceId ? ASSIGNEE_LIMIT : undefined,
+    })
+
+  useEffect(() => {
+    if (isError) {
+      toaster.danger(error ?? 'There was an error querying person reports.')
+    }
+  }, [error, isError])
+
   return (
-    <Table marginTop='2rem'>
-      <Table.Head>
-        <Table.TextHeaderCell>First Name</Table.TextHeaderCell>
-        <Table.TextHeaderCell>Last Name</Table.TextHeaderCell>
-        <Table.TextHeaderCell>Campus ID</Table.TextHeaderCell>
-        <Table.TextHeaderCell>Department</Table.TextHeaderCell>
-        <Table.TextHeaderCell>Status</Table.TextHeaderCell>
-      </Table.Head>
-      <Table.Body>
-        {Object.keys(data).map((key) => (
+    <>
+      <Table marginTop='2rem'>
+        <Table.Head>
+          <Table.TextHeaderCell>First Name</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Last Name</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Campus ID</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Department</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Status</Table.TextHeaderCell>
+        </Table.Head>
+        <Table.Body>
+          {Object.keys(data?.['clearances'] || []).map((key) => (
+            <>
+              <Table.Row height={'2.5rem'} key={key}>
+                <TableSectionHeader>
+                  <Pane
+                    display='flex'
+                    flexDirection='row'
+                    justifyContent='space-between'
+                    alignItems='center'
+                    width='100%'
+                  >
+                    {key}
+                    <Button
+                      appearance='minimal'
+                      disabled={isLoading}
+                      onClick={() => {
+                        if (selectedClearanceId) {
+                          setAssigneeCount()
+                          setSelectedClearanceId()
+                        } else {
+                          setAssigneeCount(
+                            data?.['clearances'][key]['assignee_count']
+                          )
+                          setSelectedClearanceId(
+                            data?.['clearances'][key]['clearance_id']
+                          )
+                        }
+                      }}
+                    >
+                      {selectedClearanceId ? 'Collapse' : 'Expand'}
+                    </Button>
+                  </Pane>
+                </TableSectionHeader>
+              </Table.Row>
+              {data?.['clearances']?.[key].assignees.map((person) => {
+                return (
+                  <Table.Row key={person['campus_id'] || ''}>
+                    <Table.TextCell>{person['first'] || ''}</Table.TextCell>
+                    <Table.TextCell>{person['last'] || ''}</Table.TextCell>
+                    <Table.TextCell>{person['campus_id'] || ''}</Table.TextCell>
+                    <Table.TextCell>
+                      {person['department'] || ''}
+                    </Table.TextCell>
+                    <Table.TextCell>{person['status'] || ''}</Table.TextCell>
+                  </Table.Row>
+                )
+              })}
+            </>
+          ))}
+        </Table.Body>
+      </Table>
+      <Pane
+        justifyContent='flex-end'
+        display='flex'
+        alignItems='center'
+        gap={minorScale(3)}
+      >
+        {selectedClearanceId ? (
           <>
-            <Table.Row height={'2.5rem'} key={key}>
-              <TableSectionHeader>{key}</TableSectionHeader>
-            </Table.Row>
-            {data[key].assignees.map((person) => {
-              return (
-                <Table.Row key={person['campus_id'] || ''}>
-                  <Table.TextCell>{person['first'] || ''}</Table.TextCell>
-                  <Table.TextCell>{person['last'] || ''}</Table.TextCell>
-                  <Table.TextCell>{person['campus_id'] || ''}</Table.TextCell>
-                  <Table.TextCell>{person['department'] || ''}</Table.TextCell>
-                  <Table.TextCell>{person['status'] || ''}</Table.TextCell>
-                </Table.Row>
-              )
-            })}
+            <Text color='muted'>Assignees Page {assigneePage + 1}</Text>
+            <Pagination
+              page={assigneePage + 1}
+              totalPages={Math.ceil(assigneeCount / ASSIGNEE_LIMIT)}
+              onNextPage={() =>
+                setAssigneePage((currentPage) => currentPage + 1)
+              }
+              onPreviousPage={() =>
+                setAssigneePage((currentPage) => currentPage - 1)
+              }
+              onPageChange={(p) => setAssigneePage(p - 1)}
+            />
           </>
-        ))}
-      </Table.Body>
-    </Table>
+        ) : (
+          <>
+            <Text color='muted'>Page {page + 1}</Text>
+            <Pagination
+              page={page + 1}
+              totalPages={Math.ceil(
+                data?.['total_clearances'] / CLEARANCES_LIMIT
+              )}
+              onNextPage={() => setPage((currentPage) => currentPage + 1)}
+              onPreviousPage={() => setPage((currentPage) => currentPage - 1)}
+              onPageChange={(p) => setPage(p - 1)}
+            />
+          </>
+        )}
+      </Pane>
+    </>
   )
 }
 
@@ -179,14 +283,6 @@ const DoorTable = ({ data }) => {
   )
 }
 
-const FeatureNotImplemented = () => (
-  <Pane textAlign='center' paddingTop='40px'>
-    <Text fontSize={minorScale(4)} fontWeight='700'>
-      This feature is not yet implemented.
-    </Text>
-  </Pane>
-)
-
 export default function Reports() {
   // Current location in the section
   const [reportType, setReportType] = useState(REPORT_TYPES[0])
@@ -206,18 +302,6 @@ export default function Reports() {
     isLoading: isDoorReportLoading,
   } = clearanceService.useGetReportsByDoorsQuery()
   const {
-    data: personsReportData,
-    error: personsReportError,
-    isSuccess: isPersonReportSuccess,
-    isError: isPersonReportError,
-    isLoading: isPersonReportLoading,
-  } = clearanceService.useGetReportsByPersonsQuery({
-    assignee_name:
-      selectedPersonnel.length > 0
-        ? `${selectedPersonnel[0]['first_name']} ${selectedPersonnel[0]['last_name']}`
-        : undefined,
-  })
-  const {
     data: transactionsReportData,
     error: transactionsReportError,
     isSuccess: isTransactionsReportSuccess,
@@ -226,13 +310,12 @@ export default function Reports() {
   } = clearanceService.useGetReportsByTransactionsQuery()
 
   useEffect(() => {
-    const active = []
+    const active = [REPORT_TYPES[1]]
     if (isDoorReportSuccess) active.push(REPORT_TYPES[0])
-    if (isPersonReportSuccess) active.push(REPORT_TYPES[1])
     if (isTransactionsReportSuccess) active.push(REPORT_TYPES[2])
 
     setActiveReports(active)
-  }, [isDoorReportSuccess, isPersonReportSuccess, isTransactionsReportSuccess])
+  }, [isDoorReportSuccess, isTransactionsReportSuccess])
 
   const downloadLiaisonAssignmentsReportHandler = async () => {
     try {
@@ -320,7 +403,7 @@ export default function Reports() {
         ))}
       {reportType === REPORT_TYPES[1] &&
         (activeReports.includes(reportType) ? (
-          <PeopleTable data={isPersonReportSuccess ? personsReportData : {}} />
+          <PeopleTable selectedPersonnel={selectedPersonnel} />
         ) : (
           <FeatureNotImplemented />
         ))}
