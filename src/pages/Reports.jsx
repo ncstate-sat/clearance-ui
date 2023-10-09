@@ -10,6 +10,7 @@ import {
   Table,
   IconButton,
   HelpIcon,
+  Spinner,
   Position,
   minorScale,
   toaster,
@@ -97,38 +98,78 @@ const FeatureNotImplemented = () => (
   </Pane>
 )
 
-const TransactionTable = ({ data }) => (
-  <Table marginTop='2rem'>
-    <Table.Head>
-      <Table.TextHeaderCell>Date</Table.TextHeaderCell>
-      <Table.TextHeaderCell>Door Name</Table.TextHeaderCell>
-      <Table.TextHeaderCell>Name</Table.TextHeaderCell>
-      <Table.TextHeaderCell>Campus ID</Table.TextHeaderCell>
-      <Table.TextHeaderCell>State Code</Table.TextHeaderCell>
-    </Table.Head>
-    <Table.Body>
-      {data.map((d) => (
-        <Table.Row>
-          <Table.TextCell>
-            {d.date ? d.date.toLocaleString() : ''}
-          </Table.TextCell>
-          <Table.TextCell>{d.door_name || ''}</Table.TextCell>
-          <Table.TextCell>{d.name || ''}</Table.TextCell>
-          <Table.TextCell>{d.campus_id || ''}</Table.TextCell>
-          <Table.TextCell>{d.state_code || ''}</Table.TextCell>
-        </Table.Row>
-      ))}
-    </Table.Body>
-  </Table>
-)
+const TransactionTable = () => {
+  const [selectedPersonnel, setSelectedPersonnel] = useState([])
+  const [startTime, setStartTime] = useState()
+  const [endTime, setEndTime] = useState()
 
-const PeopleTable = ({ selectedPersonnel }) => {
+  const { data, error, isError, isLoading } =
+    clearanceService.useGetReportsByTransactionsQuery()
+
+  useEffect(() => {
+    if (error && error !== 'Not Found') {
+      toaster.danger(error ?? 'There was an error querying person reports.')
+    }
+  }, [error, isError])
+
+  if (isLoading)
+    return (
+      <Pane>
+        <Spinner margin='auto' />
+      </Pane>
+    )
+  if (isError) return <FeatureNotImplemented />
+
+  return (
+    <>
+      <PeoplePicker
+        header='Filter by Person'
+        selectedPersonnel={selectedPersonnel}
+        setSelectedPersonnel={setSelectedPersonnel}
+      />
+      <ContentCard header='Filter by Timeframe'>
+        <Timeframe
+          startDateTime={startTime}
+          endDateTime={endTime}
+          onChangeStartTime={setStartTime}
+          onChangeEndTime={setEndTime}
+        />
+      </ContentCard>
+      <Table marginTop='2rem'>
+        <Table.Head>
+          <Table.TextHeaderCell>Date</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Door Name</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Name</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Campus ID</Table.TextHeaderCell>
+          <Table.TextHeaderCell>State Code</Table.TextHeaderCell>
+        </Table.Head>
+        <Table.Body>
+          {data &&
+            data.map((d) => (
+              <Table.Row>
+                <Table.TextCell>
+                  {d.date ? d.date.toLocaleString() : ''}
+                </Table.TextCell>
+                <Table.TextCell>{d.door_name || ''}</Table.TextCell>
+                <Table.TextCell>{d.name || ''}</Table.TextCell>
+                <Table.TextCell>{d.campus_id || ''}</Table.TextCell>
+                <Table.TextCell>{d.state_code || ''}</Table.TextCell>
+              </Table.Row>
+            ))}
+        </Table.Body>
+      </Table>
+    </>
+  )
+}
+
+const PeopleTable = () => {
   const CLEARANCES_LIMIT = 10
   const ASSIGNEE_LIMIT = 50
   const [page, setPage] = useState(0)
   const [assigneePage, setAssigneePage] = useState(0)
   const [assigneeCount, setAssigneeCount] = useState()
   const [selectedClearanceId, setSelectedClearanceId] = useState()
+  const [selectedPersonnel, setSelectedPersonnel] = useState([])
 
   const { data, error, isError, isLoading } =
     clearanceService.useGetReportsByPersonsQuery({
@@ -144,13 +185,26 @@ const PeopleTable = ({ selectedPersonnel }) => {
     })
 
   useEffect(() => {
-    if (isError) {
+    if (error && error !== 'Not Found') {
       toaster.danger(error ?? 'There was an error querying person reports.')
     }
   }, [error, isError])
 
+  if (isLoading)
+    return (
+      <Pane>
+        <Spinner margin='auto' />
+      </Pane>
+    )
+  if (isError) return <FeatureNotImplemented />
+
   return (
     <>
+      <PeoplePicker
+        header='Filter by Person'
+        selectedPersonnel={selectedPersonnel}
+        setSelectedPersonnel={setSelectedPersonnel}
+      />
       <Table marginTop='2rem'>
         <Table.Head>
           <Table.TextHeaderCell>First Name</Table.TextHeaderCell>
@@ -251,71 +305,132 @@ const PeopleTable = ({ selectedPersonnel }) => {
   )
 }
 
-const DoorTable = ({ data }) => {
+const DoorTable = () => {
+  const CLEARANCES_LIMIT = 10
+  const DOOR_LIMIT = 50
+  const [page, setPage] = useState(0)
+  const [doorPage, setDoorPage] = useState(0)
+  const [doorCount, setDoorCount] = useState()
+  const [selectedClearanceId, setSelectedClearanceId] = useState()
+
+  const { data, error, isError, isLoading } =
+    clearanceService.useGetReportsByDoorsQuery()
+
+  useEffect(() => {
+    if (error && error !== 'Not Found') {
+      toaster.danger(error ?? 'There was an error querying person reports.')
+    }
+  }, [error, isError])
+
+  if (isLoading)
+    return (
+      <Pane>
+        <Spinner margin='auto' />
+      </Pane>
+    )
+  if (isError) return <FeatureNotImplemented />
+
   return (
-    <Table marginTop='2rem'>
-      <Table.Head>
-        <Table.TextHeaderCell>Door Name</Table.TextHeaderCell>
-        <Table.TextHeaderCell>Type</Table.TextHeaderCell>
-        <Table.TextHeaderCell>Schedule</Table.TextHeaderCell>
-      </Table.Head>
-      <Table.Body>
-        {Object.keys(data).map((key) => (
+    <>
+      <Table marginTop='2rem'>
+        <Table.Head>
+          <Table.TextHeaderCell>Door Name</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Type</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Schedule</Table.TextHeaderCell>
+        </Table.Head>
+        <Table.Body>
+          {Object.keys(data?.['clearances'] || []).map((key) => (
+            <>
+              <Table.Row height={'2.5rem'} key={key}>
+                <TableSectionHeader>
+                  <Pane
+                    display='flex'
+                    flexDirection='row'
+                    justifyContent='space-between'
+                    alignItems='center'
+                    width='100%'
+                  >
+                    {key}
+                    <Button
+                      appearance='minimal'
+                      disabled={isLoading}
+                      onClick={() => {
+                        if (selectedClearanceId) {
+                          setDoorCount()
+                          setSelectedClearanceId()
+                        } else {
+                          setDoorCount(data?.['clearances'][key]['door_count'])
+                          setSelectedClearanceId(
+                            data?.['clearances'][key]['clearance_id']
+                          )
+                        }
+                      }}
+                    >
+                      {selectedClearanceId ? 'Collapse' : 'Expand'}
+                    </Button>
+                  </Pane>
+                </TableSectionHeader>
+              </Table.Row>
+              {data?.['clearances']?.[key].doors.map((door) => {
+                return (
+                  <Table.Row>
+                    <Table.TextCell>{door['name'] || ''}</Table.TextCell>
+                    <Table.TextCell>
+                      {door['is_elevator'] ? 'Elevator' : 'Door'}
+                    </Table.TextCell>
+                    <Table.TextCell>
+                      {door['schedule_name'] || ''}
+                    </Table.TextCell>
+                  </Table.Row>
+                )
+              })}
+            </>
+          ))}
+        </Table.Body>
+      </Table>
+      <Pane
+        justifyContent='flex-end'
+        display='flex'
+        alignItems='center'
+        gap={minorScale(3)}
+      >
+        {selectedClearanceId ? (
           <>
-            <Table.Row height={'2.5rem'} key={key}>
-              <TableSectionHeader>{key}</TableSectionHeader>
-            </Table.Row>
-            {data[key].doors.map((door) => {
-              return (
-                <Table.Row>
-                  <Table.TextCell>{door['name'] || ''}</Table.TextCell>
-                  <Table.TextCell>
-                    {door['is_elevator'] ? 'Elevator' : 'Door'}
-                  </Table.TextCell>
-                  <Table.TextCell>{door['schedule_name'] || ''}</Table.TextCell>
-                </Table.Row>
-              )
-            })}
+            <Text color='muted'>Doors Page {doorPage + 1}</Text>
+            <Pagination
+              page={doorPage + 1}
+              totalPages={Math.ceil(doorCount / DOOR_LIMIT)}
+              onNextPage={() => setDoorPage((currentPage) => currentPage + 1)}
+              onPreviousPage={() =>
+                setDoorPage((currentPage) => currentPage - 1)
+              }
+              onPageChange={(p) => setDoorPage(p - 1)}
+            />
           </>
-        ))}
-      </Table.Body>
-    </Table>
+        ) : (
+          <>
+            <Text color='muted'>Page {page + 1}</Text>
+            <Pagination
+              page={page + 1}
+              totalPages={Math.ceil(
+                data?.['total_clearances'] / CLEARANCES_LIMIT
+              )}
+              onNextPage={() => setPage((currentPage) => currentPage + 1)}
+              onPreviousPage={() => setPage((currentPage) => currentPage - 1)}
+              onPageChange={(p) => setPage(p - 1)}
+            />
+          </>
+        )}
+      </Pane>
+    </>
   )
 }
 
 export default function Reports() {
   // Current location in the section
   const [reportType, setReportType] = useState(REPORT_TYPES[0])
-  const [activeReports, setActiveReports] = useState([])
-
-  // Filter selections
-  const [selectedPersonnel, setSelectedPersonnel] = useState([])
-  const [startTime, setStartTime] = useState()
-  const [endTime, setEndTime] = useState()
 
   const [getReports] = clearanceService.useLazyGetReportsByUserQuery()
-  const {
-    data: doorReportData,
-    error: doorReportError,
-    isSuccess: isDoorReportSuccess,
-    isError: isDoorReportError,
-    isLoading: isDoorReportLoading,
-  } = clearanceService.useGetReportsByDoorsQuery()
-  const {
-    data: transactionsReportData,
-    error: transactionsReportError,
-    isSuccess: isTransactionsReportSuccess,
-    isError: isTransactionsReportError,
-    isLoading: isTransactionsReportLoading,
-  } = clearanceService.useGetReportsByTransactionsQuery()
-
-  useEffect(() => {
-    const active = [REPORT_TYPES[1]]
-    if (isDoorReportSuccess) active.push(REPORT_TYPES[0])
-    if (isTransactionsReportSuccess) active.push(REPORT_TYPES[2])
-
-    setActiveReports(active)
-  }, [isDoorReportSuccess, isTransactionsReportSuccess])
 
   const downloadLiaisonAssignmentsReportHandler = async () => {
     try {
@@ -376,45 +491,9 @@ export default function Reports() {
           Liaison Assignments
         </Button>
       </Pane>
-      {PEOPLE_PICKER_FILTER.includes(reportType) &&
-        activeReports.includes(reportType) && (
-          <PeoplePicker
-            header='Filter by Person'
-            selectedPersonnel={selectedPersonnel}
-            setSelectedPersonnel={setSelectedPersonnel}
-          />
-        )}
-      {TIMEFRAME_FILTER.includes(reportType) &&
-        activeReports.includes(reportType) && (
-          <ContentCard header='Filter by Timeframe'>
-            <Timeframe
-              startDateTime={startTime}
-              endDateTime={endTime}
-              onChangeStartTime={setStartTime}
-              onChangeEndTime={setEndTime}
-            />
-          </ContentCard>
-        )}
-      {reportType === REPORT_TYPES[0] &&
-        (activeReports.includes(reportType) ? (
-          <DoorTable data={isDoorReportSuccess ? doorReportData : {}} />
-        ) : (
-          <FeatureNotImplemented />
-        ))}
-      {reportType === REPORT_TYPES[1] &&
-        (activeReports.includes(reportType) ? (
-          <PeopleTable selectedPersonnel={selectedPersonnel} />
-        ) : (
-          <FeatureNotImplemented />
-        ))}
-      {reportType === REPORT_TYPES[2] &&
-        (activeReports.includes(reportType) ? (
-          <TransactionTable
-            data={isTransactionsReportSuccess ? transactionsReportData : []}
-          />
-        ) : (
-          <FeatureNotImplemented />
-        ))}
+      {reportType === REPORT_TYPES[0] && <DoorTable />}
+      {reportType === REPORT_TYPES[1] && <PeopleTable />}
+      {reportType === REPORT_TYPES[2] && <TransactionTable />}
     </>
   )
 }
