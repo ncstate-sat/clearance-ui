@@ -138,7 +138,7 @@ const PeopleTable = () => {
       clearances_limit: CLEARANCES_LIMIT,
       clearances_skip: page * CLEARANCES_LIMIT,
       clearance_id: selectedClearanceId,
-      assignees_page: selectedClearanceId ? assigneePage : undefined,
+      assignees_page: selectedClearanceId ? assigneePage + 1 : undefined,
       assignees_page_size: selectedClearanceId ? ASSIGNEE_LIMIT : undefined,
     })
 
@@ -276,7 +276,7 @@ const DoorTable = () => {
       clearances_limit: CLEARANCES_LIMIT,
       clearances_skip: page * CLEARANCES_LIMIT,
       clearance_id: selectedClearanceId,
-      doors_page: selectedClearanceId ? page : undefined,
+      doors_page: selectedClearanceId ? doorPage + 1 : undefined,
       doors_page_size: selectedClearanceId ? DOOR_LIMIT : undefined,
     })
 
