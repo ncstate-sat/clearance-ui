@@ -24,55 +24,6 @@ import Pagination from '../components/Pagination'
 import openInNewTab from '../utils/openInNewTab'
 
 const REPORT_TYPES = ['Door Clearances', 'People Clearances', 'Transactions']
-const PEOPLE_PICKER_FILTER = [REPORT_TYPES[1], REPORT_TYPES[2]]
-const TIMEFRAME_FILTER = [REPORT_TYPES[2]]
-
-const TRANSACTIONS_REPORT_DATA = [
-  {
-    date: new Date('9/13/22 4:59 PM'),
-    door_name: 'EB1 - 3058 Lab',
-    name: 'Ashley Noelle Simpson',
-    campus_id: '200293592',
-    state_code: 'Admit',
-  },
-  {
-    date: new Date('9/13/22 4:36 PM'),
-    door_name: 'EB1 - 3058 Lab',
-    name: 'Joseph B. Tracy',
-    campus_id: '0004056039',
-    state_code: 'Admit',
-  },
-  {
-    date: new Date('9/13/22 4:59 PM'),
-    door_name: 'EB1 - 3058 Lab',
-    name: null,
-    campus_id: null,
-    state_code: 'DoorForced',
-  },
-]
-
-const DOOR_REPORT_DATA = {
-  'VTE-G-NA-TAU Finger Barn Gate 24/7-DEPT': {
-    door_count: 3,
-    doors: [
-      {
-        name: 'TSU - 1100 South Corridor 1150',
-        is_elevator: false,
-        schedule_name: 'Always',
-      },
-      {
-        name: 'TSU - 4221 Copy and Supply Room',
-        is_elevator: false,
-        schedule_name: 'Always',
-      },
-      {
-        name: 'TSU - Elevator Car Two (2)',
-        is_elevator: true,
-        schedule_name: 'TSU- 6a-1a Access',
-      },
-    ],
-  },
-}
 
 const TableSectionHeader = styled(Pane)`
   background-color: #f9fafc;
