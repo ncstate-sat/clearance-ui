@@ -146,9 +146,22 @@ const api = createApi({
       },
     }),
     getReportsByDoors: builder.query({
-      query: () => ({
+      query: ({
+        clearance_id,
+        doors_page_size,
+        doors_page,
+        clearances_limit,
+        clearances_skip,
+      }) => ({
         url: `/reports/clearances/doors`,
         method: 'GET',
+        params: {
+          clearance_id,
+          doors_page_size,
+          doors_page,
+          clearances_limit,
+          clearances_skip,
+        },
       }),
       transformErrorResponse: (response) => {
         return response?.data?.detail
@@ -179,9 +192,16 @@ const api = createApi({
       },
     }),
     getReportsByTransactions: builder.query({
-      query: () => ({
+      query: ({ skip, limit, from_time, to_time, assignee_name }) => ({
         url: '/reports/usage/transactions',
         method: 'GET',
+        params: {
+          skip,
+          limit,
+          from_time,
+          to_time,
+          assignee_name,
+        },
       }),
       transformErrorResponse: (response) => {
         return response?.data?.detail

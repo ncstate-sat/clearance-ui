@@ -104,7 +104,14 @@ const TransactionTable = () => {
   const [endTime, setEndTime] = useState()
 
   const { data, error, isError, isLoading } =
-    clearanceService.useGetReportsByTransactionsQuery()
+    clearanceService.useGetReportsByTransactionsQuery({
+      from_time: startTime?.toISOString(),
+      to_time: endTime?.toISOString(),
+      assignee_name:
+        selectedPersonnel.length > 0
+          ? `${selectedPersonnel[0]['first_name']} ${selectedPersonnel[0]['last_name']}`
+          : undefined,
+    })
 
   useEffect(() => {
     if (error && error !== 'Not Found') {
@@ -180,7 +187,7 @@ const PeopleTable = () => {
       clearances_limit: CLEARANCES_LIMIT,
       clearances_skip: page * CLEARANCES_LIMIT,
       clearance_id: selectedClearanceId,
-      assignees_page: selectedClearanceId ? page : undefined,
+      assignees_page: selectedClearanceId ? assigneePage : undefined,
       assignees_page_size: selectedClearanceId ? ASSIGNEE_LIMIT : undefined,
     })
 
@@ -314,7 +321,13 @@ const DoorTable = () => {
   const [selectedClearanceId, setSelectedClearanceId] = useState()
 
   const { data, error, isError, isLoading } =
-    clearanceService.useGetReportsByDoorsQuery()
+    clearanceService.useGetReportsByDoorsQuery({
+      clearances_limit: CLEARANCES_LIMIT,
+      clearances_skip: page * CLEARANCES_LIMIT,
+      clearance_id: selectedClearanceId,
+      doors_page: selectedClearanceId ? page : undefined,
+      doors_page_size: selectedClearanceId ? DOOR_LIMIT : undefined,
+    })
 
   useEffect(() => {
     if (error && error !== 'Not Found') {
@@ -478,6 +491,7 @@ export default function Reports() {
             <Button
               onClick={() => setReportType(t)}
               isActive={reportType === t}
+              test-id={`${t.replace(/\s+/g, '-').toLowerCase()}`}
             >
               {t}
             </Button>
