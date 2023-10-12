@@ -10,6 +10,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import './index.css'
 
 import ManageClearance from './pages/Manage'
+import Reports from './pages/Reports'
 import LiaisonPermissions from './pages/LiaisonPermissions'
 import AuditLog from './pages/Audit'
 import Admin from './pages/Admin'
@@ -111,6 +112,10 @@ const router = createBrowserRouter([
       {
         path: 'manage',
         element: <ManageClearance />,
+      },
+      {
+        path: 'reports',
+        element: <Reports />,
       },
       {
         path: 'liaison-permissions',

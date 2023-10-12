@@ -79,6 +79,7 @@ export default function SideNav({ sidebarContent }) {
               href='/manage'
               useAnchor={false}
             />
+            <SideTab title='Reports' href='/reports' useAnchor={false} />
             {roles.includes('Admin') && (
               <SideTab
                 title='Liaison Permissions'
