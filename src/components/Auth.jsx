@@ -47,7 +47,7 @@ const Footer = styled(Pane)`
   align-items: center;
 `
 
-const LIAISON_PATHS = ['/manage']
+const LIAISON_PATHS = ['/manage', '/reports']
 
 const Auth = () => {
   const isLoggedIn = useSelector((state) => state.auth.token !== null)
