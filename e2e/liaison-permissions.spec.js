@@ -298,7 +298,7 @@ test.describe('Liaison Permissions page', () => {
   })
 
   // TODO: Remove John's info from E2E tests
-  test.skip('handle an error revoking a permission', async ({ page }) => {
+  test('handle an error revoking a permission', async ({ page }) => {
     const ERROR_MESSAGE = '[TEST] Could not give permission.'
 
     await page.route(/\/personnel\?search=jtchampi/, async (route) => {

@@ -10,25 +10,6 @@ test.describe('Manage Admins page', () => {
   })
 
   // TODO: Remove John's info from E2E tests
-  test.skip('add an admin', async ({ page }) => {
-    await page.goto('/admin')
-
-    await page
-      .locator('[test-id="add-admin-input"] input')
-      .fill('jtchampi@ncsu.edu')
-
-    await page
-      .locator('text=John Champion (jtchampi@ncsu.edu) [200103374]')
-      .click()
-
-    await page.locator('[test-id="add-admin-btn"]').click()
-
-    await expect(page.locator('[test-id="admin-table"]')).toContainText(
-      'jtchampi@ncsu.edu'
-    )
-  })
-
-  // TODO: Remove John's info from E2E tests
   test.skip('add a liaison', async ({ page }) => {
     await page.goto('/admin')
 
