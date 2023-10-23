@@ -96,12 +96,10 @@ export default function ManageClearance() {
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    console.log(JSON.stringify(personnelStrings))
     const selectedPersonnelStrings = selectedPersonnel.map(
       (p) =>
         `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
     )
-    console.log(JSON.stringify(selectedPersonnelStrings))
     return personnelStrings
       .filter((i) => !selectedPersonnelStrings.includes(i))
       .sort()
