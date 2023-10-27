@@ -328,7 +328,7 @@ export default function AuditLog() {
       )}
 
       {filters[BY_TIMEFRAME].enabled && (
-        <ContentCard header='Search Date Assigned'>
+        <ContentCard header='Select Date Assigned'>
           <Tooltip content='Remove'>
             <IconButton
               onClick={() => toggleFilter(BY_TIMEFRAME)}
