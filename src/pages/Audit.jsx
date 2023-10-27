@@ -228,7 +228,7 @@ export default function AuditLog() {
                       handleFilterChange(BY_ASSIGNEE, '', [])
                     }}
                   >
-                    Filter by Person
+                    Filter on Assigned To
                   </Menu.Item>
                   <Menu.Item
                     onSelect={() => {
@@ -237,13 +237,13 @@ export default function AuditLog() {
                       handleFilterChange(BY_ASSIGNER, '', [])
                     }}
                   >
-                    Filter by Assigner
+                    Filter on Done By
                   </Menu.Item>
                   <Menu.Item onSelect={() => toggleFilter(BY_CLEARANCE_NAME)}>
                     Filter by Clearance Name
                   </Menu.Item>
                   <Menu.Item onSelect={() => toggleFilter(BY_TIMEFRAME)}>
-                    Filter by Timeframe
+                    Filter on Date Assigned
                   </Menu.Item>
                 </Menu.Group>
                 <Menu.Divider />
@@ -270,7 +270,9 @@ export default function AuditLog() {
       {(filters[BY_ASSIGNEE].enabled || filters[BY_ASSIGNER].enabled) && (
         <ContentCard
           header={
-            filters[BY_ASSIGNEE].enabled ? 'Select Person' : 'Select Assigner'
+            filters[BY_ASSIGNEE].enabled
+              ? 'Select Person - Assigned To'
+              : 'Select Person - Done By'
           }
         >
           <Tooltip content='Remove'>
@@ -326,7 +328,7 @@ export default function AuditLog() {
       )}
 
       {filters[BY_TIMEFRAME].enabled && (
-        <ContentCard header='Search Timeframe'>
+        <ContentCard header='Select Date Assigned'>
           <Tooltip content='Remove'>
             <IconButton
               onClick={() => toggleFilter(BY_TIMEFRAME)}
