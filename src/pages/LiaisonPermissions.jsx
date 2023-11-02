@@ -273,7 +273,7 @@ export default function LiaisonPermissions() {
             test-id='help-button-page'
             onClick={() =>
               openInNewTab(
-                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#liaison-permissions'
+                'https://ncstate-sat.github.io/clearance-service/#liaison-permissions'
               )
             }
           />

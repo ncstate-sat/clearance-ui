@@ -271,7 +271,7 @@ export default function ManageClearance() {
             test-id='help-button-page'
             onClick={() =>
               openInNewTab(
-                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#assign-and-manage-clearances'
+                'https://ncstate-sat.github.io/clearance-service/#assign-and-manage-clearances'
               )
             }
           />
@@ -281,7 +281,7 @@ export default function ManageClearance() {
 
       <ContentCard
         isLoading={isLoadingPersonnel}
-        helpLink={'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/'}
+        helpLink={'https://ncstate-sat.github.io/clearance-service/'}
       >
         <Pane
           display='flex'
