@@ -8,5 +8,5 @@ test('bulk upload multiple persons', async ({ page }) => {
     await manageClearancesPage.chooseCSVButton.click()
     await manageClearancesPage.uploadPersonnelCSV()
 
-    await expect(manageClearancesPage.bulkUploadTable).toContainText('awdawf')
+    await expect(manageClearancesPage.bulkUploadTable).toContainText('doesnotexist')
 })

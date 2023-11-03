@@ -8,10 +8,10 @@ test('add and clear filters', async ({ page }) => {
     await auditLogPage.addFilterButton.click()
 
     // add all filters
-    await auditLogPage.personFilter.click()
-    await expect(auditLogPage.personFilterHeader).toBeVisible()
-    await auditLogPage.assignerFilter.click()
-    await expect(auditLogPage.assignerFilterHeader).toBeVisible()
+    await auditLogPage.personAssignedToFilter.click()
+    await expect(auditLogPage.personAssignedToFilterHeader).toBeVisible()
+    await auditLogPage.personDoneByFilter.click()
+    await expect(auditLogPage.personDoneByFilterHeader).toBeVisible()
     await auditLogPage.clearanceFilter.click()
     await expect(auditLogPage.clearanceFilterHeader).toBeVisible()
     await auditLogPage.dateFilter.click()
@@ -19,23 +19,23 @@ test('add and clear filters', async ({ page }) => {
 
     // clear filters with clear filters button
     await auditLogPage.clearFilter.click()
-    await expect(auditLogPage.personFilterHeader).not.toBeVisible()
-    await expect(auditLogPage.assignerFilterHeader).not.toBeVisible()
+    await expect(auditLogPage.personAssignedToFilterHeader).not.toBeVisible()
+    await expect(auditLogPage.personDoneByFilterHeader).not.toBeVisible()
     await expect(auditLogPage.clearanceFilterHeader).not.toBeVisible()
     await expect(auditLogPage.dateFilterHeader).not.toBeVisible()
 
     // add filters and clear them with x button
     await auditLogPage.addFilterButton.click()
-    await auditLogPage.personFilter.click()
+    await auditLogPage.personAssignedToFilter.click()
     await auditLogPage.addFilterButton.click()
     await auditLogPage.filterXButton.click()
-    await expect(auditLogPage.personFilterHeader).not.toBeVisible()
+    await expect(auditLogPage.personAssignedToFilterHeader).not.toBeVisible()
 
     await auditLogPage.addFilterButton.click()
-    await auditLogPage.assignerFilter.click()
+    await auditLogPage.personDoneByFilter.click()
     await auditLogPage.addFilterButton.click()
     await auditLogPage.filterXButton.click()
-    await expect(auditLogPage.assignerFilterHeader).not.toBeVisible()
+    await expect(auditLogPage.personDoneByFilterHeader).not.toBeVisible()
     
     await auditLogPage.addFilterButton.click()
     await auditLogPage.clearanceFilter.click()

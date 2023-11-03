@@ -14,6 +14,8 @@ test('assign and revoke a clearance as an liaison', async ({ page }) => {
 
     await manageClearancesPage.routePersonnelRequest()
     await manageClearancesPage.routeClearanceSearchRequest()
+    await manageClearancesPage.routeAssignmentRequest()
+    await manageClearancesPage.routeRevocationRequest()
 
     await manageClearancesPage.searchForPerson('fakep')
     // this will click on the search result that pops up in the search bar, matching the string after "text="
@@ -34,4 +36,6 @@ test('assign and revoke a clearance as an liaison', async ({ page }) => {
 
     await manageClearancesPage.unroutePersonnelRequest()
     await manageClearancesPage.unrouteClearanceSearchRequest()
+    await manageClearancesPage.unrouteAssignmentRequest()
+    await manageClearancesPage.unrouteRevocationRequest()
 })

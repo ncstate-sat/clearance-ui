@@ -19,7 +19,7 @@ export class ReportsPage {
     }
 
     async routePeopleClearancesRequest() {
-        await page.route(
+        await this.page.route(
             /\/reports\/clearances\/persons\?clearances_limit=\d+&clearances_skip=\d+/,
             async (route) => {
               await route.fulfill({
@@ -108,7 +108,7 @@ export class ReportsPage {
     }
 
     async routeDoorClearancesRequest() {
-        await page.route(
+        await this.page.route(
           /\/reports\/clearances\/doors\?clearances_limit=\d+&clearances_skip=\d+/,
           async (route) => {
             await route.fulfill({
@@ -183,7 +183,7 @@ export class ReportsPage {
     }
     
     async routeTransactionsRequest() {
-        await page.route(/\/reports\/usage\/transactions/, async (route) => {
+        await this.page.route(/\/reports\/usage\/transactions/, async (route) => {
           await route.fulfill({
             status: 200,
             contentType: 'application/json',
