@@ -135,6 +135,78 @@ const api = createApi({
         return response?.data?.detail
       },
     }),
+    getReportsByUser: builder.query({
+      query: () => ({
+        url: '/reports/usage/monthly-by-user',
+        method: 'GET',
+        responseHandler: (response) => response.text(),
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
+    getReportsByDoors: builder.query({
+      query: ({
+        clearance_id,
+        doors_page_size,
+        doors_page,
+        clearances_limit,
+        clearances_skip,
+      }) => ({
+        url: `/reports/clearances/doors`,
+        method: 'GET',
+        params: {
+          clearance_id,
+          doors_page_size,
+          doors_page,
+          clearances_limit,
+          clearances_skip,
+        },
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
+    getReportsByPersons: builder.query({
+      query: ({
+        assignee_name,
+        clearance_id,
+        assignees_page_size,
+        assignees_page,
+        clearances_limit,
+        clearances_skip,
+      }) => ({
+        url: '/reports/clearances/persons',
+        method: 'GET',
+        params: {
+          assignee_name,
+          clearance_id,
+          assignees_page_size,
+          assignees_page,
+          clearances_limit,
+          clearances_skip,
+        },
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
+    getReportsByTransactions: builder.query({
+      query: ({ skip, limit, from_time, to_time, assignee_name }) => ({
+        url: '/reports/usage/transactions',
+        method: 'GET',
+        params: {
+          skip,
+          limit,
+          from_time,
+          to_time,
+          assignee_name,
+        },
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
   }),
 })
 
