@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { Pane, Card, Heading, Button, TagInput, minorScale } from 'evergreen-ui'
+import { Pane, Card, Heading, Button, minorScale } from 'evergreen-ui'
+import TagInput, { createTagOption } from './TagInput'
 
 import usePersonnel from '../hooks/usePersonnel'
 
@@ -8,22 +9,21 @@ export default function PeoplePicker({
   selectedPersonnel,
   setSelectedPersonnel,
 }) {
-  const { personnel, setPersonnelQuery } = usePersonnel()
+  const { personnel, personnelQuery, setPersonnelQuery } = usePersonnel()
 
   // Suggestion strings for personnel.
-  const autocompletePersonnel = useMemo(() => {
-    const personnelStrings = personnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    const selectedPersonnelStrings = selectedPersonnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    return personnelStrings
-      .filter((i) => !selectedPersonnelStrings.includes(i))
-      .sort()
-  }, [personnel, selectedPersonnel])
+  const autocompletePersonnel = useMemo(
+    () =>
+      personnel
+        .map((p) =>
+          createTagOption(
+            `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`,
+            p
+          )
+        )
+        .sort((a, b) => a['first_name'] > b['first_name']),
+    [personnel, selectedPersonnel]
+  )
 
   return (
     <Card
@@ -48,28 +48,12 @@ export default function PeoplePicker({
         </Button>
       </Pane>
       <TagInput
-        tagSubmitKey='enter'
+        inputValue={personnelQuery}
+        onInputChange={setPersonnelQuery}
+        value={selectedPersonnel}
+        onChange={setSelectedPersonnel}
+        suggestions={autocompletePersonnel}
         width='100%'
-        marginTop='8px'
-        values={selectedPersonnel.map((p) =>
-          `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
-        )}
-        onChange={(selected) => {
-          const personnelObjects = []
-          const allPersonnel = [...personnel, ...selectedPersonnel]
-          const personnelStrings = allPersonnel.map((p) =>
-            `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
-          )
-          selected.forEach((s) => {
-            const i = personnelStrings.indexOf(s)
-            if (i >= 0) {
-              personnelObjects.push(allPersonnel[i])
-            }
-          })
-          setSelectedPersonnel(personnelObjects)
-        }}
-        autocompleteItems={autocompletePersonnel}
-        onInputChange={(e) => setPersonnelQuery(e.target.value)}
       />
     </Card>
   )
