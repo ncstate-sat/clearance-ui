@@ -4,15 +4,15 @@ import {
   IconButton,
   HelpIcon,
   Table,
-  TagInput,
   Text,
   toaster,
   Tooltip,
   Position,
 } from 'evergreen-ui'
-import { useMemo, useCallback, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import ContentCard from '../components/ContentCard'
+import TagInput, { createTagOption } from '../components/TagInput'
 import FullWidthSpinner from '../components/FullWidthSpinner'
 import openInNewTab from '../utils/openInNewTab'
 
@@ -27,9 +27,10 @@ export default function ManageClearance() {
   const [removingRoles, setRemovingRoles] = useState([]) // Roles being removed from the clicked personnel.
   const [users, setUsers] = useState([]) // All users in all lists.
 
-  const [selectedPersonnel, setSelectedPersonnel] = useState([]) // Strings selected from the people picker.
+  const [selectedPersonnel, setSelectedPersonnel] = useState() // Strings selected from the people picker.
   const {
     personnel,
+    personnelQuery,
     setPersonnelQuery,
     isLoading: isLoadingPersonnel,
   } = usePersonnel() // Query for the people picker and get an array of personnel.
@@ -39,30 +40,17 @@ export default function ManageClearance() {
   const [isLoadingUsers, setIsLoadingUsers] = useState(false) // Is loading users into the lists.
 
   // The autocomplete strings shown in the people picker (not already picked).
-  const autocompletePersonnel = useMemo(() => {
-    const personnelStrings = personnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    const selectedPersonnelStrings = selectedPersonnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    return personnelStrings
-      .filter((i) => !selectedPersonnelStrings.includes(i))
-      .sort()
-  }, [selectedPersonnel, personnel])
-
-  // Get selected people strings as personnel objects.
-  const getPersonnel = useCallback(
-    (personnelString) => {
-      const person = personnel.find((p) => {
-        const s = `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-        return s === personnelString
-      })
-      return person
-    },
-    [personnel]
+  const autocompletePersonnel = useMemo(
+    () =>
+      personnel
+        .map((p) =>
+          createTagOption(
+            `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`,
+            p
+          )
+        )
+        .sort((a, b) => a['first_name'] > b['first_name']),
+    [selectedPersonnel, personnel]
   )
 
   // Array of email addresses being removed currently.
@@ -71,13 +59,13 @@ export default function ManageClearance() {
   // Give permission to user.
   useEffect(() => {
     // Make sure a person is selected first.
-    if (selectedPersonnel.length === 0) {
+    if (!selectedPersonnel) {
       if (addingRoles.length > 0) {
         setAddingRoles([])
       }
       return
     }
-    const selectedEmail = selectedPersonnel[0]['email']
+    const selectedEmail = selectedPersonnel['raw']['email']
 
     const controller = new AbortController()
 
@@ -104,7 +92,7 @@ export default function ManageClearance() {
           newUsers.push(account)
           return [...JSON.parse(JSON.stringify(newUsers))]
         })
-        setSelectedPersonnel([])
+        setSelectedPersonnel()
         setAddingRoles([])
       })
       .catch((error) => {
@@ -113,7 +101,7 @@ export default function ManageClearance() {
           !error.response?.data?.['detail'] === 'Token is expired'
         ) {
           console.error(error)
-          setSelectedPersonnel([])
+          setSelectedPersonnel()
           setAddingRoles([])
           toaster.danger('There was an error adding the role.')
         }
@@ -257,25 +245,12 @@ export default function ManageClearance() {
 
       <ContentCard header='Add Person' isLoading={isLoadingPersonnel}>
         <TagInput
-          tagSubmitKey='enter'
+          inputValue={personnelQuery}
+          onInputChange={setPersonnelQuery}
+          value={selectedPersonnel}
+          onChange={setSelectedPersonnel}
+          suggestions={autocompletePersonnel}
           width='100%'
-          values={selectedPersonnel.map(
-            (p) =>
-              `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-          )}
-          onChange={(p) => {
-            if (p.length === 0) {
-              setSelectedPersonnel([])
-            } else {
-              const person = getPersonnel(p[p.length - 1])
-              if (person) {
-                setSelectedPersonnel([person])
-              }
-            }
-          }}
-          autocompleteItems={autocompletePersonnel}
-          onInputChange={(e) => setPersonnelQuery(e.target.value)}
-          test-id='add-admin-input'
         />
         <Button
           appearance='primary'
@@ -283,7 +258,7 @@ export default function ManageClearance() {
           onClick={() => setAddingRoles(['Admin'])}
           marginTop='0.5rem'
           marginRight='0.5rem'
-          disabled={selectedPersonnel.length === 0}
+          disabled={!selectedPersonnel}
           test-id='add-admin-btn'
         >
           Add Admin
@@ -293,7 +268,7 @@ export default function ManageClearance() {
           isLoading={addingRoles.length > 0}
           onClick={() => setAddingRoles(['Liaison'])}
           marginTop='0.5rem'
-          disabled={selectedPersonnel.length === 0}
+          disabled={!selectedPersonnel}
           test-id='add-liaison-btn'
         >
           Add Liaison

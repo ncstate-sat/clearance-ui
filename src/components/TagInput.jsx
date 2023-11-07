@@ -343,6 +343,10 @@ const TagInput = ({
     selectedOptions = [
       <Tag onClick={() => removeOption(value)} key={value.text}>
         {value.text}
+        <CrossIcon
+          size={10}
+          style={{ transform: 'translateX(4px) translateY(1px)' }}
+        />
       </Tag>,
     ]
   }

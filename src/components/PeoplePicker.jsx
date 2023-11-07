@@ -40,7 +40,11 @@ export default function PeoplePicker({
         </Heading>
         <Button
           onClick={() => {
-            setSelectedPersonnel([])
+            if (Array.isArray(selectedPersonnel)) {
+              setSelectedPersonnel([])
+            } else {
+              setSelectedPersonnel()
+            }
             setPersonnelQuery('')
           }}
         >
