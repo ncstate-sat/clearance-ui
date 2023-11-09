@@ -194,7 +194,7 @@ export default function AuditLog() {
             test-id='help-button-page'
             onClick={() =>
               openInNewTab(
-                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#audit-logs'
+                'https://ncstate-sat.github.io/clearance-service/#audit-logs'
               )
             }
           />

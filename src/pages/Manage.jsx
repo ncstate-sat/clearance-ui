@@ -235,7 +235,7 @@ export default function ManageClearance() {
     if (bulkPersonnelNotFound.length === 0) return null
 
     return (
-      <Table marginTop='1rem'>
+      <Table marginTop='1rem' test-id='bulk-upload-table'>
         <Table.Body>
           {bulkPersonnelNotFound.map((n) => (
             <Table.Row key={JSON.stringify(n)}>
@@ -270,7 +270,7 @@ export default function ManageClearance() {
             test-id='help-button-page'
             onClick={() =>
               openInNewTab(
-                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#assign-and-manage-clearances'
+                'https://ncstate-sat.github.io/clearance-service/#assign-and-manage-clearances'
               )
             }
           />
@@ -280,7 +280,7 @@ export default function ManageClearance() {
 
       <ContentCard
         isLoading={isLoadingPersonnel}
-        helpLink={'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/'}
+        helpLink={'https://ncstate-sat.github.io/clearance-service/'}
       >
         <Pane
           display='flex'
@@ -362,7 +362,7 @@ export default function ManageClearance() {
             Assign
           </Button>
 
-          <Table>
+          <Table test-id='clearances-table'>
             <Table.Head>
               <Table.SearchHeaderCell
                 flexBasis='65%'

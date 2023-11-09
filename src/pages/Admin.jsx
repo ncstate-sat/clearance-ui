@@ -235,7 +235,7 @@ export default function ManageClearance() {
             test-id='help-button-page'
             onClick={() =>
               openInNewTab(
-                'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/#admin-manage-users'
+                'https://ncstate-sat.github.io/clearance-service/#admin-manage-users'
               )
             }
           />
