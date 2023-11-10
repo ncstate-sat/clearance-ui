@@ -12,5 +12,5 @@ test('help button should open a new NCSU page', async ({ page, context }) => {
     await helpPage.waitForLoadState()
 
     // TODO assert the title once github login is no longer necessary
-    await expect(helpPage).toHaveURL(/.github.ncsu.edu/)
+    await expect(helpPage).toHaveURL(/ncstate-sat.github.io/)
 })
