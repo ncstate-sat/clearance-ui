@@ -17,6 +17,7 @@ import {
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import authService from '../apis/authService'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import ClearancePicker from '../components/ClearancePicker'
@@ -24,8 +25,6 @@ import NoResultsText from '../components/NoResultsText'
 import openInNewTab from '../utils/openInNewTab'
 
 import usePersonnel from '../hooks/usePersonnel'
-
-import authService from '../apis/authService'
 
 export default function LiaisonPermissions() {
   const token = useSelector((state) => state.auth.token)
@@ -71,6 +70,10 @@ export default function LiaisonPermissions() {
     useState(false)
   const [shouldAddLiaisonPermission, setShouldAddLiaisonPermission] =
     useState(false)
+  const [copyLiaisonModal, setCopyLiaisonModal] = useState(false)
+  const [copyPersonnelObjects, setCopyPersonnelObjects] = useState([])
+  const [shouldCopyLiaisonModal, setShouldCopyLiaisonModal] = useState(false)
+  const [shouldCopyLiaison, setShouldCopyLiaison] = useState(false)
 
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
@@ -78,6 +81,7 @@ export default function LiaisonPermissions() {
   const [selectedClearances, setSelectedClearances] = useState([])
 
   const [selectedPersonnel, setSelectedPersonnel] = useState([])
+  const [selectedCopyPersonnel, setSelectedCopyPersonnel] = useState([])
   const {
     personnel,
     personnelQuery,
@@ -258,6 +262,51 @@ export default function LiaisonPermissions() {
     })
   }
 
+  useEffect(() => {
+    if (
+      shouldCopyLiaison &&
+      selectedPersonnel.length > 0 &&
+      selectedCopyPersonnel.length > 0
+    ) {
+      const controller = new AbortController()
+
+      // Add user to auth DB and clearance_service DB or update existing records
+      selectedCopyPersonnel.forEach((p) => {
+        console.log(p)
+        authService
+          .put(
+            '/update-account-roles',
+            {
+              email: p.email,
+              add_roles: ['Liaison'],
+            },
+            {
+              headers: {
+                Authorization: 'Bearer ' + token,
+              },
+              signal: controller.signal,
+            }
+          )
+          .catch((error) => {
+            if (
+              !error.response.status === 401 &&
+              !error.response?.data?.['detail'] === 'Token is expired'
+            ) {
+              console.error(error)
+              setShouldAddLiaisonPermissionModal(false)
+            }
+          })
+
+        assignLiaisonPermission({
+          campusId: p.campus_id,
+          clearanceIDs: clearanceAssignments.map((cl) => cl.id),
+        })
+      })
+
+      setShouldCopyLiaison(false)
+    }
+  }, [shouldCopyLiaison, selectedCopyPersonnel, token])
+
   return (
     <>
       <Heading size={800}>
@@ -302,6 +351,67 @@ export default function LiaisonPermissions() {
         You've just given this person clearances to assign, but this person does
         not currently have access to the tool as a Liaison. Would you like to
         give them access to use this tool?
+      </Dialog>
+
+      <Dialog
+        isShown={shouldCopyLiaisonModal}
+        title='Copy Liaison?'
+        cancelLabel={'Cancel'}
+        confirmLabel='Copy Liaison'
+        onCloseComplete={() => {
+          setShouldCopyLiaisonModal(false)
+          // setShouldProcessRequest(false)
+        }}
+        onCancel={(close) => {
+          // setShouldProcessRequest(false)
+          close()
+        }}
+        onConfirm={(close) => {
+          setShouldCopyLiaison(true)
+          close()
+          setCopyLiaisonModal(true)
+        }}
+      >
+        Select liaisons to copy permissions to
+        <ContentCard header='Select Liaison' isLoading={isLoadingPersonnel}>
+          <TagInput
+            tagSubmitKey='enter'
+            width='100%'
+            values={selectedCopyPersonnel.map((p) =>
+              `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
+            )}
+            onChange={(selected) => {
+              if (selected.length > 1) {
+                selected = [selected[selected.length - 1]]
+              }
+
+              const allPersonnel = [...personnel, ...selectedCopyPersonnel]
+              const personnelStrings = allPersonnel.map((p) =>
+                `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
+              )
+              selected.forEach((s) => {
+                const i = personnelStrings.indexOf(s)
+                if (i >= 0) {
+                  copyPersonnelObjects.push(allPersonnel[i])
+                }
+              })
+              setSelectedCopyPersonnel(copyPersonnelObjects)
+            }}
+            autocompleteItems={autocompletePersonnel}
+            onInputChange={(e) => setPersonnelQuery(e.target.value)}
+            test-id='personnel-input'
+          />
+          <NoResultsText
+            $visible={
+              !isLoadingPersonnel &&
+              !isTypingPersonnel &&
+              personnelQuery.length >= 3 &&
+              personnelLength === 0
+            }
+          >
+            No Personnel Found
+          </NoResultsText>
+        </ContentCard>
       </Dialog>
 
       <ContentCard header='Select Liaison' isLoading={isLoadingPersonnel}>
@@ -363,6 +473,19 @@ export default function LiaisonPermissions() {
         test-id='assign-permission-btn'
       >
         Give Permission
+      </Button>
+
+      <Button
+        appearance='primary'
+        intent='success'
+        // isLoading={isAssigningPermission}
+        disabled={selectedPersonnel.length === 0}
+        onClick={() => {
+          setShouldCopyLiaisonModal(true)
+        }}
+        test-id='copy-liaison-btn'
+      >
+        Copy Liaison
       </Button>
 
       <Table marginTop={minorScale(6)}>
