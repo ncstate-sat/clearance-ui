@@ -96,7 +96,7 @@ export default function Layout({ sidebarContent, hideApp, children }) {
               test-id='help-button-main'
               onClick={() =>
                 window.open(
-                  'https://pages.github.ncsu.edu/SAT/clearance-service-mirror/',
+                  'https://ncstate-sat.github.io/clearance-service/',
                   '_blank',
                   'noreferrer'
                 )
