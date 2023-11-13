@@ -24,7 +24,7 @@ const TagInputBox = styled.div`
   border: 1px solid #d8dae5;
   border-radius: 4px;
   padding: 4px;
-  z-index: 2;
+  z-index: 5;
   background-color: white;
   cursor: text;
 `
@@ -86,6 +86,7 @@ const SuggestionContainer = styled.div`
   grid-template-rows: auto auto;
   width: 100%;
   margin-top: 4px;
+  z-index: 5;
 `
 
 const Suggestion = styled.div`
@@ -352,54 +353,51 @@ const TagInput = ({
   }
 
   return (
-    <Fragment>
+    <Container $showDropdown={showSuggestions} $width={width}>
       {showSuggestions ? (
         <Backdrop
           onClick={() => setShowSuggestions(false)}
           data-testid='suggestion-box-backdrop'
         ></Backdrop>
       ) : null}
-      <Container $showDropdown={showSuggestions} $width={width}>
-        <TagInputBox onClick={focusInputHandler}>
-          {selectedOptions}
-          {multipleAllowed || (!multipleAllowed && !value) ? (
-            <TextInput
-              data-testid='inp_suggestion'
-              type='text'
-              value={inputValue}
-              placeholder={placeholder || ''}
-              onChange={(e) => onInputChange(e.target.value)}
-              onKeyDown={typedInputHandler}
-              onFocus={() => setShowSuggestions(true)}
-              ref={inputRef}
-            />
-          ) : null}
-          {showSuggestions && suggestions.length > 0 ? (
-            <DropdownToggleContainer>
-              <DropdownToggle>
-                <CaretDownIcon size={14} color='muted' />
-              </DropdownToggle>
-            </DropdownToggleContainer>
-          ) : null}
-        </TagInputBox>
-        {showSuggestions ? (
-          <SuggestionContainer>
-            <Pane
-              elevation={3}
-              backgroundColor='white'
-              maxHeight='12.5rem'
-              overflowY='scroll'
-            >
-              {suggestionItems.length > 0 ? (
-                suggestionItems
-              ) : (
-                <NoResults>No Results</NoResults>
-              )}
-            </Pane>
-          </SuggestionContainer>
+      <TagInputBox onClick={focusInputHandler}>
+        {selectedOptions}
+        {multipleAllowed || (!multipleAllowed && !value) ? (
+          <TextInput
+            type='text'
+            value={inputValue}
+            placeholder={placeholder || ''}
+            onChange={(e) => onInputChange(e.target.value)}
+            onKeyDown={typedInputHandler}
+            onFocus={() => setShowSuggestions(true)}
+            ref={inputRef}
+          />
         ) : null}
-      </Container>
-    </Fragment>
+        {showSuggestions && suggestions.length > 0 ? (
+          <DropdownToggleContainer>
+            <DropdownToggle>
+              <CaretDownIcon size={14} color='muted' />
+            </DropdownToggle>
+          </DropdownToggleContainer>
+        ) : null}
+      </TagInputBox>
+      {showSuggestions ? (
+        <SuggestionContainer>
+          <Pane
+            elevation={3}
+            backgroundColor='white'
+            maxHeight='12.5rem'
+            overflowY='scroll'
+          >
+            {suggestionItems.length > 0 ? (
+              suggestionItems
+            ) : (
+              <NoResults>No Results</NoResults>
+            )}
+          </Pane>
+        </SuggestionContainer>
+      ) : null}
+    </Container>
   )
 }
 
