@@ -71,7 +71,6 @@ export default function LiaisonPermissions() {
   const [shouldAddLiaisonPermission, setShouldAddLiaisonPermission] =
     useState(false)
   const [copyLiaisonModal, setCopyLiaisonModal] = useState(false)
-  const [copyPersonnelObjects, setCopyPersonnelObjects] = useState([])
   const [shouldCopyLiaisonModal, setShouldCopyLiaisonModal] = useState(false)
   const [shouldCopyLiaison, setShouldCopyLiaison] = useState(false)
 
@@ -144,9 +143,13 @@ export default function LiaisonPermissions() {
   }, [isRevokeSuccess, isRevokeError, revokeData, revokeError, revokeArgs])
 
   useEffect(() => {
+    console.log('CCC')
+    console.log(shouldCopyLiaison)
     if (isAssignSuccess) {
       setSelectedClearances([])
-      setClearanceAssignments(assignData['record']['clearances'])
+      if (shouldCopyLiaison) {
+        setClearanceAssignments(assignData['record']['clearances'])
+      }
       toaster.success('Permissions Assigned')
       setShouldProcessRequest(true)
     } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
@@ -272,7 +275,6 @@ export default function LiaisonPermissions() {
 
       // Add user to auth DB and clearance_service DB or update existing records
       selectedCopyPersonnel.forEach((p) => {
-        console.log(p)
         authService
           .put(
             '/update-account-roles',
@@ -385,17 +387,19 @@ export default function LiaisonPermissions() {
                 selected = [selected[selected.length - 1]]
               }
 
+              const personnelObjects = []
               const allPersonnel = [...personnel, ...selectedCopyPersonnel]
               const personnelStrings = allPersonnel.map((p) =>
                 `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
               )
+              console.log(selected)
               selected.forEach((s) => {
                 const i = personnelStrings.indexOf(s)
                 if (i >= 0) {
-                  copyPersonnelObjects.push(allPersonnel[i])
+                  personnelObjects.push(allPersonnel[i])
                 }
               })
-              setSelectedCopyPersonnel(copyPersonnelObjects)
+              setSelectedCopyPersonnel(personnelObjects)
             }}
             autocompleteItems={autocompletePersonnel}
             onInputChange={(e) => setPersonnelQuery(e.target.value)}
