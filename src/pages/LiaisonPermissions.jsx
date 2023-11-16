@@ -379,6 +379,7 @@ export default function LiaisonPermissions() {
           <TagInput
             tagSubmitKey='enter'
             width='100%'
+            test-id='dialog-personnel-input'
             values={selectedCopyPersonnel.map((p) =>
               `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
             )}
@@ -403,7 +404,6 @@ export default function LiaisonPermissions() {
             }}
             autocompleteItems={autocompletePersonnel}
             onInputChange={(e) => setPersonnelQuery(e.target.value)}
-            test-id='personnel-input'
           />
           <NoResultsText
             $visible={
@@ -422,6 +422,7 @@ export default function LiaisonPermissions() {
         <TagInput
           tagSubmitKey='enter'
           width='100%'
+          test-id='personnel-input'
           values={selectedPersonnel.map((p) =>
             `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
           )}
@@ -445,7 +446,6 @@ export default function LiaisonPermissions() {
           }}
           autocompleteItems={autocompletePersonnel}
           onInputChange={(e) => setPersonnelQuery(e.target.value)}
-          test-id='personnel-input'
         />
         <NoResultsText
           $visible={

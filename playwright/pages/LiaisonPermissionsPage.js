@@ -7,11 +7,14 @@ export class LiaisonPermissionsPage {
         // reusable elements on the page
         this.pageHeader = this.page.getByRole('heading', { name: 'Liaison Permissions' })
         this.liaisonInput = this.page.locator('[test-id="personnel-input"] input')
+        this.dialogLiaisonInput = this.page.locator('[test-id="dialog-personnel-input"] input')
         this.clearanceInput = this.page.locator('[test-id="clearance-input"] input')
         this.givePermissionButton = this.page.getByTestId('test-id=assign-permission-btn')
         this.permissionsAssignedHeader = this.page.getByRole('heading', { name: 'Permissions Assigned' })
         // this will find all revoke buttons, so only use when there is just 1 clearance present
         this.revokeButton = this.page.getByTestId('revoke-permission-btn')
+        this.copyButton = this.page.getByTestId('copy-liaison-btn')
+        this.assignedClearanceSuccessToast = this.page.getByRole('heading', { name: 'Permissions Assigned' })
         this.revocationSucceededHeader = this.page.getByRole('heading', { name: 'Revoke Succeeded' })
         this.mockedLiaisonEntry = this.page.getByText('Missing () [100015229]')
     }
@@ -33,6 +36,26 @@ export class LiaisonPermissionsPage {
                             last_name: 'Person',
                             email: 'fakep@ncsu.edu',
                             campus_id: '000000000',
+                        },
+                    ],
+                }),
+            })
+        })
+    }
+
+    async routePersonnelRequest() {
+        await this.page.route(/\/personnel\?search=copyfakep/, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    personnel: [
+                        {
+                            first_name: 'Copy',
+                            middle_name: '',
+                            last_name: 'Fake',
+                            email: 'cake@test.edu',
+                            campus_id: '000000001',
                         },
                     ],
                 }),
@@ -162,6 +185,13 @@ export class LiaisonPermissionsPage {
     async searchForLiaison(text) {
         await this.liaisonInput.fill(text)
     }
+
+    /**
+     * @param {string} text
+     */
+        async searchForCopyLiaison(text) {
+            await this.liaisonInput.fill(text)
+        }
 
     /**
      * @param {string} text
