@@ -3,7 +3,6 @@ import {
   Heading,
   minorScale,
   Table,
-  TagInput,
   Text,
   Spinner,
   Pane,
@@ -18,9 +17,11 @@ import {
 import { useMemo, useState, useEffect, useRef, Fragment } from 'react'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
+import TagInput, { createTagOption } from '../components/TagInput'
 import ClearancePicker from '../components/ClearancePicker'
 import NoResultsText from '../components/NoResultsText'
 import openInNewTab from '../utils/openInNewTab'
+import createTagInputString from '../utils/createTagInputString'
 
 import usePersonnel from '../hooks/usePersonnel'
 import useBulkUpload from '../hooks/useBulkUpload'
@@ -91,19 +92,13 @@ export default function ManageClearance() {
   const [selectedClearances, setSelectedClearances] = useState([])
 
   // Suggestion strings for personnel.
-  const autocompletePersonnel = useMemo(() => {
-    const personnelStrings = personnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    const selectedPersonnelStrings = selectedPersonnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    return personnelStrings
-      .filter((i) => !selectedPersonnelStrings.includes(i))
-      .sort()
-  }, [personnel, selectedPersonnel])
+  const autocompletePersonnel = useMemo(
+    () =>
+      personnel
+        .map((p) => createTagOption(createTagInputString(p), p))
+        .sort((a, b) => a['first_name'] > b['first_name']),
+    [personnel, selectedPersonnel]
+  )
 
   // Respond to API response to clearance assignment request.
   useEffect(() => {
@@ -127,7 +122,7 @@ export default function ManageClearance() {
   // Fetch clearance assignments for the selected person.
   useEffect(() => {
     if (selectedPersonnel.length === 1) {
-      const campusId = selectedPersonnel[0]['campus_id']
+      const campusId = selectedPersonnel[0]['raw']['campus_id']
 
       const request = getAssignments({ campusId: campusId })
 
@@ -167,7 +162,7 @@ export default function ManageClearance() {
   // Submit Assign request.
   const onAssignClearance = async () => {
     const assigneeIds = selectedPersonnel.map((p) => p['campus_id'])
-    const clearanceIds = selectedClearances.map((c) => c['id'])
+    const clearanceIds = selectedClearances.map((c) => c['raw']['id'])
 
     assignClearance({ assigneeIDs: assigneeIds, clearanceIDs: clearanceIds })
       .unwrap()
@@ -175,7 +170,7 @@ export default function ManageClearance() {
         setClearanceAssignments((prev) => {
           const oldValues = JSON.parse(JSON.stringify(prev))
           const newValues = selectedClearances.map((cl) => ({
-            ...cl,
+            ...cl['raw'],
             can_revoke: true,
           }))
 
@@ -322,28 +317,12 @@ export default function ManageClearance() {
           </Pane>
         </Pane>
         <TagInput
-          tagSubmitKey='enter'
+          inputValue={personnelQuery}
+          onInputChange={setPersonnelQuery}
+          value={selectedPersonnel}
+          onChange={setSelectedPersonnel}
+          suggestions={autocompletePersonnel}
           width='100%'
-          values={selectedPersonnel.map((p) =>
-            `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
-          )}
-          onChange={(selected) => {
-            const personnelObjects = []
-            const allPersonnel = [...personnel, ...selectedPersonnel]
-            const personnelStrings = allPersonnel.map((p) =>
-              `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
-            )
-            selected.forEach((s) => {
-              const i = personnelStrings.indexOf(s)
-              if (i >= 0) {
-                personnelObjects.push(allPersonnel[i])
-              }
-            })
-            setSelectedPersonnel(personnelObjects)
-          }}
-          autocompleteItems={autocompletePersonnel}
-          onInputChange={(e) => setPersonnelQuery(e.target.value)}
-          test-id='personnel-input'
         />
         {bulkUploadTable}
         <NoResultsText

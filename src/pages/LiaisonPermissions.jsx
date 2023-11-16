@@ -4,7 +4,6 @@ import {
   Heading,
   minorScale,
   Table,
-  TagInput,
   Text,
   Spinner,
   Pane,
@@ -15,15 +14,12 @@ import {
   Tooltip,
   Position,
 } from 'evergreen-ui'
-import { useMemo, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import clearanceService from '../apis/clearanceService'
-import ContentCard from '../components/ContentCard'
+import PeoplePicker from '../components/PeoplePicker'
 import ClearancePicker from '../components/ClearancePicker'
-import NoResultsText from '../components/NoResultsText'
 import openInNewTab from '../utils/openInNewTab'
-
-import usePersonnel from '../hooks/usePersonnel'
 
 import authService from '../apis/authService'
 
@@ -76,31 +72,7 @@ export default function LiaisonPermissions() {
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
   const [selectedClearances, setSelectedClearances] = useState([])
-
-  const [selectedPersonnel, setSelectedPersonnel] = useState([])
-  const {
-    personnel,
-    personnelQuery,
-    setPersonnelQuery,
-    length: personnelLength,
-    isTyping: isTypingPersonnel,
-    isLoading: isLoadingPersonnel,
-  } = usePersonnel()
-
-  // Suggestion strings for personnel.
-  const autocompletePersonnel = useMemo(() => {
-    const personnelStrings = personnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    const selectedPersonnelStrings = selectedPersonnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    return personnelStrings
-      .filter((i) => !selectedPersonnelStrings.includes(i))
-      .sort()
-  }, [personnel, selectedPersonnel])
+  const [selectedPersonnel, setSelectedPersonnel] = useState(null)
 
   // UPDATES AFTER API RESPONSES
   useEffect(() => {
@@ -152,8 +124,8 @@ export default function LiaisonPermissions() {
 
   // EVENT HANDLERS
   useEffect(() => {
-    if (selectedPersonnel.length > 0 && !isAssigningPermission) {
-      const campusId = selectedPersonnel[0]['campus_id']
+    if (selectedPersonnel && !isAssigningPermission) {
+      const campusId = selectedPersonnel['raw']['campus_id']
 
       const request = getLiaisonPermissions({ campusId: campusId }, false)
 
@@ -164,18 +136,18 @@ export default function LiaisonPermissions() {
   }, [selectedPersonnel, isAssigningPermission])
 
   const onRevokeClearance = (clearanceId) => {
-    if (selectedPersonnel.length === 0) return
+    if (!selectedPersonnel) return
 
     setLoadingRevokeRequests((requests) => [...requests, clearanceId])
 
     revokeLiaisonPermission({
-      campusId: selectedPersonnel[0]['campus_id'],
+      campusId: selectedPersonnel['raw']['campus_id'],
       clearanceIDs: [clearanceId],
     })
   }
 
   useEffect(() => {
-    if (shouldProcessRequest && selectedPersonnel.length > 0) {
+    if (shouldProcessRequest && selectedPersonnel) {
       // Check if this liaison already has access to the tool. If not, add him or her.
       authService
         .get('/role-accounts?role=Liaison', {
@@ -186,7 +158,7 @@ export default function LiaisonPermissions() {
         .then((response) => {
           const liaisonAccounts = response.data['accounts']
           const thisLiaison = liaisonAccounts.find(
-            (l) => l['email'] === selectedPersonnel[0]['email']
+            (l) => l['email'] === selectedPersonnel['raw']['email']
           )
 
           if (!thisLiaison) {
@@ -209,12 +181,12 @@ export default function LiaisonPermissions() {
   }, [shouldProcessRequest, selectedPersonnel, token])
 
   useEffect(() => {
-    if (shouldAddLiaisonPermission && selectedPersonnel.length > 0) {
+    if (shouldAddLiaisonPermission && selectedPersonnel) {
       authService
         .put(
           '/update-account-roles',
           {
-            email: selectedPersonnel[0]['email'],
+            email: selectedPersonnel['raw']['email'],
             add_roles: ['Liaison'],
           },
           {
@@ -243,8 +215,7 @@ export default function LiaisonPermissions() {
   }, [shouldAddLiaisonPermission, selectedPersonnel, token])
 
   const submitRequestHandler = async () => {
-    if (selectedPersonnel.length === 0 || selectedClearances.length === 0)
-      return
+    if (!selectedPersonnel || selectedClearances.length === 0) return
 
     setShouldProcessRequest(false)
     setShouldAddLiaisonPermissionModal(false)
@@ -253,7 +224,7 @@ export default function LiaisonPermissions() {
     const clearanceIds = selectedClearances.map((c) => c['id'])
 
     assignLiaisonPermission({
-      campusId: selectedPersonnel[0]['campus_id'],
+      campusId: selectedPersonnel['raw']['campus_id'],
       clearanceIDs: clearanceIds,
     })
   }
@@ -304,46 +275,11 @@ export default function LiaisonPermissions() {
         give them access to use this tool?
       </Dialog>
 
-      <ContentCard header='Select Liaison' isLoading={isLoadingPersonnel}>
-        <TagInput
-          tagSubmitKey='enter'
-          width='100%'
-          values={selectedPersonnel.map((p) =>
-            `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
-          )}
-          onChange={(selected) => {
-            if (selected.length > 1) {
-              selected = [selected[selected.length - 1]]
-            }
-
-            const personnelObjects = []
-            const allPersonnel = [...personnel, ...selectedPersonnel]
-            const personnelStrings = allPersonnel.map((p) =>
-              `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
-            )
-            selected.forEach((s) => {
-              const i = personnelStrings.indexOf(s)
-              if (i >= 0) {
-                personnelObjects.push(allPersonnel[i])
-              }
-            })
-            setSelectedPersonnel(personnelObjects)
-          }}
-          autocompleteItems={autocompletePersonnel}
-          onInputChange={(e) => setPersonnelQuery(e.target.value)}
-          test-id='personnel-input'
-        />
-        <NoResultsText
-          $visible={
-            !isLoadingPersonnel &&
-            !isTypingPersonnel &&
-            personnelQuery.length >= 3 &&
-            personnelLength === 0
-          }
-        >
-          No Personnel Found
-        </NoResultsText>
-      </ContentCard>
+      <PeoplePicker
+        header='Select Liaison'
+        selectedPersonnel={selectedPersonnel}
+        setSelectedPersonnel={setSelectedPersonnel}
+      />
 
       <ClearancePicker
         selectedClearances={selectedClearances}
@@ -354,9 +290,7 @@ export default function LiaisonPermissions() {
         appearance='primary'
         intent='success'
         isLoading={isAssigningPermission}
-        disabled={
-          selectedClearances.length === 0 || selectedPersonnel.length === 0
-        }
+        disabled={selectedClearances.length === 0 || !selectedPersonnel}
         onClick={() => {
           submitRequestHandler()
         }}
