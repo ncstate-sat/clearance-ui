@@ -21,6 +21,7 @@ import TagInput, { createTagOption } from '../components/TagInput'
 import ClearancePicker from '../components/ClearancePicker'
 import NoResultsText from '../components/NoResultsText'
 import openInNewTab from '../utils/openInNewTab'
+import createTagInputString from '../utils/createTagInputString'
 
 import usePersonnel from '../hooks/usePersonnel'
 import useBulkUpload from '../hooks/useBulkUpload'
@@ -94,12 +95,7 @@ export default function ManageClearance() {
   const autocompletePersonnel = useMemo(
     () =>
       personnel
-        .map((p) =>
-          createTagOption(
-            `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`,
-            p
-          )
-        )
+        .map((p) => createTagOption(createTagInputString(p), p))
         .sort((a, b) => a['first_name'] > b['first_name']),
     [personnel, selectedPersonnel]
   )

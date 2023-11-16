@@ -21,7 +21,7 @@ export class LiaisonPermissionsPage {
     this.revocationSucceededHeader = this.page.getByRole('heading', {
       name: 'Revoke Succeeded',
     })
-    this.mockedLiaisonEntry = this.page.getByText('Missing () [100015229]')
+    this.mockedLiaisonEntry = this.page.getByText('Missing [100015229]')
   }
 
   async goto() {

@@ -31,7 +31,7 @@ export class ManageClearancesPage {
     this.revokeFailureToast = this.page.getByRole('heading', {
       name: '[TEST] Could not revoke clearance assignment.',
     })
-    this.mockedPersonnelEntry = this.page.getByText('Missing () [100015229]')
+    this.mockedPersonnelEntry = this.page.getByText('Missing [100015229]')
     this.mockedClearanceEntry = this.page.getByText(
       'MRC-ECE 401/A, 446, 454, 454D-DEPT'
     )

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Pane, Card, Heading, Button, minorScale } from 'evergreen-ui'
 import TagInput, { createTagOption } from './TagInput'
+import createTagInputString from '../utils/createTagInputString'
 
 import usePersonnel from '../hooks/usePersonnel'
 
@@ -15,12 +16,7 @@ export default function PeoplePicker({
   const autocompletePersonnel = useMemo(
     () =>
       personnel
-        .map((p) =>
-          createTagOption(
-            `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`,
-            p
-          )
-        )
+        .map((p) => createTagOption(createTagInputString(p), p))
         .sort((a, b) => a['first_name'] > b['first_name']),
     [personnel, selectedPersonnel]
   )
