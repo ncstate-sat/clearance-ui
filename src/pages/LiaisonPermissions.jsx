@@ -70,7 +70,6 @@ export default function LiaisonPermissions() {
     useState(false)
   const [shouldAddLiaisonPermission, setShouldAddLiaisonPermission] =
     useState(false)
-  const [copyLiaisonModal, setCopyLiaisonModal] = useState(false)
   const [shouldCopyLiaisonModal, setShouldCopyLiaisonModal] = useState(false)
   const [shouldCopyLiaison, setShouldCopyLiaison] = useState(false)
 
@@ -143,8 +142,6 @@ export default function LiaisonPermissions() {
   }, [isRevokeSuccess, isRevokeError, revokeData, revokeError, revokeArgs])
 
   useEffect(() => {
-    console.log('CCC')
-    console.log(shouldCopyLiaison)
     if (isAssignSuccess) {
       setSelectedClearances([])
       if (shouldCopyLiaison) {
@@ -362,16 +359,13 @@ export default function LiaisonPermissions() {
         confirmLabel='Copy Liaison'
         onCloseComplete={() => {
           setShouldCopyLiaisonModal(false)
-          // setShouldProcessRequest(false)
         }}
         onCancel={(close) => {
-          // setShouldProcessRequest(false)
           close()
         }}
         onConfirm={(close) => {
           setShouldCopyLiaison(true)
           close()
-          setCopyLiaisonModal(true)
         }}
       >
         Select liaisons to copy permissions to
@@ -393,7 +387,6 @@ export default function LiaisonPermissions() {
               const personnelStrings = allPersonnel.map((p) =>
                 `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
               )
-              console.log(selected)
               selected.forEach((s) => {
                 const i = personnelStrings.indexOf(s)
                 if (i >= 0) {
@@ -488,7 +481,7 @@ export default function LiaisonPermissions() {
           setShouldCopyLiaisonModal(true)
         }}
         test-id='copy-liaison-btn'
-        marginLeft={10}
+        marginLeft={minorScale(3)}
       >
         Copy Liaison
       </Button>
