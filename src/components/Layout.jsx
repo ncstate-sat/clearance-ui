@@ -93,6 +93,19 @@ export default function Layout({ sidebarContent, hideApp, children }) {
           <Pane display='flex' marginLeft='auto'>
             <Button
               appearance='none'
+              test-id='tips-button-main'
+              onClick={() =>
+                window.open(
+                  'https://sites.google.com/ncsu.edu/sat-liaison-guide',
+                  '_blank',
+                  'noreferrer'
+                )
+              }
+            >
+              Liaison Tips
+            </Button>
+            <Button
+              appearance='none'
               test-id='help-button-main'
               onClick={() =>
                 window.open(
@@ -102,7 +115,7 @@ export default function Layout({ sidebarContent, hideApp, children }) {
                 )
               }
             >
-              Help
+              User Guide
             </Button>
             {isLoggedIn && (
               <Button onClick={() => dispatch(logOut())}>Sign Out</Button>
