@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
-import { TagInput, Tooltip, IconButton, CrossIcon } from 'evergreen-ui'
+import { Tooltip, IconButton, CrossIcon } from 'evergreen-ui'
 import useClearance from '../hooks/useClearance'
 import ContentCard from './ContentCard'
+import TagInput, { createTagOption } from './TagInput'
 import NoResultsText from './NoResultsText'
 
 export default function ({
@@ -19,15 +20,10 @@ export default function ({
   } = useClearance()
 
   // Suggestion strings for clearances.
-  const autocompleteClearances = useMemo(() => {
-    const clearanceNames = clearances.map((c) => c['name'].replace(/,/g, ''))
-    const selectedClearanceNames = selectedClearances.map((c) =>
-      c['name'].replace(/,/g, '')
-    )
-    return clearanceNames
-      .filter((i) => !selectedClearanceNames.includes(i))
-      .sort()
-  }, [clearances, selectedClearances])
+  const autocompleteClearances = useMemo(
+    () => clearances.map((c) => createTagOption(c['name'], c)),
+    [clearances]
+  )
 
   return (
     <ContentCard header='Select Clearance' isLoading={isLoadingClearances}>
@@ -45,26 +41,12 @@ export default function ({
         </Tooltip>
       )}
       <TagInput
-        tagSubmitKey='enter'
+        inputValue={clearanceQuery}
+        onInputChange={setClearanceQuery}
+        value={selectedClearances}
+        onChange={setSelectedClearances}
+        suggestions={autocompleteClearances}
         width='100%'
-        values={selectedClearances.map((c) => c['name'].replace(/,/g, ''))}
-        onChange={(selected) => {
-          const clearanceObjects = []
-          const allClearances = [...clearances, ...selectedClearances]
-          const clearanceStrings = allClearances.map(
-            (c) => `${c['name'].replace(/,/g, '')}`
-          )
-          selected.forEach((s) => {
-            const i = clearanceStrings.indexOf(s)
-            if (i >= 0) {
-              clearanceObjects.push(allClearances[i])
-            }
-          })
-          setSelectedClearances(clearanceObjects)
-        }}
-        autocompleteItems={autocompleteClearances}
-        onInputChange={(e) => setClearanceQuery(e.target.value)}
-        test-id='clearance-input'
       />
       <NoResultsText
         $visible={

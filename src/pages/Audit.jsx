@@ -8,7 +8,6 @@ import {
   Popover,
   Position,
   Table,
-  TagInput,
   Text,
   Tooltip,
   Spinner,
@@ -22,9 +21,11 @@ import clearanceService from '../apis/clearanceService'
 import { AUDIT_FILTERS } from '../components/AuditFilterCard'
 import ContentCard from '../components/ContentCard'
 import ClearancePicker from '../components/ClearancePicker'
+import TagInput, { createTagOption } from '../components/TagInput'
 import Timeframe from '../components/Timeframe'
 import usePersonnel from '../hooks/usePersonnel'
 import openInNewTab from '../utils/openInNewTab'
+import createTagInputString from '../utils/createTagInputString'
 
 const QUERY_LIMIT = 50
 
@@ -35,15 +36,15 @@ const { BY_ASSIGNEE, BY_ASSIGNER, BY_CLEARANCE_NAME, BY_TIMEFRAME } =
 const emptyFilters = {
   [BY_ASSIGNEE]: {
     enabled: false,
-    value: [],
+    value: null,
   },
   [BY_ASSIGNER]: {
     enabled: false,
-    value: [],
+    value: null,
   },
   [BY_CLEARANCE_NAME]: {
     enabled: false,
-    value: [],
+    value: null,
   },
   [BY_TIMEFRAME]: {
     enabled: false,
@@ -98,7 +99,7 @@ export default function AuditLog() {
           ...prev,
           [filter]: {
             ...prev[filter],
-            value: [...value],
+            value: value,
           },
         }))
       }
@@ -106,35 +107,29 @@ export default function AuditLog() {
     [setFilters]
   )
 
-  const selectedPersonnel = filters[BY_ASSIGNEE].value || []
-  const selectedClearances = filters[BY_CLEARANCE_NAME].value || []
+  const selectedPersonnel = filters[BY_ASSIGNEE].value || null
+  const selectedClearances = filters[BY_CLEARANCE_NAME].value || null
 
-  const { personnel, setPersonnelQuery } = usePersonnel()
+  const { personnel, personnelQuery, setPersonnelQuery } = usePersonnel()
 
   // Suggestion strings for personnel.
-  const autocompletePersonnel = useMemo(() => {
-    const personnelStrings = personnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    const selectedPersonnelStrings = selectedPersonnel.map(
-      (p) =>
-        `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-    )
-    return personnelStrings
-      .filter((i) => !selectedPersonnelStrings.includes(i))
-      .sort()
-  }, [personnel, selectedPersonnel])
+  const autocompletePersonnel = useMemo(
+    () =>
+      personnel
+        .map((p) => createTagOption(createTagInputString(p), p))
+        .sort((a, b) => a['first_name'] > b['first_name']),
+    [personnel, selectedPersonnel]
+  )
 
   const queryLogs = useCallback((flts, pg, selPsnl, selCls) => {
-    const campusId = selPsnl.length > 0 ? selPsnl[0]['campus_id'] : undefined
+    const campusId = selPsnl ? selPsnl['raw']['campus_id'] : undefined
 
     const timeframe = flts[BY_TIMEFRAME].value
 
     const queryParams = {
       skip: pg * QUERY_LIMIT,
       limit: QUERY_LIMIT + 1,
-      clearance_name: selCls?.[0]?.['name'],
+      clearance_name: selCls?.['text'],
       from_time: timeframe?.startDateTime?.toISOString(),
       to_time: timeframe?.endDateTime?.toISOString(),
       assignee_id: flts[BY_ASSIGNEE].enabled ? campusId : undefined,
@@ -225,7 +220,7 @@ export default function AuditLog() {
                     onSelect={() => {
                       toggleFilter(BY_ASSIGNEE, true)
                       toggleFilter(BY_ASSIGNER, false)
-                      handleFilterChange(BY_ASSIGNEE, '', [])
+                      handleFilterChange(BY_ASSIGNEE, '', null)
                     }}
                   >
                     Filter on Assigned To
@@ -234,7 +229,7 @@ export default function AuditLog() {
                     onSelect={() => {
                       toggleFilter(BY_ASSIGNER, true)
                       toggleFilter(BY_ASSIGNEE, false)
-                      handleFilterChange(BY_ASSIGNER, '', [])
+                      handleFilterChange(BY_ASSIGNER, '', null)
                     }}
                   >
                     Filter on Done By
@@ -290,29 +285,14 @@ export default function AuditLog() {
             />
           </Tooltip>
           <TagInput
-            tagSubmitKey='enter'
+            inputValue={personnelQuery}
+            onInputChange={setPersonnelQuery}
+            value={selectedPersonnel}
+            onChange={(values) =>
+              handleFilterChange(BY_ASSIGNEE, 'input', values)
+            }
+            suggestions={autocompletePersonnel}
             width='100%'
-            values={selectedPersonnel.map(
-              (p) =>
-                `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-            )}
-            onChange={(selected) => {
-              const personnelObjects = []
-              const allPersonnel = [...personnel, ...selectedPersonnel]
-              const personnelStrings = allPersonnel.map(
-                (p) =>
-                  `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
-              )
-              selected.forEach((s) => {
-                const i = personnelStrings.indexOf(s)
-                if (i >= 0) {
-                  personnelObjects.push(allPersonnel[i])
-                }
-              })
-              handleFilterChange(BY_ASSIGNEE, 'input', personnelObjects)
-            }}
-            autocompleteItems={autocompletePersonnel}
-            onInputChange={(e) => setPersonnelQuery(e.target.value)}
           />
         </ContentCard>
       )}

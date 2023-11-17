@@ -50,7 +50,7 @@ const FeatureNotImplemented = () => (
 )
 
 const TransactionTable = () => {
-  const [selectedPersonnel, setSelectedPersonnel] = useState([])
+  const [selectedPersonnel, setSelectedPersonnel] = useState(null)
   const [startTime, setStartTime] = useState()
   const [endTime, setEndTime] = useState()
 
@@ -58,10 +58,9 @@ const TransactionTable = () => {
     clearanceService.useGetReportsByTransactionsQuery({
       from_time: startTime?.toISOString(),
       to_time: endTime?.toISOString(),
-      assignee_name:
-        selectedPersonnel.length > 0
-          ? `${selectedPersonnel[0]['first_name']} ${selectedPersonnel[0]['last_name']}`
-          : undefined,
+      assignee_name: selectedPersonnel
+        ? `${selectedPersonnel['raw']['first_name']} ${selectedPersonnel['raw']['last_name']}`
+        : undefined,
     })
 
   useEffect(() => {
@@ -127,14 +126,13 @@ const PeopleTable = () => {
   const [assigneePage, setAssigneePage] = useState(0)
   const [assigneeCount, setAssigneeCount] = useState()
   const [selectedClearanceId, setSelectedClearanceId] = useState()
-  const [selectedPersonnel, setSelectedPersonnel] = useState([])
+  const [selectedPersonnel, setSelectedPersonnel] = useState(null)
 
   const { data, error, isError, isLoading } =
     clearanceService.useGetReportsByPersonsQuery({
-      assignee_name:
-        selectedPersonnel.length > 0
-          ? `${selectedPersonnel[0]['first_name']} ${selectedPersonnel[0]['last_name']}`
-          : undefined,
+      assignee_name: selectedPersonnel
+        ? `${selectedPersonnel['raw']['first_name']} ${selectedPersonnel['raw']['last_name']}`
+        : undefined,
       clearances_limit: CLEARANCES_LIMIT,
       clearances_skip: page * CLEARANCES_LIMIT,
       clearance_id: selectedClearanceId,
