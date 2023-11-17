@@ -39,6 +39,7 @@ export class ManageClearancesPage {
     this.fileUpload = this.page.getByTestId('file-upload')
     this.bulkUploadTable = this.page.getByTestId('bulk-upload-table')
     this.helpButton = this.page.getByTestId('help-button-main')
+    this.tipsButton = this.page.getByTestId('tips-button-main')
     this.ackModal = this.page.getByRole('button', { name: 'Acknowledge' })
   }
 
