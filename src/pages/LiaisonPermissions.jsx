@@ -21,6 +21,8 @@ import clearanceService from '../apis/clearanceService'
 import PeoplePicker from '../components/PeoplePicker'
 import ClearancePicker from '../components/ClearancePicker'
 import openInNewTab from '../utils/openInNewTab'
+import ContentCard from '../components/ContentCard'
+import usePersonnel from '../hooks/usePersonnel'
 
 export default function LiaisonPermissions() {
   const token = useSelector((state) => state.auth.token)
@@ -75,6 +77,14 @@ export default function LiaisonPermissions() {
   const [selectedClearances, setSelectedClearances] = useState([])
   const [selectedPersonnel, setSelectedPersonnel] = useState(null)
   const [selectedCopyPersonnel, setSelectedCopyPersonnel] = useState([])
+  const {
+    personnel,
+    personnelQuery,
+    setPersonnelQuery,
+    length: personnelLength,
+    isTyping: isTypingPersonnel,
+    isLoading: isLoadingPersonnel,
+  } = usePersonnel()
 
   // UPDATES AFTER API RESPONSES
   useEffect(() => {
