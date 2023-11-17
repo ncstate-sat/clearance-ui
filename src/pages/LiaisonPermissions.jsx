@@ -221,7 +221,7 @@ export default function LiaisonPermissions() {
     setShouldAddLiaisonPermissionModal(false)
     setShouldAddLiaisonPermission(false)
 
-    const clearanceIds = selectedClearances.map((c) => c['id'])
+    const clearanceIds = selectedClearances.map((c) => c['raw']['id'])
 
     assignLiaisonPermission({
       campusId: selectedPersonnel['raw']['campus_id'],
