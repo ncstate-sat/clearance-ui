@@ -488,6 +488,7 @@ export default function LiaisonPermissions() {
           setShouldCopyLiaisonModal(true)
         }}
         test-id='copy-liaison-btn'
+        marginLeft={10}
       >
         Copy Liaison
       </Button>
