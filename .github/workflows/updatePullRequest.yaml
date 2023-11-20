@@ -1,0 +1,20 @@
+name: Update Pull Request
+
+on:
+  pull_request:
+    types: 
+      - opened
+
+jobs:
+  update_pr:
+    runs-on: sat-hosted
+    steps:
+      - name: Get SAT Actions
+        uses: actions/checkout@v3
+        with:
+          repository: SAT/sat-actions
+          ref: TEAM-22-Review-CI-workflow-for-optimizations
+          path: sat-actions
+
+      - name: Update Pull Request
+        uses: ./sat-actions/update-pr
