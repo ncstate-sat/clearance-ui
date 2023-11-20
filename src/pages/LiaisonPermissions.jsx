@@ -21,7 +21,6 @@ import clearanceService from '../apis/clearanceService'
 import PeoplePicker from '../components/PeoplePicker'
 import ClearancePicker from '../components/ClearancePicker'
 import openInNewTab from '../utils/openInNewTab'
-import ContentCard from '../components/ContentCard'
 import usePersonnel from '../hooks/usePersonnel'
 
 export default function LiaisonPermissions() {
@@ -234,8 +233,7 @@ export default function LiaisonPermissions() {
     setShouldProcessRequest(false)
     setShouldAddLiaisonPermissionModal(false)
     setShouldAddLiaisonPermission(false)
-
-    const clearanceIds = selectedClearances.map((c) => c['id'])
+    const clearanceIds = selectedClearances.map((c) => c.raw.id)
 
     assignLiaisonPermission({
       campusId: selectedPersonnel['raw']['campus_id'],
@@ -246,7 +244,7 @@ export default function LiaisonPermissions() {
   useEffect(() => {
     if (
       shouldCopyLiaison &&
-      selectedPersonnel.length > 0 &&
+      selectedPersonnel &&
       selectedCopyPersonnel.length > 0
     ) {
       const controller = new AbortController()
@@ -350,52 +348,22 @@ export default function LiaisonPermissions() {
         }}
       >
         Select liaisons to copy permissions to
-        <ContentCard header='Select Liaison' isLoading={isLoadingPersonnel}>
-          <TagInput
-            tagSubmitKey='enter'
-            width='100%'
-            test-id='dialog-personnel-input'
-            values={selectedCopyPersonnel.map((p) =>
-              `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
-            )}
-            onChange={(selected) => {
-              if (selected.length > 1) {
-                selected = [selected[selected.length - 1]]
-              }
-
-              const personnelObjects = []
-              const allPersonnel = [...personnel, ...selectedCopyPersonnel]
-              const personnelStrings = allPersonnel.map((p) =>
-                `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`.trim()
-              )
-              selected.forEach((s) => {
-                const i = personnelStrings.indexOf(s)
-                if (i >= 0) {
-                  personnelObjects.push(allPersonnel[i])
-                }
-              })
-              setSelectedCopyPersonnel(personnelObjects)
-            }}
-            autocompleteItems={autocompletePersonnel}
-            onInputChange={(e) => setPersonnelQuery(e.target.value)}
-          />
-          <NoResultsText
-            $visible={
-              !isLoadingPersonnel &&
-              !isTypingPersonnel &&
-              personnelQuery.length >= 3 &&
-              personnelLength === 0
-            }
-          >
-            No Personnel Found
-          </NoResultsText>
-        </ContentCard>
+        <PeoplePicker
+          header='Select Liaison'
+          selectedPersonnel={selectedCopyPersonnel}
+          setSelectedPersonnel={setSelectedCopyPersonnel}
+        />
       </Dialog>
 
       <PeoplePicker
         header='Select Liaison'
         selectedPersonnel={selectedPersonnel}
         setSelectedPersonnel={setSelectedPersonnel}
+        buttonName='Copy Liaison'
+        onButtonClick={() => {
+          setShouldCopyLiaisonModal(true)
+        }}
+        buttonTooltip="Copy this liaison's permissions to another liaison"
       />
 
       <ClearancePicker
@@ -416,11 +384,11 @@ export default function LiaisonPermissions() {
         Give Permission
       </Button>
 
-      <Button
+      {/* <Button  // TODO delete this?
         appearance='primary'
         intent='success'
         // isLoading={isAssigningPermission}
-        disabled={selectedPersonnel.length === 0}
+        disabled={ !selectedPersonnel }
         onClick={() => {
           setShouldCopyLiaisonModal(true)
         }}
@@ -428,7 +396,7 @@ export default function LiaisonPermissions() {
         marginLeft={minorScale(3)}
       >
         Copy Liaison
-      </Button>
+      </Button> */}
 
       <Table marginTop={minorScale(6)}>
         <Table.Head>
