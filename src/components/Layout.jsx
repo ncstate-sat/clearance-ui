@@ -16,6 +16,7 @@ import { LayoutContext } from './LayoutProvider'
 import SideNav from './SideNav'
 import { logOut } from '../store/slices/auth'
 import LiaisonAcknowledgement from './LiaisonAcknowledgement'
+import HelpForm from './HelpForm'
 
 const HeaderContainer = styled(Pane)`
   display: flex;
@@ -70,6 +71,7 @@ export default function Layout({ sidebarContent, hideApp, children }) {
   return (
     <>
       <LiaisonAcknowledgement />
+      <HelpForm />
       <HeaderContainer
         backgroundColor={colors.gray50}
         borderColor={colors.gray100}
