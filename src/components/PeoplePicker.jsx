@@ -44,8 +44,6 @@ export default function PeoplePicker({
     </Tooltip>
   ) : null
 
-  console.log(buttonComponent)
-
   return (
     <Card
       position='relative'
