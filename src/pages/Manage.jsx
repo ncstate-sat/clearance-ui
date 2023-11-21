@@ -136,7 +136,7 @@ export default function ManageClearance() {
     setLoadingRevokeRequests((requests) => [...requests, clearanceId])
 
     revokeAssignments({
-      assigneeIDs: [selectedPersonnel[0]['campus_id']],
+      assigneeIDs: [selectedPersonnel[0]['raw']['campus_id']],
       clearanceIDs: [clearanceId],
     })
       .unwrap()
@@ -161,7 +161,7 @@ export default function ManageClearance() {
 
   // Submit Assign request.
   const onAssignClearance = async () => {
-    const assigneeIds = selectedPersonnel.map((p) => p['campus_id'])
+    const assigneeIds = selectedPersonnel.map((p) => p['raw']['campus_id'])
     const clearanceIds = selectedClearances.map((c) => c['raw']['id'])
 
     assignClearance({ assigneeIDs: assigneeIds, clearanceIDs: clearanceIds })
