@@ -384,20 +384,6 @@ export default function LiaisonPermissions() {
         Give Permission
       </Button>
 
-      {/* <Button  // TODO delete this?
-        appearance='primary'
-        intent='success'
-        // isLoading={isAssigningPermission}
-        disabled={ !selectedPersonnel }
-        onClick={() => {
-          setShouldCopyLiaisonModal(true)
-        }}
-        test-id='copy-liaison-btn'
-        marginLeft={minorScale(3)}
-      >
-        Copy Liaison
-      </Button> */}
-
       <Table marginTop={minorScale(6)}>
         <Table.Head>
           <Table.SearchHeaderCell
