@@ -199,7 +199,7 @@ export default function LiaisonPermissions() {
         .put(
           '/update-account-roles',
           {
-            email: selectedPersonnel['raw']['email'],
+            email: selectedPersonnel.raw.email,
             add_roles: ['Liaison'],
           },
           {
@@ -255,7 +255,7 @@ export default function LiaisonPermissions() {
           .put(
             '/update-account-roles',
             {
-              email: p.email,
+              email: p.raw.email,
               add_roles: ['Liaison'],
             },
             {
@@ -276,7 +276,7 @@ export default function LiaisonPermissions() {
           })
 
         assignLiaisonPermission({
-          campusId: p.campus_id,
+          campusId: p.raw.campus_id,
           clearanceIDs: clearanceAssignments.map((cl) => cl.id),
         })
       })
