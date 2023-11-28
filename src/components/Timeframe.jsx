@@ -74,15 +74,16 @@ const checkbox = styled.div`
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid #cc0000;
+  border: ${({ $disabled }) =>
+    $disabled ? '2px solid #696f8c' : '2px solid #cc0000'};
   border-radius: 12px;
-  cursor: pointer;
+  cursor: ${({ $disabled }) => ($disabled ? 'inherit' : 'pointer')};
   background-color: white;
   display: absolute;
 
   &:hover {
-    border: 4px solid #cc0000;
-    background-color: white;
+    border: ${({ $disabled }) =>
+      $disabled ? '2px solid gray' : '4px solid #cc0000'};
   }
 `
 
@@ -142,6 +143,9 @@ export default function Timeframe({
         onClick={() =>
           onChangeStartTime(startDateTime ? undefined : new Date())
         }
+        aria-checked={startDateTime}
+        aria-disabled={!onChangeStartTime}
+        $disabled={!onChangeStartTime}
       />
       <VerticalCenter colStart={4} colEnd={7}>
         <CenterLine />
@@ -149,6 +153,9 @@ export default function Timeframe({
       <EndCheckbox
         isChecked={endDateTime}
         onClick={() => onChangeEndTime(endDateTime ? undefined : new Date())}
+        aria-checked={endDateTime}
+        aria-disabled={!onChangeEndTime}
+        $disabled={!onChangeEndTime}
       />
       <VerticalCenter colStart={8} colEnd={10}>
         <RightLine inactive={endDateTime} />
@@ -159,6 +166,7 @@ export default function Timeframe({
             className='no-border center'
             selected={startDateTime}
             onChange={onChangeStartTime}
+            minDate={new Date()}
             showTimeSelect
             timeIntervals={15}
             timeFormat='h:mm aa'
@@ -173,6 +181,7 @@ export default function Timeframe({
             className='no-border center'
             selected={endDateTime}
             onChange={onChangeEndTime}
+            minDate={new Date()}
             showTimeSelect
             timeIntervals={15}
             timeFormat='h:mm aa'
