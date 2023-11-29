@@ -202,7 +202,9 @@ export default function ManageClearance() {
     if (isBulkPersonnelSuccess) {
       const personnel = bulkPersonnelData['personnel']
       const notFound = bulkPersonnelData['not_found']
-      setSelectedPersonnel(personnel)
+      setSelectedPersonnel(
+        personnel.map((p) => createTagOption(createTagInputString(p), p))
+      )
       setBulkPersonnelNotFound(notFound)
     } else if (
       isBulkPersonnelError &&
@@ -377,6 +379,7 @@ export default function ManageClearance() {
             marginTop='1rem'
             marginBottom='1.5rem'
             isLoading={isAssignLoading}
+            test-id='assign-clearance-btn'
           />
 
           <Table test-id='clearances-table'>

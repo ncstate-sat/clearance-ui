@@ -86,6 +86,7 @@ export default function SplitButton({
     >
       <ButtonContainer $activeDropdown={showOptions}>
         <Button
+          className='main-button'
           width='100%'
           borderTopRightRadius={0}
           borderBottomRightRadius={0}
@@ -97,6 +98,7 @@ export default function SplitButton({
           {buttonMode}
         </Button>
         <Button
+          className='caret-button'
           borderTopLeftRadius={0}
           borderBottomLeftRadius={0}
           borderLeft='none'

@@ -15,7 +15,9 @@ export class ManageClearancesPage {
       .locator('div')
       .filter({ hasText: /^Select ClearanceNo Clearances Found$/ })
       .getByRole('textbox')
-    this.assignClearanceButton = this.page.getByTestId('assign-clearance-btn')
+    this.assignClearanceButton = this.page.getByRole('button', {
+      name: 'Assign',
+    })
     this.assignedClearanceSuccessToast = this.page.getByRole('heading', {
       name: 'Clearance(s) Assigned Successfully',
     })
