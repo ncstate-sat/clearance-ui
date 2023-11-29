@@ -53,6 +53,7 @@ const TransactionTable = () => {
   const [selectedPersonnel, setSelectedPersonnel] = useState(null)
   const [startTime, setStartTime] = useState()
   const [endTime, setEndTime] = useState()
+  const [notAvailable, setNotAvailable] = useState(false)
 
   const { data, error, isError, isLoading } =
     clearanceService.useGetReportsByTransactionsQuery({
@@ -64,8 +65,15 @@ const TransactionTable = () => {
     })
 
   useEffect(() => {
-    if (error && error !== 'Not Found') {
-      toaster.danger(error ?? 'There was an error querying person reports.')
+    if (isError && (typeof error === 'object' || error !== 'Not Found')) {
+      const defaultMessage = 'There was an error querying transaction reports.'
+      if (typeof error === 'object') {
+        toaster.danger(defaultMessage)
+      } else {
+        toaster.danger(error ?? defaultMessage)
+      }
+    } else if (isError && error === 'Not Found') {
+      setNotAvailable(true)
     }
   }, [error, isError])
 
@@ -75,7 +83,7 @@ const TransactionTable = () => {
         <Spinner margin='auto' />
       </Pane>
     )
-  if (isError) return <FeatureNotImplemented />
+  if (notAvailable) return <FeatureNotImplemented />
 
   return (
     <>
@@ -127,6 +135,7 @@ const PeopleTable = () => {
   const [assigneeCount, setAssigneeCount] = useState()
   const [selectedClearanceId, setSelectedClearanceId] = useState()
   const [selectedPersonnel, setSelectedPersonnel] = useState(null)
+  const [notAvailable, setNotAvailable] = useState(false)
 
   const { data, error, isError, isLoading } =
     clearanceService.useGetReportsByPersonsQuery({
@@ -141,8 +150,15 @@ const PeopleTable = () => {
     })
 
   useEffect(() => {
-    if (error && error !== 'Not Found') {
-      toaster.danger(error ?? 'There was an error querying person reports.')
+    if (isError && (typeof error === 'object' || error !== 'Not Found')) {
+      const defaultMessage = 'There was an error querying person reports.'
+      if (typeof error === 'object') {
+        toaster.danger(defaultMessage)
+      } else {
+        toaster.danger(error ?? defaultMessage)
+      }
+    } else if (isError && error === 'Not Found') {
+      setNotAvailable(true)
     }
   }, [error, isError])
 
@@ -152,7 +168,7 @@ const PeopleTable = () => {
         <Spinner margin='auto' />
       </Pane>
     )
-  if (isError) return <FeatureNotImplemented />
+  if (notAvailable) return <FeatureNotImplemented />
 
   return (
     <>
@@ -268,6 +284,7 @@ const DoorTable = () => {
   const [doorPage, setDoorPage] = useState(0)
   const [doorCount, setDoorCount] = useState()
   const [selectedClearanceId, setSelectedClearanceId] = useState()
+  const [notAvailable, setNotAvailable] = useState(false)
 
   const { data, error, isError, isLoading } =
     clearanceService.useGetReportsByDoorsQuery({
@@ -279,8 +296,15 @@ const DoorTable = () => {
     })
 
   useEffect(() => {
-    if (error && error !== 'Not Found') {
-      toaster.danger(error ?? 'There was an error querying person reports.')
+    if (isError && (typeof error === 'object' || error !== 'Not Found')) {
+      const defaultMessage = 'There was an error querying door reports.'
+      if (typeof error === 'object') {
+        toaster.danger(defaultMessage)
+      } else {
+        toaster.danger(error ?? defaultMessage)
+      }
+    } else if (isError && error === 'Not Found') {
+      setNotAvailable(true)
     }
   }, [error, isError])
 
@@ -290,7 +314,7 @@ const DoorTable = () => {
         <Spinner margin='auto' />
       </Pane>
     )
-  if (isError) return <FeatureNotImplemented />
+  if (notAvailable) return <FeatureNotImplemented />
 
   return (
     <>
