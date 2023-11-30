@@ -18,6 +18,13 @@ export class ManageClearancesPage {
     this.assignClearanceButton = this.page.getByRole('button', {
       name: 'Assign',
     })
+    this.assignFutureClearanceButton = this.page.getByRole('button', {
+      name: 'Assign Future',
+    })
+    this.splitButtonDropdown = this.page.locator('.caret-button')
+    this.assignFutureOption = this.page.getByText('Assign Future')
+    this.startDateNode = this.page.locator('.sc-dtBdUo').first()
+    this.startDateTextbox = this.page.getByRole('textbox').nth(2)
     this.assignedClearanceSuccessToast = this.page.getByRole('heading', {
       name: 'Clearance(s) Assigned Successfully',
     })
@@ -43,6 +50,9 @@ export class ManageClearancesPage {
     this.helpButton = this.page.getByTestId('help-button-main')
     this.tipsButton = this.page.getByTestId('tips-button-main')
     this.ackModal = this.page.getByRole('button', { name: 'Acknowledge' })
+    this.suggestionBoxBackdrop = this.page.getByTestId(
+      'suggestion-box-backdrop'
+    )
   }
 
   async goto() {

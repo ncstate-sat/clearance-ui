@@ -146,6 +146,7 @@ export default function Timeframe({
         aria-checked={startDateTime}
         aria-disabled={!onChangeStartTime}
         $disabled={!onChangeStartTime}
+        test-id='start-checkbox'
       />
       <VerticalCenter colStart={4} colEnd={7}>
         <CenterLine />
@@ -156,6 +157,7 @@ export default function Timeframe({
         aria-checked={endDateTime}
         aria-disabled={!onChangeEndTime}
         $disabled={!onChangeEndTime}
+        test-id='end-checkbox'
       />
       <VerticalCenter colStart={8} colEnd={10}>
         <RightLine inactive={endDateTime} />

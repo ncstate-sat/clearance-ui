@@ -354,7 +354,7 @@ const TagInput = ({
 
   return (
     <Container $showDropdown={showSuggestions} $width={width}>
-      {showSuggestions ? (
+      {showSuggestions && inputValue.length > 0 ? (
         <Backdrop
           onClick={() => setShowSuggestions(false)}
           data-testid='suggestion-box-backdrop'
@@ -381,7 +381,7 @@ const TagInput = ({
           </DropdownToggleContainer>
         ) : null}
       </TagInputBox>
-      {showSuggestions ? (
+      {showSuggestions && inputValue.length > 0 ? (
         <SuggestionContainer>
           <Pane
             elevation={3}
