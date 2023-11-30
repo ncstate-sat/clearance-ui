@@ -333,7 +333,7 @@ export default function LiaisonPermissions() {
 
       <Dialog
         isShown={shouldCopyLiaisonModal}
-        title='Copy Liaison?'
+        title='Copy Liaison'
         cancelLabel={'Cancel'}
         confirmLabel='Copy Liaison'
         onCloseComplete={() => {
