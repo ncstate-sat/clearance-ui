@@ -36,7 +36,7 @@ export default function PeoplePicker({
     <Tooltip content={buttonTooltip} position={Position.RIGHT}>
       <Button
         onClick={onButtonClick}
-        marginLeft='1em'
+        marginLeft={minorScale(1)}
         disabled={!selectedPersonnel}
       >
         {buttonName}
@@ -57,18 +57,21 @@ export default function PeoplePicker({
         <Heading size={600} marginBottom={minorScale(3)}>
           {header}
         </Heading>
-        <Button
-          onClick={() => {
-            if (Array.isArray(selectedPersonnel)) {
-              setSelectedPersonnel([])
-            } else {
-              setSelectedPersonnel()
-            }
-            setPersonnelQuery('')
-          }}
-        >
-          Clear
-        </Button>
+        <Pane>
+          <Button
+            onClick={() => {
+              if (Array.isArray(selectedPersonnel)) {
+                setSelectedPersonnel([])
+              } else {
+                setSelectedPersonnel()
+              }
+              setPersonnelQuery('')
+            }}
+          >
+            Clear
+          </Button>
+          {buttonComponent}
+        </Pane>
       </Pane>
       <Pane
         display='flex'
@@ -84,7 +87,6 @@ export default function PeoplePicker({
           suggestions={autocompletePersonnel}
           width='100%'
         />
-        {buttonComponent}
       </Pane>
     </Card>
   )
