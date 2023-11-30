@@ -76,14 +76,6 @@ export default function LiaisonPermissions() {
   const [selectedClearances, setSelectedClearances] = useState([])
   const [selectedPersonnel, setSelectedPersonnel] = useState(null)
   const [selectedCopyPersonnel, setSelectedCopyPersonnel] = useState([])
-  const {
-    personnel,
-    personnelQuery,
-    setPersonnelQuery,
-    length: personnelLength,
-    isTyping: isTypingPersonnel,
-    isLoading: isLoadingPersonnel,
-  } = usePersonnel()
 
   // UPDATES AFTER API RESPONSES
   useEffect(() => {
@@ -336,6 +328,7 @@ export default function LiaisonPermissions() {
         title='Copy Liaison'
         cancelLabel={'Cancel'}
         confirmLabel='Copy Liaison'
+        isConfirmDisabled={selectedCopyPersonnel.length === 0}
         onCloseComplete={() => {
           setShouldCopyLiaisonModal(false)
         }}
