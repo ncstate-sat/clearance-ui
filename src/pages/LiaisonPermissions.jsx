@@ -16,12 +16,12 @@ import {
 } from 'evergreen-ui'
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import authService from '../apis/authService'
 import clearanceService from '../apis/clearanceService'
 import PeoplePicker from '../components/PeoplePicker'
 import ClearancePicker from '../components/ClearancePicker'
 import openInNewTab from '../utils/openInNewTab'
-
-import authService from '../apis/authService'
+import usePersonnel from '../hooks/usePersonnel'
 
 export default function LiaisonPermissions() {
   const token = useSelector((state) => state.auth.token)
@@ -67,12 +67,15 @@ export default function LiaisonPermissions() {
     useState(false)
   const [shouldAddLiaisonPermission, setShouldAddLiaisonPermission] =
     useState(false)
+  const [shouldCopyLiaisonModal, setShouldCopyLiaisonModal] = useState(false)
+  const [shouldCopyLiaison, setShouldCopyLiaison] = useState(false)
 
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
 
   const [selectedClearances, setSelectedClearances] = useState([])
   const [selectedPersonnel, setSelectedPersonnel] = useState(null)
+  const [selectedCopyPersonnel, setSelectedCopyPersonnel] = useState([])
 
   // UPDATES AFTER API RESPONSES
   useEffect(() => {
@@ -114,7 +117,9 @@ export default function LiaisonPermissions() {
   useEffect(() => {
     if (isAssignSuccess) {
       setSelectedClearances([])
-      setClearanceAssignments(assignData['record']['clearances'])
+      if (shouldCopyLiaison) {
+        setClearanceAssignments(assignData['record']['clearances'])
+      }
       toaster.success('Permissions Assigned')
       setShouldProcessRequest(true)
     } else if (isAssignError && assignError?.['name'] !== 'AbortError') {
@@ -186,7 +191,7 @@ export default function LiaisonPermissions() {
         .put(
           '/update-account-roles',
           {
-            email: selectedPersonnel['raw']['email'],
+            email: selectedPersonnel.raw.email,
             add_roles: ['Liaison'],
           },
           {
@@ -220,14 +225,57 @@ export default function LiaisonPermissions() {
     setShouldProcessRequest(false)
     setShouldAddLiaisonPermissionModal(false)
     setShouldAddLiaisonPermission(false)
-
-    const clearanceIds = selectedClearances.map((c) => c['raw']['id'])
+    const clearanceIds = selectedClearances.map((c) => c.raw.id)
 
     assignLiaisonPermission({
       campusId: selectedPersonnel['raw']['campus_id'],
       clearanceIDs: clearanceIds,
     })
   }
+
+  useEffect(() => {
+    if (
+      shouldCopyLiaison &&
+      selectedPersonnel &&
+      selectedCopyPersonnel.length > 0
+    ) {
+      const controller = new AbortController()
+
+      // Add user to auth DB and clearance_service DB or update existing records
+      selectedCopyPersonnel.forEach((p) => {
+        authService
+          .put(
+            '/update-account-roles',
+            {
+              email: p.raw.email,
+              add_roles: ['Liaison'],
+            },
+            {
+              headers: {
+                Authorization: 'Bearer ' + token,
+              },
+              signal: controller.signal,
+            }
+          )
+          .catch((error) => {
+            if (
+              !error.response.status === 401 &&
+              !error.response?.data?.['detail'] === 'Token is expired'
+            ) {
+              console.error(error)
+              setShouldAddLiaisonPermissionModal(false)
+            }
+          })
+
+        assignLiaisonPermission({
+          campusId: p.raw.campus_id,
+          clearanceIDs: clearanceAssignments.map((cl) => cl.id),
+        })
+      })
+
+      setShouldCopyLiaison(false)
+    }
+  }, [shouldCopyLiaison, selectedCopyPersonnel, token])
 
   return (
     <>
@@ -275,10 +323,40 @@ export default function LiaisonPermissions() {
         give them access to use this tool?
       </Dialog>
 
+      <Dialog
+        isShown={shouldCopyLiaisonModal}
+        title='Copy Liaison'
+        cancelLabel={'Cancel'}
+        confirmLabel='Copy Liaison'
+        isConfirmDisabled={selectedCopyPersonnel.length === 0}
+        onCloseComplete={() => {
+          setShouldCopyLiaisonModal(false)
+        }}
+        onCancel={(close) => {
+          close()
+        }}
+        onConfirm={(close) => {
+          setShouldCopyLiaison(true)
+          close()
+        }}
+      >
+        Select liaisons to copy permissions to
+        <PeoplePicker
+          header='Select Liaison'
+          selectedPersonnel={selectedCopyPersonnel}
+          setSelectedPersonnel={setSelectedCopyPersonnel}
+        />
+      </Dialog>
+
       <PeoplePicker
         header='Select Liaison'
         selectedPersonnel={selectedPersonnel}
         setSelectedPersonnel={setSelectedPersonnel}
+        buttonName='Copy Liaison'
+        onButtonClick={() => {
+          setShouldCopyLiaisonModal(true)
+        }}
+        buttonTooltip="Copy this liaison's permissions to another liaison"
       />
 
       <ClearancePicker

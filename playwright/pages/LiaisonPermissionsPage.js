@@ -48,6 +48,26 @@ export class LiaisonPermissionsPage {
     })
   }
 
+    async routePersonnelRequest() {
+        await this.page.route(/\/personnel\?search=copyfakep/, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    personnel: [
+                        {
+                            first_name: 'Copy',
+                            middle_name: '',
+                            last_name: 'Fake',
+                            email: 'cake@test.edu',
+                            campus_id: '000000001',
+                        },
+                    ],
+                }),
+            })
+        })
+    }
+
   async routePersonnelRequestWithMissingDetails() {
     await this.page.route(/\/personnel\?search=Missing/, async (route) => {
       await route.fulfill({
@@ -166,12 +186,19 @@ export class LiaisonPermissionsPage {
     await this.page.unroute(/\/assignments\/revoke$/)
   }
 
-  /**
-   * @param {string} text
-   */
-  async searchForLiaison(text) {
-    await this.liaisonInput.fill(text)
-  }
+    /**
+     * @param {string} text
+     */
+    async searchForLiaison(text) {
+        await this.liaisonInput.fill(text)
+    }
+
+    /**
+     * @param {string} text
+     */
+        async searchForCopyLiaison(text) {
+            await this.liaisonInput.fill(text)
+        }
 
   /**
    * @param {string} text
