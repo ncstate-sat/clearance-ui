@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import {
   Button,
   Dialog,
@@ -6,13 +7,16 @@ import {
   Textarea,
   Label,
   minorScale,
+  toaster,
 } from 'evergreen-ui'
 import styled from 'styled-components'
+import clearanceService from '../apis/clearanceService'
 
 const PersistentButton = styled(Button)`
   display: inline-block;
-  height: 5rem;
-  width: 5rem;
+  height: 4rem;
+  width: 4rem;
+  padding: 0;
   color: white;
   background-color: #cc0000;
   border-radius: 2.5rem;
@@ -33,9 +37,13 @@ const PersistentButton = styled(Button)`
 `
 
 export default function HelpForm() {
+  const email = useSelector((state) => state.auth.email)
+
   const [showForm, setShowForm] = useState(false)
   const [subjectField, setSubjectField] = useState('')
   const [bodyField, setBodyField] = useState('')
+
+  const [postHelpTicket] = clearanceService.usePostHelpTicketMutation()
 
   useEffect(() => {
     if (showForm) {
@@ -44,8 +52,21 @@ export default function HelpForm() {
     }
   }, [showForm])
 
-  const sendTicketHandler = () => {
-    console.log('Sending ticket...')
+  const sendTicketHandler = async () => {
+    try {
+      const response = await postHelpTicket({
+        fromEmail: email,
+        subject: subjectField,
+        body: bodyField,
+      }).unwrap()
+
+      toaster.success(
+        response?.['message'] || 'A help ticket has been submitted.'
+      )
+    } catch (error) {
+      toaster.danger(error || 'There was an error submitting a help ticket.')
+    }
+
     setShowForm(false)
   }
 

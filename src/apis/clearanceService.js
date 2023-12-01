@@ -207,6 +207,20 @@ const api = createApi({
         return response?.data?.detail
       },
     }),
+    postHelpTicket: builder.mutation({
+      query: ({ subject, body, fromEmail }) => ({
+        url: '/help/create-ticket',
+        method: 'POST',
+        body: {
+          subject,
+          body,
+          from_email: fromEmail,
+        },
+      }),
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
   }),
 })
 
