@@ -62,12 +62,13 @@ const api = createApi({
       },
     }),
     assignClearances: builder.mutation({
-      query: ({ assigneeIDs, clearanceIDs }) => ({
+      query: ({ assigneeIDs, clearanceIDs, startTime }) => ({
         url: '/assignments/assign',
         method: 'POST',
         body: {
           assignees: assigneeIDs,
           clearance_ids: clearanceIDs,
+          start_time: startTime,
         },
       }),
       transformErrorResponse: (response) => {

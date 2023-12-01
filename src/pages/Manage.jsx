@@ -22,6 +22,8 @@ import ClearancePicker from '../components/ClearancePicker'
 import NoResultsText from '../components/NoResultsText'
 import openInNewTab from '../utils/openInNewTab'
 import createTagInputString from '../utils/createTagInputString'
+import SplitButton from '../components/SplitButton'
+import Timeframe from '../components/Timeframe'
 
 import usePersonnel from '../hooks/usePersonnel'
 import useBulkUpload from '../hooks/useBulkUpload'
@@ -64,6 +66,8 @@ export default function ManageClearance() {
   ] = clearanceService.useGetBulkPersonnelMutation()
 
   const [tableFilter, setTableFilter] = useState('')
+  const [showTimeframePicker, setShowTimeframePicker] = useState(false)
+  const [startTime, setStartTime] = useState()
 
   const [clearanceAssignments, setClearanceAssignments] = useState([])
   const [loadingRevokeRequests, setLoadingRevokeRequests] = useState([])
@@ -164,27 +168,33 @@ export default function ManageClearance() {
     const assigneeIds = selectedPersonnel.map((p) => p['raw']['campus_id'])
     const clearanceIds = selectedClearances.map((c) => c['raw']['id'])
 
-    assignClearance({ assigneeIDs: assigneeIds, clearanceIDs: clearanceIds })
+    assignClearance({
+      assigneeIDs: assigneeIds,
+      clearanceIDs: clearanceIds,
+      startTime: startTime ? startTime.toISOString() : null,
+    })
       .unwrap()
       .then(() => {
-        setClearanceAssignments((prev) => {
-          const oldValues = JSON.parse(JSON.stringify(prev))
-          const newValues = selectedClearances.map((cl) => ({
-            ...cl['raw'],
-            can_revoke: true,
-          }))
+        if (!startTime || startTime <= new Date()) {
+          setClearanceAssignments((prev) => {
+            const oldValues = JSON.parse(JSON.stringify(prev))
+            const newValues = selectedClearances.map((cl) => ({
+              ...cl['raw'],
+              can_revoke: true,
+            }))
 
-          const clearanceIDs = {}
-          const newClearances = []
-          for (const c of [...oldValues, ...newValues]) {
-            if (!clearanceIDs[c['id']]) {
-              newClearances.push(c)
-              clearanceIDs[c['id']] = true
+            const clearanceIDs = {}
+            const newClearances = []
+            for (const c of [...oldValues, ...newValues]) {
+              if (!clearanceIDs[c['id']]) {
+                newClearances.push(c)
+                clearanceIDs[c['id']] = true
+              }
             }
-          }
 
-          return newClearances
-        })
+            return newClearances
+          })
+        }
       })
   }
 
@@ -192,7 +202,9 @@ export default function ManageClearance() {
     if (isBulkPersonnelSuccess) {
       const personnel = bulkPersonnelData['personnel']
       const notFound = bulkPersonnelData['not_found']
-      setSelectedPersonnel(personnel)
+      setSelectedPersonnel(
+        personnel.map((p) => createTagOption(createTagInputString(p), p))
+      )
       setBulkPersonnelNotFound(notFound)
     } else if (
       isBulkPersonnelError &&
@@ -344,19 +356,31 @@ export default function ManageClearance() {
             setSelectedClearances={setSelectedClearances}
           />
 
-          <Button
-            appearance='primary'
-            intent='success'
-            isLoading={isAssignLoading}
-            disabled={
-              selectedClearances.length === 0 || selectedPersonnel.length === 0
-            }
+          {showTimeframePicker && (
+            <ContentCard header='Select Timeframe'>
+              <Timeframe
+                startDateTime={startTime}
+                onChangeStartTime={setStartTime}
+              />
+            </ContentCard>
+          )}
+
+          <SplitButton
+            options={['Assign', 'Assign Future']}
             onClick={onAssignClearance}
-            marginBottom={minorScale(6)}
+            onChangeMode={(mode) => {
+              if (mode === 'Assign Future') {
+                setShowTimeframePicker(true)
+              } else {
+                setShowTimeframePicker(false)
+              }
+            }}
+            width='10rem'
+            marginTop='1rem'
+            marginBottom='1.5rem'
+            isLoading={isAssignLoading}
             test-id='assign-clearance-btn'
-          >
-            Assign
-          </Button>
+          />
 
           <Table test-id='clearances-table'>
             <Table.Head>
