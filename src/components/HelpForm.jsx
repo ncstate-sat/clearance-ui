@@ -55,7 +55,6 @@ export default function HelpForm() {
   const sendTicketHandler = async () => {
     try {
       const response = await postHelpTicket({
-        fromEmail: email,
         subject: subjectField,
         body: bodyField,
       }).unwrap()

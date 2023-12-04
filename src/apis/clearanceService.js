@@ -208,13 +208,12 @@ const api = createApi({
       },
     }),
     postHelpTicket: builder.mutation({
-      query: ({ subject, body, fromEmail }) => ({
+      query: ({ subject, body }) => ({
         url: '/help/create-ticket',
         method: 'POST',
         body: {
           subject,
           body,
-          from_email: fromEmail,
         },
       }),
       transformErrorResponse: (response) => {

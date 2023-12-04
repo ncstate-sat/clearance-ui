@@ -71,7 +71,7 @@ export default function Layout({ sidebarContent, hideApp, children }) {
   return (
     <>
       <LiaisonAcknowledgement />
-      <HelpForm />
+      {isLoggedIn && <HelpForm />}
       <HeaderContainer
         backgroundColor={colors.gray50}
         borderColor={colors.gray100}
