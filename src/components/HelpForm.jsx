@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import {
   Button,
   Dialog,
@@ -37,8 +36,6 @@ const PersistentButton = styled(Button)`
 `
 
 export default function HelpForm() {
-  const email = useSelector((state) => state.auth.email)
-
   const [showForm, setShowForm] = useState(false)
   const [subjectField, setSubjectField] = useState('')
   const [bodyField, setBodyField] = useState('')
@@ -80,7 +77,7 @@ export default function HelpForm() {
       </PersistentButton>
       <Dialog
         isShown={showForm}
-        title='Get Help'
+        title='Submit a Help Ticket to SAT'
         confirmLabel='Submit'
         onCloseComplete={() => {
           setShowForm(false)
