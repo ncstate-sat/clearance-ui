@@ -72,12 +72,17 @@ export default function HelpForm() {
 
   return (
     <>
-      <PersistentButton onClick={() => setShowForm(true)} disabled={showForm}>
+      <PersistentButton
+        onClick={() => setShowForm(true)}
+        disabled={showForm}
+        test-id='universal-help-button'
+      >
         Help
       </PersistentButton>
       <Dialog
         isShown={showForm}
         title='Get Help'
+        confirmLabel='Submit'
         onCloseComplete={() => {
           setShowForm(false)
         }}
@@ -97,6 +102,7 @@ export default function HelpForm() {
           placeholder='Help with something'
           width='100%'
           marginBottom={minorScale(4)}
+          test-id='help-subject-field'
         />
         <Label
           display='block'
@@ -109,6 +115,7 @@ export default function HelpForm() {
           onChange={(e) => setBodyField(e.target.value)}
           value={bodyField}
           placeholder='Description...'
+          test-id='help-body-field'
         />
       </Dialog>
     </>
