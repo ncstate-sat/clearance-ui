@@ -40,6 +40,24 @@ const api = createApi({
         return response?.data?.detail
       },
     }),
+    getDoors: builder.query({
+      query: ({ search }) => ({
+        url: '/doors',
+        method: 'GET',
+        params: {
+          search: search,
+        },
+      }),
+      transformResponse: (response) => {
+        return {
+          personnel: response['doors'],
+          length: response['doors'].length,
+        }
+      },
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
     getBulkPersonnel: builder.mutation({
       query: ({ values }) => ({
         url: '/personnel/bulk',

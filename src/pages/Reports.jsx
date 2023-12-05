@@ -19,6 +19,7 @@ import styled from 'styled-components'
 import clearanceService from '../apis/clearanceService'
 import ContentCard from '../components/ContentCard'
 import PeoplePicker from '../components/PeoplePicker'
+import DoorPicker from '../components/DoorPicker'
 import Timeframe from '../components/Timeframe'
 import Pagination from '../components/Pagination'
 import openInNewTab from '../utils/openInNewTab'
@@ -284,6 +285,7 @@ const DoorTable = () => {
   const [doorPage, setDoorPage] = useState(0)
   const [doorCount, setDoorCount] = useState()
   const [selectedClearanceId, setSelectedClearanceId] = useState()
+  const [selectedDoors, setSelectedDoors] = useState([])
   const [notAvailable, setNotAvailable] = useState(false)
 
   const { data, error, isError, isLoading } =
@@ -318,6 +320,11 @@ const DoorTable = () => {
 
   return (
     <>
+      <DoorPicker
+        header='Filter by Door'
+        selectedDoors={selectedDoors}
+        setSelectedDoors={setSelectedDoors}
+      />
       <Table marginTop='2rem'>
         <Table.Head>
           <Table.TextHeaderCell>Door Name</Table.TextHeaderCell>
