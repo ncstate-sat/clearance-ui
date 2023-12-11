@@ -49,21 +49,30 @@ export default function HelpForm() {
     }
   }, [showForm])
 
-  const sendTicketHandler = async () => {
-    try {
-      const response = await postHelpTicket({
-        subject: subjectField,
-        body: bodyField,
-      }).unwrap()
-
-      toaster.success(
-        response?.['message'] || 'A help ticket has been submitted.'
-      )
-    } catch (error) {
-      toaster.danger(error || 'There was an error submitting a help ticket.')
+  const sendTicketHandler = () => {
+    if (subjectField.length === 0) {
+      toaster.danger('A subject is required.')
+      return
+    } else if (bodyField.length === 0) {
+      toaster.danger('A body is required.')
+      return
     }
 
-    setShowForm(false)
+    postHelpTicket({
+      subject: subjectField,
+      body: bodyField,
+    })
+      .unwrap()
+      .then((response) => {
+        toaster.success(
+          response?.['message'] || 'A help ticket has been submitted.'
+        )
+        setShowForm(false)
+      })
+      .catch((error) => {
+        toaster.danger(error || 'There was an error submitting a help ticket.')
+        setShowForm(false)
+      })
   }
 
   return (
