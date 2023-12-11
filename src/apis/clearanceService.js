@@ -41,17 +41,18 @@ const api = createApi({
       },
     }),
     getDoors: builder.query({
-      query: ({ search }) => ({
-        url: '/doors',
+      query: ({ query, doorsOnly }) => ({
+        url: '/reports/search-items',
         method: 'GET',
         params: {
-          search: search,
+          search: query,
+          doors_only: doorsOnly,
         },
       }),
       transformResponse: (response) => {
         return {
-          personnel: response['doors'],
-          length: response['doors'].length,
+          doors: response,
+          length: response.length,
         }
       },
       transformErrorResponse: (response) => {
@@ -171,6 +172,7 @@ const api = createApi({
         doors_page,
         clearances_limit,
         clearances_skip,
+        door_ids,
       }) => ({
         url: `/reports/clearances/doors`,
         method: 'GET',
@@ -180,6 +182,7 @@ const api = createApi({
           doors_page,
           clearances_limit,
           clearances_skip,
+          door_ids,
         },
       }),
       transformErrorResponse: (response) => {

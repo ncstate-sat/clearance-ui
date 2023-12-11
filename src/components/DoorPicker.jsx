@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
-import { Tooltip, IconButton, CrossIcon } from 'evergreen-ui'
-import ContentCard from './ContentCard'
+import { Pane, Card, Heading, Button, Spinner, minorScale } from 'evergreen-ui'
 import useDoor from '../hooks/useDoor'
 import TagInput, { createTagOption } from './TagInput'
 
@@ -18,20 +17,34 @@ export default function ({ selectedDoors, setSelectedDoors, header, onClose }) {
   )
 
   return (
-    <ContentCard header={header || 'Select Door'} isLoading={isLoadingDoors}>
-      {onClose && (
-        <Tooltip content='Remove'>
-          <IconButton
-            onClick={onClose}
-            icon={<CrossIcon size={20} />}
-            border='none'
-            position='absolute'
-            top={0}
-            right={0}
-            test-id='remove-filter-btn'
-          />
-        </Tooltip>
+    <Card
+      position='relative'
+      padding={minorScale(6)}
+      backgroundColor='white'
+      marginY={minorScale(6)}
+      elevation={0}
+      border='muted'
+    >
+      {isLoadingDoors && (
+        <Spinner size={16} position='absolute' top='4px' right='4px' />
       )}
+      <Pane display='flex' flexDirection='row' justifyContent='space-between'>
+        <Heading size={600} marginBottom={minorScale(3)}>
+          {header}
+        </Heading>
+        <Button
+          onClick={() => {
+            if (Array.isArray(selectedDoors)) {
+              setSelectedDoors([])
+            } else {
+              setSelectedDoors()
+            }
+            setDoorQuery('')
+          }}
+        >
+          Clear
+        </Button>
+      </Pane>
       <TagInput
         inputValue={doorQuery}
         onInputChange={setDoorQuery}
@@ -40,6 +53,6 @@ export default function ({ selectedDoors, setSelectedDoors, header, onClose }) {
         suggestions={autocompleteDoors}
         width='100%'
       />
-    </ContentCard>
+    </Card>
   )
 }

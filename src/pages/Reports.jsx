@@ -295,6 +295,10 @@ const DoorTable = () => {
       clearance_id: selectedClearanceId,
       doors_page: selectedClearanceId ? doorPage + 1 : undefined,
       doors_page_size: selectedClearanceId ? DOOR_LIMIT : undefined,
+      door_ids:
+        selectedDoors.length > 0
+          ? selectedDoors.map((d) => d['raw']['item_id'])
+          : undefined,
     })
 
   useEffect(() => {
