@@ -207,6 +207,44 @@ export class ReportsPage {
     )
   }
 
+  async routeFilteredDoorClearancesRequest() {
+    await this.page.route(
+      /\/reports\/clearances\/doors\?clearances_limit=\d+&clearances_skip=\d+&door_ids=5000/,
+      async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            total_clearances: 4,
+            clearances: {
+              ClearanceB: {
+                clearance_id: 10354,
+                door_count: 3,
+                doors: [
+                  {
+                    name: 'TSU - 1100 South Corridor 1150',
+                    is_elevator: false,
+                    schedule_name: 'Always',
+                  },
+                  {
+                    name: 'TSU - 4221 Copy and Supply Room',
+                    is_elevator: false,
+                    schedule_name: 'Always',
+                  },
+                  {
+                    name: 'TSU - Elevator Car Two (2)',
+                    is_elevator: true,
+                    schedule_name: 'TSU- 6a-1a Access',
+                  },
+                ],
+              },
+            },
+          }),
+        })
+      }
+    )
+  }
+
   async routeDoorClearancesRequestError() {
     await this.page.route(
       /\/reports\/clearances\/doors\?clearances_limit=\d+&clearances_skip=\d+/,
@@ -275,6 +313,12 @@ export class ReportsPage {
   async unrouteDoorClearancesRequest() {
     await this.page.unroute(
       /\/reports\/clearances\/doors\?clearances_limit=\d+&clearances_skip=\d+/
+    )
+  }
+
+  async unrouteFilteredDoorClearancesRequest() {
+    await this.page.unroute(
+      /\/reports\/clearances\/doors\?clearances_limit=\d+&clearances_skip=\d+&door_ids=5000/
     )
   }
 
