@@ -189,6 +189,18 @@ export class ManageClearancesPage {
     )
   }
 
+  async routeHelpRequest() {
+    await this.page.route(/\/help\/create-ticket$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          message: 'A new help ticket has been created.',
+        }),
+      })
+    })
+  }
+
   async unroutePersonnelRequest() {
     await this.page.unroute(/\/personnel\?search=fakep/)
   }
@@ -214,7 +226,11 @@ export class ManageClearancesPage {
   }
 
   async unrouteAckRequest() {
-    await this.page.route(/\/liaison\/needs-acknowledgement$/)
+    await this.page.unroute(/\/liaison\/needs-acknowledgement$/)
+  }
+
+  async unrouteHelpRequest() {
+    await this.page.unroute(/\/help\/create-ticket$/)
   }
 
   /**
