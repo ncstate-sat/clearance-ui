@@ -25,7 +25,7 @@ const useDoor = (initialQuery = '') => {
 
       const timeout = setTimeout(async () => {
         setIsTyping(false)
-        request = getDoors({ query })
+        request = getDoors({ query, doorsOnly: false })
         request
           .unwrap()
           .then((payload) => setResultLength(payload.length))

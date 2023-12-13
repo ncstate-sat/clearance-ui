@@ -173,6 +173,7 @@ const api = createApi({
         clearances_limit,
         clearances_skip,
         door_ids,
+        elevator_ids,
       }) => ({
         url: `/reports/clearances/doors`,
         method: 'GET',
@@ -183,6 +184,7 @@ const api = createApi({
           clearances_limit,
           clearances_skip,
           door_ids,
+          elevator_ids,
         },
       }),
       transformErrorResponse: (response) => {

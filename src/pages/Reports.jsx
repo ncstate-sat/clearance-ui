@@ -297,7 +297,15 @@ const DoorTable = () => {
       doors_page_size: selectedClearanceId ? DOOR_LIMIT : undefined,
       door_ids:
         selectedDoors.length > 0
-          ? selectedDoors.map((d) => d['raw']['item_id'])
+          ? selectedDoors
+              .filter((d) => d['raw']['item_type'] === 'Door')
+              .map((d) => d['raw']['item_id'])
+          : undefined,
+      elevator_ids:
+        selectedDoors.length > 0
+          ? selectedDoors
+              .filter((d) => d['raw']['item_type'] === 'Elevator')
+              .map((d) => d['raw']['item_id'])
           : undefined,
     })
 
