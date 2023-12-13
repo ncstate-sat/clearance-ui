@@ -19,6 +19,7 @@ const PersistentButton = styled(Button)`
   color: white;
   background-color: #cc0000;
   border-radius: 2.5rem;
+  border: 0;
   position: fixed;
   right: 3rem;
   bottom: 3rem;
