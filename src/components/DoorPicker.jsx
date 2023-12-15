@@ -3,7 +3,7 @@ import { Pane, Card, Heading, Button, Spinner, minorScale } from 'evergreen-ui'
 import useDoor from '../hooks/useDoor'
 import TagInput, { createTagOption } from './TagInput'
 
-export default function ({ selectedDoors, setSelectedDoors, header, onClose }) {
+export default function ({ selectedDoors, setSelectedDoors, header }) {
   const {
     doors,
     doorQuery,
