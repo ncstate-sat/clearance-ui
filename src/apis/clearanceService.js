@@ -40,6 +40,25 @@ const api = createApi({
         return response?.data?.detail
       },
     }),
+    getDoors: builder.query({
+      query: ({ query, doorsOnly }) => ({
+        url: '/reports/search-items',
+        method: 'GET',
+        params: {
+          search: query,
+          doors_only: doorsOnly,
+        },
+      }),
+      transformResponse: (response) => {
+        return {
+          doors: response,
+          length: response.length,
+        }
+      },
+      transformErrorResponse: (response) => {
+        return response?.data?.detail
+      },
+    }),
     getBulkPersonnel: builder.mutation({
       query: ({ values }) => ({
         url: '/personnel/bulk',
@@ -153,6 +172,8 @@ const api = createApi({
         doors_page,
         clearances_limit,
         clearances_skip,
+        door_ids,
+        elevator_ids,
       }) => ({
         url: `/reports/clearances/doors`,
         method: 'GET',
@@ -162,6 +183,8 @@ const api = createApi({
           doors_page,
           clearances_limit,
           clearances_skip,
+          door_ids,
+          elevator_ids,
         },
       }),
       transformErrorResponse: (response) => {

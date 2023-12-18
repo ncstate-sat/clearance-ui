@@ -1,15 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { ReportsPage } from '../../pages/ReportsPage'
 
-test('access the `reports` page as an admin', async ({ page }) => {
-    const reportsPage = new ReportsPage(page)
-    await reportsPage.goto()
-    
-    await reportsPage.routeDoorClearancesRequest()
+test('access the door report page', async ({ page }) => {
+  const reportsPage = new ReportsPage(page)
+  await reportsPage.goto()
 
-    await reportsPage.doorClearancesButton.click()
+  await reportsPage.routeDoorClearancesRequest()
 
-    await expect(reportsPage.mockedClearanceEntry).toBeVisible()
-    
-    await reportsPage.unrouteDoorClearancesRequest()
+  await reportsPage.doorClearancesButton.click()
+
+  await expect(reportsPage.mockedClearanceEntry).toBeVisible()
+
+  // await reportsPage.unrouteDoorClearancesRequest()
 })
