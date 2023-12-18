@@ -21,7 +21,6 @@ import clearanceService from '../apis/clearanceService'
 import PeoplePicker from '../components/PeoplePicker'
 import ClearancePicker from '../components/ClearancePicker'
 import openInNewTab from '../utils/openInNewTab'
-import usePersonnel from '../hooks/usePersonnel'
 
 export default function LiaisonPermissions() {
   const token = useSelector((state) => state.auth.token)
@@ -362,6 +361,11 @@ export default function LiaisonPermissions() {
       <ClearancePicker
         selectedClearances={selectedClearances}
         setSelectedClearances={setSelectedClearances}
+        omittedSuggestions={clearanceAssignments
+          .filter((cl) => {
+            return cl['name'].toLowerCase().includes(tableFilter.toLowerCase())
+          })
+          .map((cl) => cl['name'])}
       />
 
       <Button
