@@ -25,7 +25,7 @@ spec:
       containers:
         - name: clearance-frontend
           image: satregistry.ehps.ncsu.edu/clearance-tool/clearance-ui:main
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
           - name: VITE_GOOGLE_IDENTITY_CLIENT_ID
             value: "4944492663-6msau4peegvm3oqa9pbgsmncorfkj5sa.apps.googleusercontent.com"
