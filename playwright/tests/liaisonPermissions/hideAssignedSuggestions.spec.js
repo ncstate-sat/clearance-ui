@@ -20,7 +20,7 @@ test('hide permissions from the clearance picker that have already been assigned
   // Search in the clearance picker for that clearance, ensuring one of those clearances is in the response\
   await liaisonPermissionsPage.searchForClearance('Clearance')
 
-  const cCount = await await page.$$eval('body', (elements) =>
+  const cCount = await page.$$eval('body', (elements) =>
     elements.reduce((count, element) => {
       const textContent = element.textContent || ''
       return count + (textContent.includes('ClearanceC') ? 1 : 0)
