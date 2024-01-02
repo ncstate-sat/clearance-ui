@@ -8,6 +8,7 @@ import NoResultsText from './NoResultsText'
 export default function ({
   selectedClearances,
   setSelectedClearances,
+  omittedSuggestions = [],
   onClose,
 }) {
   const {
@@ -21,8 +22,11 @@ export default function ({
 
   // Suggestion strings for clearances.
   const autocompleteClearances = useMemo(
-    () => clearances.map((c) => createTagOption(c['name'], c)),
-    [clearances]
+    () =>
+      clearances
+        .filter((c) => !omittedSuggestions.includes(c['name']))
+        .map((c) => createTagOption(c['name'], c)),
+    [clearances, omittedSuggestions]
   )
 
   return (

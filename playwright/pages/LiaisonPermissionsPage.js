@@ -9,7 +9,10 @@ export class LiaisonPermissionsPage {
       name: 'Liaison Permissions',
     })
     this.liaisonInput = this.page.getByRole('textbox').first()
-    this.clearanceInput = this.page.locator('[test-id="clearance-input"] input')
+    this.clearanceInput = this.page
+      .locator('div')
+      .filter({ hasText: /^Select ClearanceNo Clearances Found$/ })
+      .getByRole('textbox')
     this.givePermissionButton = this.page.getByTestId(
       'test-id=assign-permission-btn'
     )
@@ -48,26 +51,6 @@ export class LiaisonPermissionsPage {
     })
   }
 
-    async routePersonnelRequest() {
-        await this.page.route(/\/personnel\?search=copyfakep/, async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    personnel: [
-                        {
-                            first_name: 'Copy',
-                            middle_name: '',
-                            last_name: 'Fake',
-                            email: 'cake@test.edu',
-                            campus_id: '000000001',
-                        },
-                    ],
-                }),
-            })
-        })
-    }
-
   async routePersonnelRequestWithMissingDetails() {
     await this.page.route(/\/personnel\?search=Missing/, async (route) => {
       await route.fulfill({
@@ -88,6 +71,23 @@ export class LiaisonPermissionsPage {
     })
   }
 
+  async routeLiaisonRequest() {
+    await this.page.route(/\/liaison\?campus_id=000000000/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          clearances: [
+            {
+              id: 10355,
+              name: 'ClearanceC',
+            },
+          ],
+        }),
+      })
+    })
+  }
+
   async routeClearanceSearchRequest() {
     await this.page.route(/\/clearances\?search=testc/, async (route) => {
       await route.fulfill({
@@ -98,6 +98,31 @@ export class LiaisonPermissionsPage {
             {
               id: 2239,
               name: 'testclearance',
+            },
+          ],
+        }),
+      })
+    })
+  }
+
+  async routeClearanceSearchRequestMultiple() {
+    await this.page.route(/\/clearances\?search=Clearance/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          clearance_names: [
+            {
+              id: 10353,
+              name: 'ClearanceAAA',
+            },
+            {
+              id: 10354,
+              name: 'ClearanceB',
+            },
+            {
+              id: 10355,
+              name: 'ClearanceC',
             },
           ],
         }),
@@ -166,6 +191,10 @@ export class LiaisonPermissionsPage {
     await this.page.unroute(/\/personnel\?search=Missing/)
   }
 
+  async unrouteLiaisonRequest() {
+    await this.page.unroute(/\/liaison\?campus_id=000000000/)
+  }
+
   async unrouteClearanceSearchRequest() {
     await this.page.unroute(/\/clearances\?search=testc/)
   }
@@ -186,19 +215,19 @@ export class LiaisonPermissionsPage {
     await this.page.unroute(/\/assignments\/revoke$/)
   }
 
-    /**
-     * @param {string} text
-     */
-    async searchForLiaison(text) {
-        await this.liaisonInput.fill(text)
-    }
+  /**
+   * @param {string} text
+   */
+  async searchForLiaison(text) {
+    await this.liaisonInput.fill(text)
+  }
 
-    /**
-     * @param {string} text
-     */
-        async searchForCopyLiaison(text) {
-            await this.liaisonInput.fill(text)
-        }
+  /**
+   * @param {string} text
+   */
+  async searchForCopyLiaison(text) {
+    await this.liaisonInput.fill(text)
+  }
 
   /**
    * @param {string} text
