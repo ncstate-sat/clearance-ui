@@ -7,8 +7,10 @@ import {
   Text,
   Spinner,
   Pane,
+  Tooltip,
   toaster,
   majorScale,
+  Position,
 } from 'evergreen-ui'
 import { useMemo, useState, useEffect, Fragment } from 'react'
 import clearanceService from '../apis/clearanceService'
@@ -111,7 +113,7 @@ export default function ManageClearance() {
 
   // Fetch clearance assignments for the selected person.
   useEffect(() => {
-    if (selectedPersonnel.length > 0) {
+    if (selectedPersonnel.length === 1) {
       const campusId = selectedPersonnel[0]['campus_id']
 
       const request = getAssignments({ campusId: campusId })
@@ -159,7 +161,10 @@ export default function ManageClearance() {
       .then(() => {
         setClearanceAssignments((prev) => {
           const oldValues = JSON.parse(JSON.stringify(prev))
-          const newValues = JSON.parse(JSON.stringify(selectedClearances))
+          const newValues = selectedClearances.map((cl) => ({
+            ...cl,
+            can_revoke: true,
+          }))
 
           const clearanceIDs = {}
           const newClearances = []
@@ -192,10 +197,6 @@ export default function ManageClearance() {
               `${p['first_name']} ${p['last_name']} (${p['email']}) [${p['campus_id']}]`
           )}
           onChange={(selected) => {
-            if (selected.length > 1) {
-              selected = [selected[selected.length - 1]]
-            }
-
             const personnelObjects = []
             const allPersonnel = [...personnel, ...selectedPersonnel]
             const personnelStrings = allPersonnel.map(
@@ -292,7 +293,14 @@ export default function ManageClearance() {
               </Table.TextHeaderCell>
             </Table.Head>
             <Table.Body>
-              {isFetchingAssignments ? (
+              {selectedPersonnel.length > 1 ? (
+                <Pane className='center' padding={minorScale(6)}>
+                  <Text>
+                    Clearances cannot be shown when more than one person is
+                    selected.
+                  </Text>
+                </Pane>
+              ) : isFetchingAssignments ? (
                 <Pane className='center' padding={minorScale(6)}>
                   <Spinner size={majorScale(4)} marginX='auto' />
                 </Pane>
@@ -307,20 +315,32 @@ export default function ManageClearance() {
                       .toLowerCase()
                       .includes(tableFilter.toLowerCase())
                   })
+                  .sort((a, b) => (a['name'] > b['name'] ? 1 : -1))
                   .map((cl) => (
                     <Table.Row key={cl['id']}>
                       <Table.TextCell flexBasis='65%'>
                         {cl['name']}
                       </Table.TextCell>
                       <Table.TextCell flexShrink={0} textAlign='right'>
-                        <Button
-                          test-id='revoke-clearance-btn'
-                          appearance='secondary'
-                          onClick={() => onRevokeClearance(cl['id'])}
-                          isLoading={loadingRevokeRequests.includes(cl['id'])}
+                        <Tooltip
+                          isShown={cl['can_revoke'] ? false : undefined}
+                          content='You do not have permission to revoke this clearance.'
+                          position={Position.RIGHT}
                         >
-                          Revoke
-                        </Button>
+                          <div>
+                            <Button
+                              test-id='revoke-clearance-btn'
+                              appearance='secondary'
+                              disabled={!cl['can_revoke']}
+                              onClick={() => onRevokeClearance(cl['id'])}
+                              isLoading={loadingRevokeRequests.includes(
+                                cl['id']
+                              )}
+                            >
+                              Revoke
+                            </Button>
+                          </div>
+                        </Tooltip>
                       </Table.TextCell>
                     </Table.Row>
                   ))

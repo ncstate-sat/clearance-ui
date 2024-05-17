@@ -14,6 +14,7 @@ import {
   Spinner,
   majorScale,
   minorScale,
+  toaster,
 } from 'evergreen-ui'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import clearanceService from '../apis/clearanceService'
@@ -22,6 +23,8 @@ import ContentCard from '../components/ContentCard'
 import Timeframe from '../components/Timeframe'
 import useClearance from '../hooks/useClearance'
 import usePersonnel from '../hooks/usePersonnel'
+
+const QUERY_LIMIT = 50
 
 // FILTER CONSTANTS
 const { BY_ASSIGNEE, BY_ASSIGNER, BY_CLEARANCE_NAME, BY_TIMEFRAME } =
@@ -60,6 +63,7 @@ export default function AuditLog() {
   const [filters, setFilters] = useState(emptyFilters)
   const [log, setLog] = useState([])
   const [page, setPage] = useState(0)
+  const [showLoadMoreButton, setShowLoadMoreButton] = useState(true)
 
   const toggleFilter = useCallback(
     (type, value) => {
@@ -136,8 +140,8 @@ export default function AuditLog() {
     const timeframe = flts[BY_TIMEFRAME].value
 
     const queryParams = {
-      page: pg,
-      limit: 50,
+      skip: pg * QUERY_LIMIT,
+      limit: QUERY_LIMIT + 1,
       clearance_name: selCls?.[0],
       from_time: timeframe?.startDateTime?.toISOString(),
       to_time: timeframe?.endDateTime?.toISOString(),
@@ -150,10 +154,16 @@ export default function AuditLog() {
 
   useEffect(() => {
     if (isSuccess) {
+      let newLogs = [...logData['assignments']]
+      if (newLogs.length < QUERY_LIMIT + 1) {
+        setShowLoadMoreButton(false)
+      } else if (newLogs.length === QUERY_LIMIT + 1) {
+        newLogs.pop()
+      }
       setLog((prev) => {
-        let newData = [...logData['assignments']]
+        let newData = [...newLogs]
         if (page > 0) {
-          newData = [...prev, ...logData['assignments']]
+          newData = [...prev, ...newLogs]
         }
         newData.sort(
           (a, b) => new Date(b['timestamp']) - new Date(a['timestamp'])
@@ -170,6 +180,7 @@ export default function AuditLog() {
 
   useEffect(() => {
     setPage(0)
+    setShowLoadMoreButton(true)
     queryLogs(filters, 0, selectedPersonnel, selectedClearances)
   }, [filters])
 
@@ -387,12 +398,14 @@ export default function AuditLog() {
         </Table.Body>
       </Table>
 
-      <Button
-        onClick={() => setPage((p) => p + 1)}
-        disabled={log.length === 0 || isFetching}
-      >
-        Load More
-      </Button>
+      {showLoadMoreButton && (
+        <Button
+          onClick={() => setPage((p) => p + 1)}
+          disabled={log.length === 0 || isFetching}
+        >
+          Load More
+        </Button>
+      )}
     </>
   )
 }

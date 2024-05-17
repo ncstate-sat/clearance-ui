@@ -57,6 +57,7 @@ const BodyContainer = styled(Pane)`
   margin-left: ${({ $isHidden, $isSidebarOpen }) =>
     $isHidden ? '0' : $isSidebarOpen ? '36px' : '8px'};
   margin-right: ${({ $isHidden }) => ($isHidden ? '0' : '8px')};
+  margin-bottom: ${({ $isHidden }) => ($isHidden ? '0' : '100px')};
 `
 
 export default function Layout({ sidebarContent, hideApp, children }) {
